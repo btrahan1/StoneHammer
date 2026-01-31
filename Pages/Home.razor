@@ -1,9 +1,10 @@
 ﻿@page "/"
 @using StoneHammer.Components
 @using StoneHammer.Systems
+@implements IDisposable
 @inject AssetManager AssetManager
-
 @inject CityBridge CityBridge
+@inject IJSRuntime JSRuntime
 
 <PageTitle>StoneHammer</PageTitle>
 
@@ -22,11 +23,30 @@
 <SceneView />
 
 @code {
+    private DotNetObjectReference<Home>? _objRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _objRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("stoneHammer.setDotNetHelper", _objRef);
+        }
+    }
+
+    [JSInvokable]
+    public async Task HandleEnterBuilding(string buildingName) => await AssetManager.EnterBuilding(buildingName);
+
+    [JSInvokable]
+    public async Task HandleExitBuilding(float x, float z) => await AssetManager.ExitBuilding(x, z);
+
     private async Task SpawnAsPlayer() => await AssetManager.SpawnPlayer();
     private async Task SpawnBartender() => await AssetManager.SpawnBartender(5, 5);
     private async Task SpawnStore() => await AssetManager.SpawnStore(0, 0);
     private async Task GenerateTown() => await AssetManager.GenerateTown();
     private async Task ClearScene() => await AssetManager.ClearAll();
+
+    public void Dispose() => _objRef?.Dispose();
 }
 
 <style>

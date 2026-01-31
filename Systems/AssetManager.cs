@@ -33,10 +33,24 @@ namespace StoneHammer.Systems
         public async Task SpawnBlackjackTable() => await SpawnAsset("assets/table.json", "Blackjack Table", false);
 
         public async Task SpawnTavern(float x = 0, float z = 0) => await SpawnAsset("assets/tavern.json", "Tavern", false, new { Position = new[] { x, 0, z } });
-        public async Task SpawnGuild(float x = 0, float z = 0) => await SpawnAsset("assets/guild.json", "Guild", false, new { Position = new[] { x, 0, z } });
+        public async Task SpawnGuild(float x = 0, float z = 0) => await SpawnAsset("assets/guild.json", "Guild", false, new { Position = new[] { x, 0, z }, isTrigger = true, triggerRadius = 5.0f });
         public async Task SpawnStore(float x = 0, float z = 0) => await SpawnAsset("assets/general_store.json", "General Store", false, new { Position = new[] { x, 0, z } });
 
-        public async Task GenerateTown()
+        public async Task EnterBuilding(string buildingName)
+        {
+            if (buildingName.Contains("Guild"))
+            {
+                await SpawnAsset("assets/guild_interior.json", "Guild Interior");
+                await SpawnPlayer(0, 0); // Spawn at interior origin
+            }
+        }
+
+        public async Task ExitBuilding(float x, float z)
+        {
+            await GenerateTown(x, z);
+        }
+
+        public async Task GenerateTown(float x = 0, float z = 0)
         {
             await _bridge.ClearAll();
 
@@ -56,8 +70,8 @@ namespace StoneHammer.Systems
             }
 
             // 3. NPCs, Player & Decor
-            await SpawnPlayer(0, 0);
-            await SpawnBartender(0, 30);
+            await SpawnPlayer(x, z);
+            await SpawnBartender(x + 5, z + 5);
             await SpawnAsset("assets/table.json", "Street Table 1", false, new { Position = new[] { 5, 0, 5 } });
             await SpawnAsset("assets/table.json", "Street Table 2", false, new { Position = new[] { -5, 0, 5 } });
         }

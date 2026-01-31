@@ -7,6 +7,14 @@ window.stoneHammer = {
     playerSpeed: 0.25,
     playerRotationSpeed: 0.05,
     walkTime: 0,
+    buildingTriggers: [],
+    currentBuilding: null,
+    dotNetHelper: null,
+
+    setDotNetHelper: function (helper) {
+        this.dotNetHelper = helper;
+        this.log("JS Interop Helper Registered", "lime");
+    },
 
     getProp: function (obj, key) {
         if (!obj) return null;
@@ -26,60 +34,70 @@ window.stoneHammer = {
 
     init: function (canvasId) {
         try {
-            this.log("Engine Init v3.1 (Hammer Orientation)", "cyan");
+            this.log("Engine Init v6.2 (True Stone Reconstruction)", "cyan");
             this.canvas = document.getElementById(canvasId);
             this.engine = new BABYLON.Engine(this.canvas, true);
             this.scene = new BABYLON.Scene(this.engine);
 
-            this.scene.clearColor = new BABYLON.Color4(0.08, 0.08, 0.12, 1);
+            // Register Escape for exit
+            window.addEventListener("keydown", (e) => {
+                if (e.key === "Escape" && this.currentBuilding) {
+                    this.exitBuilding();
+                }
+            });
 
-            // High-Fidelity Camera & Lighting
-            this.camera = new BABYLON.ArcRotateCamera("camera1", -Math.PI / 2, Math.PI / 3, 15, BABYLON.Vector3.Zero(), this.scene);
+            this.scene.clearColor = new BABYLON.Color4(0.1, 0.1, 0.15, 1);
+
+            // Stable Camera
+            this.camera = new BABYLON.ArcRotateCamera("camera1", -Math.PI / 2, Math.PI / 3, 20, BABYLON.Vector3.Zero(), this.scene);
             this.camera.attachControl(this.canvas, true);
             this.camera.upperRadiusLimit = 1000;
-            this.camera.lowerRadiusLimit = 4;
+            this.camera.lowerRadiusLimit = 2;
             this.camera.wheelPrecision = 50;
-            // Removed targetScreenOffset - using camTarget node instead
+            this.camera.minZ = 0.1;
 
+            // Stable Lighting rig
             var hemi = new BABYLON.HemisphericLight("hemi", new BABYLON.Vector3(0, 1, 0), this.scene);
-            hemi.intensity = 0.8;
+            hemi.intensity = 1.0;
             hemi.groundColor = new BABYLON.Color3(0.1, 0.1, 0.2);
 
             var dir = new BABYLON.DirectionalLight("dir", new BABYLON.Vector3(-1, -2, -1), this.scene);
             dir.position = new BABYLON.Vector3(50, 100, 50);
-            dir.intensity = 1.6;
+            dir.intensity = 1.2;
 
-            // High-Fidelity Stone Plaza Floor (v1.9)
+            // v6.2 True Stone Floor (Robust Grid + Procedural Fallback)
             var ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 1000, height: 1000 }, this.scene);
 
-            // Check for GridMaterial (Library) or BrickProcedural (Built-in)
-            const Grid = BABYLON.GridMaterial || (BABYLON.Materials && BABYLON.Materials.GridMaterial);
+            // Try everything to find the GridMaterial
+            const Grid = BABYLON.GridMaterial || (BABYLON.Materials && BABYLON.Materials.GridMaterial) || window.GridMaterial;
 
             if (Grid) {
                 var stoneGrid = new Grid("groundGrid", this.scene);
-                stoneGrid.mainColor = new BABYLON.Color3(0.15, 0.15, 0.18);
-                stoneGrid.lineColor = new BABYLON.Color3(0.3, 0.3, 0.35);
-                stoneGrid.gridRatio = 2.5;
-                stoneGrid.majorUnitFrequency = 5;
-                stoneGrid.opacity = 0.98;
+                stoneGrid.mainColor = new BABYLON.Color3(0.05, 0.05, 0.08);
+                stoneGrid.lineColor = new BABYLON.Color3(0.2, 0.2, 0.25);
+                stoneGrid.gridRatio = 4; // Classic ratio
+                stoneGrid.majorUnitFrequency = 10;
+                stoneGrid.opacity = 0.99;
                 ground.material = stoneGrid;
-                this.log("Grid Material Loaded", "lime");
+                this.log("Stone Grid Material Active", "lime");
             } else {
-                // Fallback to Procedural Brick (Stone Plaza look)
+                // High-Quality Procedural Stone Fallback (v6.2 Fix)
                 var groundMat = new BABYLON.StandardMaterial("groundMat", this.scene);
-                if (BABYLON.BrickProceduralTexture) {
-                    var stoneTex = new BABYLON.BrickProceduralTexture("stoneTex", 512, this.scene);
+                const BrickTex = BABYLON.BrickProceduralTexture || (BABYLON.ProceduralTexturesLibrary && BABYLON.ProceduralTexturesLibrary.BrickProceduralTexture);
+
+                if (BrickTex) {
+                    var stoneTex = new BrickTex("stoneTex", 512, this.scene);
                     stoneTex.numberOfBricksHeight = 20;
                     stoneTex.numberOfBricksWidth = 20;
                     stoneTex.jointColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-                    stoneTex.brickColor = new BABYLON.Color3(0.15, 0.15, 0.18);
-                    stoneTex.uScale = 50;
-                    stoneTex.vScale = 50;
+                    stoneTex.brickColor = new BABYLON.Color3(0.15, 0.15, 0.2);
+                    stoneTex.uScale = 40;
+                    stoneTex.vScale = 40;
                     groundMat.diffuseTexture = stoneTex;
-                    this.log("Procedural Brick Fallback Active", "lime");
+                    this.log("Procedural Stone Active (Backup)", "lime");
                 } else {
                     groundMat.diffuseColor = new BABYLON.Color3(0.15, 0.15, 0.18);
-                    this.log("All High-Fidelity Materials MISSING", "orange");
+                    this.log("CRITICAL: All Stone Textures Missing", "orange");
                 }
                 ground.material = groundMat;
             }
@@ -90,7 +108,7 @@ window.stoneHammer = {
             this.engine.runRenderLoop(() => { this.scene.render(); this.updateAnimations(); });
             window.addEventListener("resize", () => { this.engine.resize(); });
 
-            this.log("StoneHammer v3.1 Online", "lime");
+            this.log("StoneHammer v6.2 Online", "lime");
         } catch (err) {
             this.log("CRITICAL ERR: " + err.message, "red");
         }
@@ -242,6 +260,15 @@ window.stoneHammer = {
             this.log("Player character registered and camera locked to torso", "cyan");
         }
 
+        if (transform && transform.isTrigger) {
+            this.buildingTriggers.push({
+                name: name,
+                pos: pos,
+                radius: transform.triggerRadius || 3
+            });
+            this.log("Registered Building Trigger: " + name, "orange");
+        }
+
         this.log("Spawned Voxel Actor: " + name, "lime");
     },
 
@@ -274,6 +301,16 @@ window.stoneHammer = {
 
         const pos = this.parseVec3(this.getProp(transform, "Position"));
         group.position = pos;
+
+        if (transform && transform.isTrigger) {
+            this.buildingTriggers.push({
+                name: name,
+                pos: pos,
+                radius: transform.triggerRadius || 3
+            });
+            this.log("Registered Building Trigger: " + name, "orange");
+        }
+
         this.log("Spawned Procedural Landmark: " + name, "lime");
     },
 
@@ -332,6 +369,50 @@ window.stoneHammer = {
                 node.rotation.x = -armSwing;
             }
         });
+
+        // Check Building Triggers
+        if (!this.currentBuilding) {
+            this.buildingTriggers.forEach(t => {
+                const dist = BABYLON.Vector3.Distance(this.player.position, t.pos);
+                if (dist < t.radius) {
+                    this.enterBuilding(t.name);
+                }
+            });
+        }
+    },
+
+    enterBuilding: function (buildingName) {
+        this.log("Entering: " + buildingName, "cyan");
+        this.currentBuilding = buildingName;
+
+        // Save player position before clear
+        this.lastTownPosition = this.player.position.clone();
+        this.lastTownPosition.z += 2; // Offset slightly for return
+
+        this.clearAll();
+
+        // Standard interior brightness boost
+        const hemi = this.scene.getLightByName("hemi");
+        if (hemi) hemi.intensity = 1.3;
+
+        // Callback to C# to load interior
+        if (this.dotNetHelper) {
+            this.dotNetHelper.invokeMethodAsync('HandleEnterBuilding', buildingName);
+        }
+
+        this.log("Press 'Esc' to exit the building.", "yellow");
+    },
+
+    exitBuilding: function () {
+        if (!this.currentBuilding) return;
+        this.log("Exiting to Town...", "cyan");
+        this.currentBuilding = null;
+        this.clearAll();
+
+        // Callback to C# to reload town
+        if (this.dotNetHelper) {
+            this.dotNetHelper.invokeMethodAsync('HandleExitBuilding', this.lastTownPosition.x, this.lastTownPosition.z);
+        }
     },
 
     clearAll: function () {
@@ -339,6 +420,8 @@ window.stoneHammer = {
             if (m.name !== "ground") m.dispose();
         });
         this.scene.transformNodes.forEach(t => t.dispose());
+        this.player = null; // Important: Clear player reference
+        this.buildingTriggers = []; // Reset triggers for the new scene
         this.log("Scene Cleared", "orange");
     }
 };

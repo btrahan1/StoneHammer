@@ -1,0 +1,166 @@
+{
+    "Name": "Ironblood Guildhall Cathedral",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "interior_floor",
+            "Shape": "Box",
+            "Position": [
+                0,
+                -0.05,
+                0
+            ],
+            "Scale": [
+                100,
+                0.1,
+                150
+            ],
+            "ColorHex": "#1E293B",
+            "Material": "Metal"
+        },
+        {
+            "Id": "wall_back",
+            "Shape": "Box",
+            "Position": [
+                0,
+                50,
+                -75
+            ],
+            "Scale": [
+                100,
+                100,
+                1
+            ],
+            "ColorHex": "#0F172A",
+            "Material": "Metal"
+        },
+        {
+            "Id": "wall_left",
+            "Shape": "Box",
+            "Position": [
+                -50,
+                50,
+                0
+            ],
+            "Scale": [
+                1,
+                100,
+                150
+            ],
+            "ColorHex": "#0F172A",
+            "Material": "Metal"
+        },
+        {
+            "Id": "wall_right",
+            "Shape": "Box",
+            "Position": [
+                50,
+                50,
+                0
+            ],
+            "Scale": [
+                1,
+                100,
+                150
+            ],
+            "ColorHex": "#0F172A",
+            "Material": "Metal"
+        },
+        {
+            "Id": "wall_front",
+            "Shape": "Box",
+            "Position": [
+                0,
+                50,
+                75
+            ],
+            "Scale": [
+                100,
+                100,
+                1
+            ],
+            "ColorHex": "#0F172A",
+            "Material": "Metal"
+        },
+        {
+            "Id": "quest_board",
+            "Shape": "Box",
+            "Position": [
+                0,
+                15,
+                -74
+            ],
+            "Scale": [
+                30,
+                20,
+                0.5
+            ],
+            "ColorHex": "#DC2626",
+            "Material": "Glow"
+        },
+        {
+            "Id": "pillar_front_l",
+            "Shape": "Cylinder",
+            "Position": [
+                -35,
+                50,
+                40
+            ],
+            "Scale": [
+                8,
+                100,
+                8
+            ],
+            "ColorHex": "#334155",
+            "Material": "Metal"
+        },
+        {
+            "Id": "pillar_front_r",
+            "Shape": "Cylinder",
+            "Position": [
+                35,
+                50,
+                40
+            ],
+            "Scale": [
+                8,
+                100,
+                8
+            ],
+            "ColorHex": "#334155",
+            "Material": "Metal"
+        },
+        {
+            "Id": "pillar_back_l",
+            "Shape": "Cylinder",
+            "Position": [
+                -35,
+                50,
+                -40
+            ],
+            "Scale": [
+                8,
+                100,
+                8
+            ],
+            "ColorHex": "#334155",
+            "Material": "Metal"
+        },
+        {
+            "Id": "pillar_back_r",
+            "Shape": "Cylinder",
+            "Position": [
+                35,
+                50,
+                -40
+            ],
+            "Scale": [
+                8,
+                100,
+                8
+            ],
+            "ColorHex": "#334155",
+            "Material": "Metal"
+        }
+    ]
+}
