@@ -34,7 +34,7 @@ window.stoneHammer = {
 
     init: function (canvasId) {
         try {
-            this.log("Engine Init v9.8 (Ground Restoration)", "cyan");
+            this.log("Engine Init v9.13 (Subsurface Fix)", "cyan");
             this.canvas = document.getElementById(canvasId);
             this.engine = new BABYLON.Engine(this.canvas, true);
             this.scene = new BABYLON.Scene(this.engine);
@@ -125,7 +125,7 @@ window.stoneHammer = {
             this.engine.runRenderLoop(() => { this.scene.render(); this.updateAnimations(); });
             window.addEventListener("resize", () => { this.engine.resize(); });
 
-            this.log("StoneHammer v9.8 Online", "lime");
+            this.log("StoneHammer v9.13 Online", "lime");
         } catch (err) {
             this.log("CRITICAL ERR: " + err.message, "red");
         }
@@ -170,15 +170,33 @@ window.stoneHammer = {
     },
 
     createMaterial: function (id, config) {
-        const mat = new BABYLON.PBRMaterial("mat_" + id, this.scene);
+        const type = (this.getProp(config, "Material") || "Plastic").toLowerCase();
         const colorHex = this.getProp(config, "ColorHex") || "#888888";
         const color = BABYLON.Color3.FromHexString(colorHex);
-        const type = (this.getProp(config, "Material") || "Plastic").toLowerCase();
 
+        // v9.13: Robust Grid Lookup
+        if (type.includes("grid")) {
+            const Grid = (BABYLON.GridMaterial) || (BABYLON.Materials && BABYLON.Materials.GridMaterial) || window.GridMaterial;
+            if (Grid) {
+                const gridMat = new Grid("grid_" + id, this.scene);
+                gridMat.mainColor = new BABYLON.Color3(0.05, 0.05, 0.08);
+                gridMat.lineColor = new BABYLON.Color3(0.2, 0.2, 0.25);
+                gridMat.gridRatio = 4;
+                gridMat.majorUnitFrequency = 10;
+                gridMat.opacity = 0.99;
+                return gridMat;
+            }
+        }
+
+        // v9.12: Static PBR Stone (For Walls/Clean look)
+        const mat = new BABYLON.PBRMaterial("mat_" + id, this.scene);
         mat.albedoColor = color;
         if (this.scene.environmentTexture) mat.reflectionTexture = this.scene.environmentTexture;
 
-        if (type.includes("metal")) {
+        if (type.includes("stone")) {
+            mat.metallic = 0.0;
+            mat.roughness = 1.0;
+        } else if (type.includes("metal")) {
             mat.metallic = 1.0;
             mat.roughness = 0.1;
         } else if (type.includes("glass")) {

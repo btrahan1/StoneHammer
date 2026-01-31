@@ -15,8 +15,8 @@
                 0.1,
                 100
             ],
-            "ColorHex": "#94a3b8",
-            "Material": "Stone"
+            "ColorHex": "#334155",
+            "Material": "Grid"
         },
         {
             "Id": "wall_n",
