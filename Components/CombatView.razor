@@ -5,52 +5,149 @@
 @if (CombatService.IsFighting)
 {
     <div class="combat-overlay">
-        <!-- Top: Combat Log -->
-        <div class="combat-log-box">
+        <!-- Top: Log -->
+        <div class="combat-log">
             @CombatService.CombatLog
         </div>
 
-        <!-- Center: Scene is visible behind this UI -->
+        <!-- Center: Battlefield (Enemies) -->
+        <div class="battlefield">
+            <div class="enemy-group">
+                @foreach(var enemy in CombatService.Enemies)
+                {
+                    <div class="combat-unit enemy @(enemy.HP <= 0 ? "dead" : "") @(_targetMode && enemy.HP > 0 ? "targetable" : "")" 
+                         @onclick="() => SelectTarget(enemy)">
+                        <div class="unit-model">👹</div>
+                        <div class="unit-name">@enemy.Name</div>
+                        <div class="unit-hp-bar">
+                            <div class="fill" style="width: @(GetHpPercent(enemy))%"></div>
+                        </div>
+                        <div class="unit-hp-text">@enemy.HP / @enemy.MaxHP</div>
+                    </div>
+                }
+            </div>
+        </div>
 
-        <!-- Bottom: Control Panel -->
-        <div class="combat-controls">
-            <!-- Left: Command Menu -->
-            <div class="combat-menu">
-                <div class="combat-menu-title">COMMAND</div>
-                <ul>
-                    <li @onclick='() => Action("Attack")'>Attack</li>
-                    <li @onclick='() => Action("Heal")'>Magic</li>
-                    <li @onclick='() => Action("Defend")'>Defend</li>
-                    <li @onclick='() => Action("Item")'>Item</li>
-                    <li @onclick='() => Action("Run")'>Run</li>
-                </ul>
+        <!-- Bottom: Heroes & Controls -->
+        <div class="control-deck">
+            <!-- Hero Cards -->
+            <div class="hero-group">
+                @foreach(var hero in CombatService.Heroes)
+                {
+                    <div class="combat-unit hero @(_selectedHero == hero ? "selected" : "") @(hero.HP <= 0 ? "dead" : "")"
+                         @onclick="() => SelectHero(hero)">
+                        <div class="unit-model">@(hero.Name.Substring(0,1))</div>
+                        <div class="unit-info">
+                            <div class="name">@hero.Name</div>
+                            <div class="class-label">@(hero.SourceCharacter?.Class.ToString() ?? "Unknown")</div>
+                            <div class="hp">@hero.HP / @hero.MaxHP</div>
+                            <div class="action-preview">
+                                @(hero.QueuedAction?.Type ?? "Waiting...")
+                                @if(hero.QueuedAction?.Target != null) { <span> > @hero.QueuedAction.Target.Name</span> }
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
 
-            <!-- Right: Status -->
-            <div class="combat-status">
-                <div class="status-row">
-                    <span class="name">MASON</span>
-                    <span class="hp">HP @CombatService.PlayerHP / @CombatService.PlayerMaxHP</span>
-                </div>
-                 <div class="status-row enemy">
-                    <span class="name">@CombatService.CurrentEnemy.Name</span>
-                    <span class="hp">HP @CombatService.CurrentEnemy.HP / @CombatService.CurrentEnemy.MaxHP</span>
-                </div>
+            <!-- Command Menu (Only in Input Phase) -->
+            <div class="command-panel">
+                @if (CombatService.Phase == CombatPhase.Input)
+                {
+                    @if(_selectedHero != null && !_targetMode)
+                    {
+                        <div class="menu-title">COMMAND: @_selectedHero.Name</div>
+                        <div class="btn-grid">
+                            <button @onclick='() => BeginTargeting("Attack")'>⚔️ Attack</button>
+                            <button @onclick='() => QueueDirect("Heal")'>💖 Heal</button>
+                            <button @onclick='() => QueueDirect("Defend")'>🛡️ Defend</button>
+                        </div>
+                    }
+                    else if (_targetMode)
+                    {
+                        <div class="menu-title">SELECT TARGET</div>
+                        <div class="sub-text">Click an enemy above...</div>
+                        <button class="btn-cancel" @onclick="CancelTargeting">Cancel</button>
+                    }
+                    else
+                    {
+                        <div class="menu-title">Select a Hero</div>
+                    }
+
+                    <!-- Fight Button -->
+                    <button class="btn-fight" @onclick="ExecuteRound">GO FIGHT!</button>
+                }
+                else
+                {
+                    <div class="menu-title">EXECUTING...</div>
+                }
             </div>
         </div>
     </div>
 }
 
 @code {
+    private CombatEntity? _selectedHero;
+    private bool _targetMode = false;
+    private string _pendingAction = "";
+
     protected override void OnInitialized()
     {
         CombatService.OnStateChanged += StateHasChanged;
     }
 
-    private async Task Action(string action)
+    private void SelectHero(CombatEntity hero)
     {
-        await CombatService.PlayerAction(action);
+        if (CombatService.Phase != CombatPhase.Input) return;
+        if (hero.HP <= 0) return;
+        
+        _selectedHero = hero;
+        _targetMode = false;
+        StateHasChanged();
     }
+
+    private void QueueDirect(string action)
+    {
+        if (_selectedHero == null) return;
+        CombatService.QueueAction(_selectedHero, action);
+        // Auto select next hero?
+        AutoSelectNext();
+    }
+
+    private void BeginTargeting(string action)
+    {
+        _pendingAction = action;
+        _targetMode = true;
+    }
+
+    private void SelectTarget(CombatEntity target)
+    {
+        if (!_targetMode || _selectedHero == null) return;
+        
+        CombatService.QueueAction(_selectedHero, _pendingAction, target);
+        _targetMode = false;
+        AutoSelectNext();
+    }
+
+    private void CancelTargeting()
+    {
+        _targetMode = false;
+    }
+
+    private async Task ExecuteRound()
+    {
+        _selectedHero = null;
+        await CombatService.ExecuteRound();
+    }
+    
+    private void AutoSelectNext()
+    {
+        // Simple logic to move selection to next hero who hasn't queued yet
+        _selectedHero = CombatService.Heroes.FirstOrDefault(h => h.QueuedAction == null && h.HP > 0);
+        StateHasChanged();
+    }
+
+    private int GetHpPercent(CombatEntity e) => (int)((float)e.HP / e.MaxHP * 100);
 
     public void Dispose()
     {
@@ -60,96 +157,72 @@
 
 <style>
     .combat-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none; /* Let clicks pass through generally, but re-enable for menus */
-        z-index: 2000;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 20px;
-        box-sizing: border-box;
-        font-family: 'Courier New', Courier, monospace;
-        font-weight: bold;
-        color: white;
-        text-shadow: 2px 2px #000;
-    }
-
-    .combat-log-box {
-        background: linear-gradient(#000088, #000044);
-        border: 4px solid white;
-        border-radius: 8px;
-        padding: 20px;
-        width: 100%;
-        font-size: 1.5rem;
-        pointer-events: auto;
-    }
-
-    .combat-controls {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        width: 100%;
-        pointer-events: auto;
-    }
-
-    .combat-menu {
-        background: linear-gradient(#000088, #000044);
-        border: 4px solid white;
-        border-radius: 8px;
-        padding: 15px;
-        width: 250px;
-    }
-
-    .combat-menu-title {
-        border-bottom: 2px solid white;
-        margin-bottom: 10px;
-        color: #ffff00;
-    }
-
-    .combat-menu ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .combat-menu li {
-        padding: 5px 10px;
-        cursor: pointer;
-    }
-
-    .combat-menu li:hover {
-        background-color: rgba(255, 255, 255, 0.2);
-        color: #ffff00;
-    }
-
-    .combat-menu li::before {
-        content: "►"; /* Hand cursor */
-        margin-right: 10px;
-        opacity: 0;
-    }
-    .combat-menu li:hover::before {
-        opacity: 1;
-    }
-
-    .combat-status {
-        background: linear-gradient(#000088, #000044);
-        border: 4px solid white;
-        border-radius: 8px;
-        padding: 15px;
-        width: 400px;
-    }
-
-    .status-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 5px;
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        display: flex; flex-direction: column; pointer-events: none;
+        z-index: 2000; font-family: 'Segoe UI', sans-serif;
     }
     
-    .status-row.enemy {
-        color: #ff6666;
+    .combat-log {
+        background: rgba(0,0,0,0.7); color: white; text-align: center; padding: 10px;
+        font-size: 1.5rem; border-bottom: 2px solid #555;
     }
+
+    .battlefield {
+        flex: 1; display: flex; justify-content: center; align-items: center;
+    }
+    
+    .enemy-group {
+        display: flex; gap: 20px; pointer-events: auto;
+    }
+    
+    .combat-unit {
+        width: 100px; padding: 10px; background: rgba(0,0,0,0.6); border: 2px solid #555;
+        border-radius: 8px; color: white; display: flex; flex-direction: column; align-items: center;
+        transition: all 0.2s; cursor: pointer;
+    }
+    .combat-unit.enemy:hover { border-color: red; transform: scale(1.05); }
+    .combat-unit.dead { opacity: 0.5; filter: grayscale(100%); }
+    .combat-unit.targetable { border-color: yellow; animation: pulse 1s infinite; cursor: crosshair; }
+    
+    .unit-model { font-size: 32px; margin-bottom: 5px; }
+    .unit-hp-bar { width: 100%; height: 6px; background: #333; margin-top: 5px; }
+    .unit-hp-bar .fill { height: 100%; background: #00ff00; }
+    .enemy .unit-hp-bar .fill { background: #ff0000; }
+
+    .control-deck {
+        height: 200px; background: rgba(0,0,50,0.9); border-top: 4px solid gold;
+        display: flex; pointer-events: auto;
+    }
+    
+    .hero-group {
+        flex: 1; display: flex; gap: 10px; padding: 20px;
+        overflow-x: auto;
+    }
+    
+    .combat-unit.hero {
+        width: 150px; flex-direction: row; text-align: left;
+    }
+    .combat-unit.hero.selected {
+        border-color: gold; background: rgba(50,50,100,0.8);
+    }
+    
+    .unit-info { margin-left: 10px; flex: 1; overflow: hidden; }
+    .class-label { font-size: 11px; color: #ffffaa; font-style: italic; margin-bottom: 2px; }
+    .action-preview { font-size: 10px; color: #aaaaff; margin-top: 5px; }
+
+    .command-panel {
+        width: 300px; padding: 20px; border-left: 2px solid #555;
+        display: flex; flex-direction: column;
+    }
+    
+    .menu-title { font-weight: bold; color: yellow; margin-bottom: 10px; text-transform: uppercase; }
+    .btn-grid { display: flex; flex-direction: column; gap: 5px; }
+    button { background: #444; color: white; border: 1px solid #666; padding: 8px; cursor: pointer; }
+    button:hover { background: #666; border-color: white; }
+    
+    .btn-fight { margin-top: auto; background: #880000; font-weight: bold; font-size: 1.2rem; }
+    .btn-fight:hover { background: #aa0000; }
+    .btn-cancel { background: #555; }
+    
+    @@keyframes pulse { 0% { border-color: yellow; } 50% { border-color: red; } 100% { border-color: yellow; } }
 </style>
