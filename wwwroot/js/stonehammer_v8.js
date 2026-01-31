@@ -34,7 +34,7 @@ window.stoneHammer = {
 
     init: function (canvasId) {
         try {
-            this.log("Engine Init v9.13 (Subsurface Fix)", "cyan");
+            this.log("Engine Init v9.16 (Procedural Masonry)", "cyan");
             this.canvas = document.getElementById(canvasId);
             this.engine = new BABYLON.Engine(this.canvas, true);
             this.scene = new BABYLON.Scene(this.engine);
@@ -125,7 +125,7 @@ window.stoneHammer = {
             this.engine.runRenderLoop(() => { this.scene.render(); this.updateAnimations(); });
             window.addEventListener("resize", () => { this.engine.resize(); });
 
-            this.log("StoneHammer v9.13 Online", "lime");
+            this.log("StoneHammer v9.16 Online", "lime");
         } catch (err) {
             this.log("CRITICAL ERR: " + err.message, "red");
         }
@@ -174,29 +174,41 @@ window.stoneHammer = {
         const colorHex = this.getProp(config, "ColorHex") || "#888888";
         const color = BABYLON.Color3.FromHexString(colorHex);
 
-        // v9.13: Robust Grid Lookup
-        if (type.includes("grid")) {
-            const Grid = (BABYLON.GridMaterial) || (BABYLON.Materials && BABYLON.Materials.GridMaterial) || window.GridMaterial;
-            if (Grid) {
-                const gridMat = new Grid("grid_" + id, this.scene);
-                gridMat.mainColor = new BABYLON.Color3(0.05, 0.05, 0.08);
-                gridMat.lineColor = new BABYLON.Color3(0.2, 0.2, 0.25);
-                gridMat.gridRatio = 4;
-                gridMat.majorUnitFrequency = 10;
-                gridMat.opacity = 0.99;
-                return gridMat;
-            }
+        // v9.16: Official Procedural Brick (For Floors/Plazas)
+        if (type.includes("brick") || type.includes("grid")) {
+            const brickMat = new BABYLON.StandardMaterial("brick_" + id, this.scene);
+            const brickTex = new BABYLON.BrickProceduralTexture("brickTex_" + id, 512, this.scene);
+
+            // Town-like proportions
+            brickTex.numberOfBricksHeight = 20;
+            brickTex.numberOfBricksWidth = 20;
+            brickTex.brickColor = new BABYLON.Color3(0.3, 0.3, 0.35); // Dark Stone
+            brickTex.jointColor = new BABYLON.Color3(0.1, 0.1, 0.1); // Black Grout
+
+            brickMat.diffuseTexture = brickTex;
+            return brickMat;
         }
 
-        // v9.12: Static PBR Stone (For Walls/Clean look)
+        // v9.16: Non-Animated Noise Stone (For Walls)
+        if (type.includes("stone")) {
+            const stoneMat = new BABYLON.StandardMaterial("stone_" + id, this.scene);
+            const noise = new BABYLON.NoiseProceduralTexture("noise_" + id, 512, this.scene);
+            noise.octaves = 8;
+            noise.persistence = 0.8;
+            noise.animationSpeedFactor = 0; // Frozen solid
+            noise.uScale = 5;
+            noise.vScale = 5;
+
+            stoneMat.diffuseTexture = noise;
+            stoneMat.diffuseColor = color;
+            return stoneMat;
+        }
+
         const mat = new BABYLON.PBRMaterial("mat_" + id, this.scene);
         mat.albedoColor = color;
         if (this.scene.environmentTexture) mat.reflectionTexture = this.scene.environmentTexture;
 
-        if (type.includes("stone")) {
-            mat.metallic = 0.0;
-            mat.roughness = 1.0;
-        } else if (type.includes("metal")) {
+        if (type.includes("metal")) {
             mat.metallic = 1.0;
             mat.roughness = 0.1;
         } else if (type.includes("glass")) {
