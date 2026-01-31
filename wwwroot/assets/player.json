@@ -1,0 +1,10 @@
+{
+    "Name": "Master Mason",
+    "Type": "Voxel",
+    "ProceduralColors": {
+        "Skin": "#F1C27D",
+        "Shirt": "#4E342E",
+        "Pants": "#3E2723"
+    },
+    "Description": "The lead architect of the Stone Plaza, equipped with a protective helmet and a signature stone hammer."
+}

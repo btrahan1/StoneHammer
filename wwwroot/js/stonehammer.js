@@ -4,8 +4,9 @@ window.stoneHammer = {
     canvas: null,
     player: null,
     inputMap: {},
-    playerSpeed: 0.5,
+    playerSpeed: 0.25,
     playerRotationSpeed: 0.05,
+    walkTime: 0,
 
     getProp: function (obj, key) {
         if (!obj) return null;
@@ -25,7 +26,7 @@ window.stoneHammer = {
 
     init: function (canvasId) {
         try {
-            this.log("Engine Init v2.7 (Classic Rotation)", "cyan");
+            this.log("Engine Init v3.1 (Hammer Orientation)", "cyan");
             this.canvas = document.getElementById(canvasId);
             this.engine = new BABYLON.Engine(this.canvas, true);
             this.scene = new BABYLON.Scene(this.engine);
@@ -89,7 +90,7 @@ window.stoneHammer = {
             this.engine.runRenderLoop(() => { this.scene.render(); this.updateAnimations(); });
             window.addEventListener("resize", () => { this.engine.resize(); });
 
-            this.log("StoneHammer v2.7 Online", "lime");
+            this.log("StoneHammer v3.1 Online", "lime");
         } catch (err) {
             this.log("CRITICAL ERR: " + err.message, "red");
         }
@@ -178,10 +179,10 @@ window.stoneHammer = {
             { id: "leg_l", shape: "Box", scale: [0.3, 1.0, 0.3], pos: [-0.25, 0.5, 0], color: accent },
             { id: "leg_r", shape: "Box", scale: [0.3, 1.0, 0.3], pos: [0.25, 0.5, 0], color: accent },
 
-            // Master Mason Equipment
-            { id: "helmet", shape: "Box", scale: [0.6, 0.2, 0.6], pos: [0, 2.7, 0], color: charcoal }, // Protective helmet
-            { id: "hammer_handle", shape: "Box", scale: [0.1, 0.8, 0.1], pos: [0.8, 1.6, 0.4], color: wood }, // Handle
-            { id: "hammer_head", shape: "Box", scale: [0.4, 0.4, 0.8], pos: [0.8, 2.0, 0.4], color: charcoal } // Stone head
+            // Master Mason Equipment - Parented to limbs
+            { id: "helmet", shape: "Box", scale: [0.6, 0.2, 0.6], pos: [0, 0.3, 0], color: charcoal, parentLimb: "head" },
+            { id: "hammer_handle", shape: "Box", scale: [0.1, 0.8, 0.1], pos: [0, -0.6, 0.4], rotation: [90, 0, 0], color: wood, parentLimb: "arm_r" },
+            { id: "hammer_head", shape: "Box", scale: [0.4, 0.4, 0.8], pos: [0, 0.4, 0], color: charcoal, parentLimb: "hammer_handle" }
         ];
     },
 
@@ -193,6 +194,8 @@ window.stoneHammer = {
             this.log("WARNING: No parts generated for " + name, "orange");
         }
 
+        const meshMap = {};
+
         parts.forEach(p => {
             const mesh = BABYLON.MeshBuilder.CreateBox(name + "_" + p.id, {
                 width: p.scale[0],
@@ -200,7 +203,26 @@ window.stoneHammer = {
                 depth: p.scale[2]
             }, this.scene);
             mesh.position = new BABYLON.Vector3(p.pos[0], p.pos[1], p.pos[2]);
-            mesh.parent = group;
+            if (p.rotation) {
+                mesh.rotation = new BABYLON.Vector3(
+                    BABYLON.Tools.ToRadians(p.rotation[0]),
+                    BABYLON.Tools.ToRadians(p.rotation[1]),
+                    BABYLON.Tools.ToRadians(p.rotation[2])
+                );
+            }
+            meshMap[p.id] = mesh;
+
+            // Handle Parenting
+            if (p.parentLimb && meshMap[p.parentLimb]) {
+                mesh.parent = meshMap[p.parentLimb];
+            } else {
+                mesh.parent = group;
+            }
+
+            // Store pivot points for limbs to allow rotation
+            if (p.id.includes("arm") || p.id.includes("leg")) {
+                mesh.setPivotPoint(new BABYLON.Vector3(0, p.scale[1] / 2, 0));
+            }
 
             const mat = new BABYLON.StandardMaterial("mat_" + name + "_" + p.id, this.scene);
             mat.diffuseColor = BABYLON.Color3.FromHexString(p.color || "#FFFFFF");
@@ -287,9 +309,29 @@ window.stoneHammer = {
         }
 
         if (moved) {
+            const isSprinting = this.inputMap["shift"];
+            const currentSpeed = isSprinting ? 0.5 : 0.25;
+            this.walkTime += isSprinting ? 0.25 : 0.15;
+
             moveDir.normalize();
-            this.player.position.addInPlace(moveDir.scale(this.playerSpeed));
+            this.player.position.addInPlace(moveDir.scale(currentSpeed));
+        } else {
+            // Smoothly return to idle pose
+            this.walkTime *= 0.8;
+            if (this.walkTime < 0.01) this.walkTime = 0;
         }
+
+        // Apply procedural limb swinging
+        const armSwing = Math.sin(this.walkTime) * 0.5;
+        const legSwing = Math.sin(this.walkTime) * 0.4;
+
+        this.player.getChildren().forEach(node => {
+            if (node.name.includes("arm_l") || node.name.includes("leg_r")) {
+                node.rotation.x = armSwing;
+            } else if (node.name.includes("arm_r") || node.name.includes("leg_l")) {
+                node.rotation.x = -armSwing;
+            }
+        });
     },
 
     clearAll: function () {
