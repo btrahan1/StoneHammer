@@ -1,0 +1,86 @@
+{
+    "Id": "Lodge",
+    "Name": "Wooden Lodge Sandbox",
+    "Parts": [
+        {
+            "Id": "floor",
+            "Shape": "Box",
+            "Position": [
+                0,
+                -0.05,
+                0
+            ],
+            "Scale": [
+                100,
+                0.1,
+                100
+            ],
+            "ColorHex": "#5D4037",
+            "Material": "Wood"
+        },
+        {
+            "Id": "wall_n",
+            "Shape": "Box",
+            "Position": [
+                0,
+                10,
+                50
+            ],
+            "Scale": [
+                100,
+                20,
+                1
+            ],
+            "ColorHex": "#4E342E",
+            "Material": "Wood"
+        },
+        {
+            "Id": "wall_s",
+            "Shape": "Box",
+            "Position": [
+                0,
+                10,
+                -50
+            ],
+            "Scale": [
+                100,
+                20,
+                1
+            ],
+            "ColorHex": "#4E342E",
+            "Material": "Wood"
+        },
+        {
+            "Id": "wall_e",
+            "Shape": "Box",
+            "Position": [
+                50,
+                10,
+                0
+            ],
+            "Scale": [
+                1,
+                20,
+                100
+            ],
+            "ColorHex": "#4E342E",
+            "Material": "Wood"
+        },
+        {
+            "Id": "wall_w",
+            "Shape": "Box",
+            "Position": [
+                -50,
+                10,
+                0
+            ],
+            "Scale": [
+                1,
+                20,
+                100
+            ],
+            "ColorHex": "#4E342E",
+            "Material": "Wood"
+        }
+    ]
+}

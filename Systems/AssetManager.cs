@@ -38,16 +38,29 @@ namespace StoneHammer.Systems
 
         public async Task EnterBuilding(string buildingName)
         {
+            await this.ClearAll(); // Ensure clean state across transitions
+
             if (buildingName.Contains("Guild"))
             {
                 await SpawnAsset("assets/guild_interior.json", "Guild Interior");
-                await SpawnPlayer(0, 0); // Spawn at interior origin
             }
-            else if (buildingName.Contains("Sandbox"))
+            else if (buildingName.Contains("Desert"))
+            {
+                await SpawnAsset("assets/desert_interior.json", "Desert Interior");
+            }
+            else if (buildingName.Contains("Lodge"))
+            {
+                await SpawnAsset("assets/lodge_interior.json", "Lodge Interior");
+            }
+            else
             {
                 await SpawnAsset("assets/sandbox_interior.json", "Sandbox Interior");
-                await SpawnPlayer(0, 0);
             }
+            
+            // v10.1: Spawn Exit Crystal in every room
+            await SpawnAsset("assets/exit_crystal.json", "ExitCrystal", false, new { Position = new float[] { -5, 0, -5 } });
+            
+            await SpawnPlayer(0, 0);
         }
 
         public async Task ExitBuilding(float x, float z)
@@ -59,7 +72,10 @@ namespace StoneHammer.Systems
         {
             await _bridge.ClearAll();
 
-            // 1. "Main Street" Layout (Spacious & Open)
+            // v10.1: Town Floor is now a JSON asset
+            await SpawnAsset("assets/town_floor.json", "TownFloor");
+
+            // 1. "Main Street" Layout
             // Tavern at the end of the road
             await SpawnTavern(0, 40); 
             

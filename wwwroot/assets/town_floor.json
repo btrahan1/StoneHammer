@@ -1,0 +1,22 @@
+{
+    "Id": "TownFloor",
+    "Name": "The Great Plaza",
+    "Parts": [
+        {
+            "Id": "plaza",
+            "Shape": "Box",
+            "Position": [
+                0,
+                -0.05,
+                0
+            ],
+            "Scale": [
+                1000,
+                0.1,
+                1000
+            ],
+            "ColorHex": "#334155",
+            "Material": "Brick"
+        }
+    ]
+}

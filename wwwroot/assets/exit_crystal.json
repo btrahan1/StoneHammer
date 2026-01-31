@@ -1,0 +1,43 @@
+{
+    "Id": "ExitCrystal",
+    "Name": "Return Portal",
+    "Parts": [
+        {
+            "Id": "base",
+            "Shape": "Box",
+            "Scale": [
+                1.5,
+                0.2,
+                1.5
+            ],
+            "Position": [
+                0,
+                0.1,
+                0
+            ],
+            "ColorHex": "#333333",
+            "Material": "Stone"
+        },
+        {
+            "Id": "crystal",
+            "Shape": "Box",
+            "Scale": [
+                0.8,
+                2.0,
+                0.8
+            ],
+            "Position": [
+                0,
+                1.2,
+                0
+            ],
+            "Rotation": [
+                45,
+                45,
+                0
+            ],
+            "ColorHex": "#ff00ff",
+            "Material": "Glass"
+        }
+    ]
+}
