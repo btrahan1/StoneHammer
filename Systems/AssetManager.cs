@@ -71,6 +71,8 @@ namespace StoneHammer.Systems
             await SpawnAsset("assets/crypt_entrance.json", "CryptEntrance", false, new { Position = new[] { 0, 0, 60 } });
         }
 
+        private int _currentDepth = 0;
+
         public async Task EnterBuilding(string buildingName)
         {
             await this.ClearAll();
@@ -89,8 +91,24 @@ namespace StoneHammer.Systems
             }
             else if (buildingName.Contains("Crypt"))
             {
-                // v12.3: Spawning the Crypt Interior
-                await SpawnAsset("assets/crypt_interior.json", "Crypt Interior");
+                // v13.0: Procedural Dungeon Generation
+                // format: "Crypt_Depth_X"
+                if (buildingName.Contains("Depth"))
+                {
+                   var parts = buildingName.Split('_');
+                   if (parts.Length == 3 && int.TryParse(parts[2], out int d))
+                   {
+                       _currentDepth = d;
+                   }
+                }
+                else 
+                {
+                   _currentDepth = 1; // Default entry
+                }
+
+                System.Console.WriteLine($"[AssetManager] Entering Crypt Level {_currentDepth}");
+                var levelAsset = CryptGenerator.Generate(_currentDepth);
+                await SpawnGeneratedAsset(levelAsset, levelAsset.Name);
             }
             else
             {
@@ -101,7 +119,22 @@ namespace StoneHammer.Systems
             await SpawnPlayer(0, 0);
         }
 
-        public async Task ClearAll() => await _bridge.ClearAll();
+        public async Task ClearAll()
+        {
+             _currentDepth = 0;
+             await _bridge.ClearAll();
+        }
+
+        // v13.0: Overload for spawning C# generated assets directly
+        private async Task SpawnGeneratedAsset(ProceduralAsset asset, string name, object? transform = null)
+        {
+             await _bridge.SpawnRecipe(asset, name, transform);
+             foreach (var child in asset.Children)
+             {
+                 // Recursively spawn children (stairs, crystals, etc)
+                 await SpawnAsset(child.Path, child.Name, false, child.Transform);
+             }
+        }
 
         private async Task SpawnAsset(string path, string name, bool isPlayer = false, object? transform = null)
         {

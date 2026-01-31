@@ -1,0 +1,44 @@
+{
+    "Name": "Stone Stairs",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "base",
+            "Shape": "Box",
+            "Position": [
+                0,
+                1,
+                0
+            ],
+            "Scale": [
+                4,
+                2,
+                6
+            ],
+            "ColorHex": "#4a5568",
+            "Material": "Stone"
+        },
+        {
+            "Id": "ramp",
+            "Shape": "Box",
+            "Position": [
+                0,
+                2.5,
+                0.5
+            ],
+            "Rotation": [
+                25,
+                0,
+                0
+            ],
+            "Scale": [
+                4,
+                0.5,
+                7
+            ],
+            "ColorHex": "#718096",
+            "Material": "Stone"
+        }
+    ],
+    "Children": []
+}

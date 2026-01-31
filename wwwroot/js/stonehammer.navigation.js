@@ -88,6 +88,33 @@
                 this.log("Returning to Town...", "magenta");
                 this.exitBuilding();
             }
+
+            // v13.0: Dungeon Navigation
+            if (name.includes("StairsDown")) {
+                // Format: Crypt_Depth_X
+                let currentDepth = 1;
+                if (this.currentBuilding && this.currentBuilding.includes("Depth")) {
+                    currentDepth = parseInt(this.currentBuilding.split('_')[2]);
+                }
+                const nextDepth = currentDepth + 1;
+                this.log("Descending to Depth " + nextDepth + "...", "orange");
+                this.enterBuilding("Crypt_Depth_" + nextDepth);
+            }
+
+            if (name.includes("StairsUp")) {
+                let currentDepth = 2; // If untracked, assume level 2 going to 1
+                if (this.currentBuilding && this.currentBuilding.includes("Depth")) {
+                    currentDepth = parseInt(this.currentBuilding.split('_')[2]);
+                }
+                const nextDepth = currentDepth - 1;
+                if (nextDepth < 1) {
+                    this.log("Leaving the Crypt...", "magenta");
+                    this.exitBuilding();
+                } else {
+                    this.log("Ascending to Depth " + nextDepth + "...", "cyan");
+                    this.enterBuilding("Crypt_Depth_" + nextDepth);
+                }
+            }
         };
 
         // v12.3: Double Click for Crypt
