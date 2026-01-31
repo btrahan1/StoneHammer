@@ -38,7 +38,7 @@ namespace StoneHammer.Systems
 
         public async Task EnterBuilding(string buildingName)
         {
-            await this.ClearAll(); // Ensure clean state across transitions
+            await this.ClearAll();
 
             if (buildingName.Contains("Guild"))
             {
@@ -57,9 +57,7 @@ namespace StoneHammer.Systems
                 await SpawnAsset("assets/sandbox_interior.json", "Sandbox Interior");
             }
             
-            // v10.1: Spawn Exit Crystal in every room
-            await SpawnAsset("assets/exit_crystal.json", "ExitCrystal", false, new { Position = new float[] { -5, 0, -5 } });
-            
+            // v11.0: Child assets like Exit Crystals are now loaded via JSON nesting
             await SpawnPlayer(0, 0);
         }
 
@@ -76,14 +74,11 @@ namespace StoneHammer.Systems
             await SpawnAsset("assets/town_floor.json", "TownFloor");
 
             // 1. "Main Street" Layout
-            // Tavern at the end of the road
             await SpawnTavern(0, 40); 
-            
-            // Guild and Store as anchor buildings
             await SpawnGuild(-25, 10);
             await SpawnStore(25, 10);
 
-            // 2. Residential strip (Open spacing)
+            // 2. Residential strip
             for (int i = 0; i < 3; i++)
             {
                 await SpawnAsset("assets/house.json", $"House_L_{i}", false, new { Position = new[] { -20f, 0, -15f - (i * 20f) }, Rotation = new[] { 0, 90f, 0 } });
@@ -101,16 +96,51 @@ namespace StoneHammer.Systems
 
         private async Task SpawnAsset(string path, string name, bool isPlayer = false, object? transform = null)
         {
-            var json = await _http.GetStringAsync(path);
-            if (json.Contains("\"Voxel\""))
+            try 
             {
-                var asset = JsonSerializer.Deserialize<VoxelAsset>(json, _options);
-                if (asset != null) await _bridge.SpawnVoxel(asset, name, isPlayer, transform);
+                string json;
+                if (!string.IsNullOrEmpty(path))
+                {
+                    json = await _http.GetStringAsync(path);
+                }
+                else 
+                {
+                    // v11.1: If no path, we assume the transform or a separate data source might contain it
+                    // but for children with inline data, we can serialize the child object itself back to JSON 
+                    // or just pass the child object if we refactor more. 
+                    // For now, let's just log that we need a path or inline support.
+                    System.Console.WriteLine($"Error: Asset {name} has no path and inline data is not yet supported in SpawnAsset.");
+                    return;
+                }
+
+                if (json.Contains("\"Voxel\""))
+                {
+                    var asset = JsonSerializer.Deserialize<VoxelAsset>(json, _options);
+                    if (asset != null) 
+                    {
+                        await _bridge.SpawnVoxel(asset, name, isPlayer, transform);
+                        foreach (var child in asset.Children)
+                        {
+                            await SpawnAsset(child.Path, child.Name, false, child.Transform);
+                        }
+                    }
+                }
+                else
+                {
+                    var asset = JsonSerializer.Deserialize<ProceduralAsset>(json, _options);
+                    if (asset != null) 
+                    {
+                        await _bridge.SpawnRecipe(asset, name, transform);
+                        foreach (var child in asset.Children)
+                        {
+                            await SpawnAsset(child.Path, child.Name, false, child.Transform);
+                        }
+                    }
+                }
             }
-            else
+            catch (System.Exception ex)
             {
-                var asset = JsonSerializer.Deserialize<ProceduralAsset>(json, _options);
-                if (asset != null) await _bridge.SpawnRecipe(asset, name, transform);
+                System.Console.WriteLine($"Error Spawning Asset {name} ({path}): {ex.Message}");
             }
         }
     }

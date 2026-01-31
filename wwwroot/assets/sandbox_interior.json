@@ -82,5 +82,18 @@
             "ColorHex": "#475569",
             "Material": "Stone"
         }
+    ],
+    "Children": [
+        {
+            "Path": "assets/exit_crystal.json",
+            "Name": "SandboxExit",
+            "Transform": {
+                "Position": [
+                    -5,
+                    0,
+                    -5
+                ]
+            }
+        }
     ]
 }

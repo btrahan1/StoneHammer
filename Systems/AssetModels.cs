@@ -23,6 +23,7 @@ namespace StoneHammer.Systems
         public VoxelTextures? Textures { get; set; }
         public string? Skin { get; set; } // Base64 texture
         public string? Description { get; set; }
+        public List<ChildAsset> Children { get; set; } = new();
     }
 
     public class VoxelProceduralColors
@@ -61,6 +62,14 @@ namespace StoneHammer.Systems
         public string Type { get; set; } = "Procedural";
         public List<ProceduralPart> Parts { get; set; } = new();
         public List<TimelineEvent> Timeline { get; set; } = new();
+        public List<ChildAsset> Children { get; set; } = new();
+    }
+
+    public class ChildAsset
+    {
+        public string Path { get; set; } = "";
+        public string Name { get; set; } = "";
+        public object? Transform { get; set; }
     }
 
     public class TimelineEvent

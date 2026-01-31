@@ -82,5 +82,18 @@
             "ColorHex": "#4E342E",
             "Material": "Wood"
         }
+    ],
+    "Children": [
+        {
+            "Path": "assets/exit_crystal.json",
+            "Name": "LodgeExit",
+            "Transform": {
+                "Position": [
+                    -5,
+                    0,
+                    -5
+                ]
+            }
+        }
     ]
 }

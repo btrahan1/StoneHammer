@@ -65,6 +65,16 @@
         const pos = this.parseVec3(this.getProp(transform, "Position"));
         group.position = pos;
 
+        const scale = this.parseVec3(this.getProp(transform, "Scale"), 1);
+        group.scaling = scale;
+
+        const rot = this.parseVec3(this.getProp(transform, "Rotation"));
+        group.rotation = new BABYLON.Vector3(
+            BABYLON.Tools.ToRadians(rot.x),
+            BABYLON.Tools.ToRadians(rot.y),
+            BABYLON.Tools.ToRadians(rot.z)
+        );
+
         if (isPlayer) {
             this.player = group;
             const camTarget = new BABYLON.TransformNode("camTarget", this.scene);
@@ -84,22 +94,51 @@
     sh.spawnRecipe = function (asset, name, transform) {
         const group = new BABYLON.TransformNode("recipe_" + name, this.scene);
         asset.parts.forEach(p => {
-            const mesh = BABYLON.MeshBuilder.CreateBox(name + "_" + p.id, {
-                width: (p.scale && p.scale[0]) || 1, height: (p.scale && p.scale[1]) || 1, depth: (p.scale && p.scale[2]) || 1
-            }, this.scene);
+            const shape = (p.shape || "Box").toLowerCase();
+            let mesh;
+            const w = (p.scale && p.scale[0]) || 1;
+            const h = (p.scale && p.scale[1]) || 1;
+            const d = (p.scale && p.scale[2]) || 1;
+
+            if (shape === "cylinder") {
+                mesh = BABYLON.MeshBuilder.CreateCylinder(name + "_" + p.id, { height: h, diameter: w }, this.scene);
+            } else if (shape === "sphere") {
+                mesh = BABYLON.MeshBuilder.CreateSphere(name + "_" + p.id, { diameter: w }, this.scene);
+            } else {
+                mesh = BABYLON.MeshBuilder.CreateBox(name + "_" + p.id, { width: w, height: h, depth: d }, this.scene);
+            }
+
             mesh.position = this.parseVec3(p.position);
             if (p.rotation) mesh.rotation = new BABYLON.Vector3(
-                BABYLON.Tools.ToRadians(p.rotation[0]), BABYLON.Tools.ToRadians(p.rotation[1]), BABYLON.Tools.ToRadians(p.rotation[2])
+                BABYLON.Tools.ToRadians(p.rotation[0] || 0),
+                BABYLON.Tools.ToRadians(p.rotation[1] || 0),
+                BABYLON.Tools.ToRadians(p.rotation[2] || 0)
             );
             mesh.material = this.createMaterial(name + "_" + p.id, p);
+
             if (p.parentId) {
                 const parent = this.scene.getNodeByName(name + "_" + p.parentId);
                 if (parent) mesh.parent = parent;
                 else mesh.parent = group;
-            } else mesh.parent = group;
+            } else {
+                mesh.parent = group;
+            }
         });
+
+        // Apply Prefab-level Transform
         const pos = this.parseVec3(this.getProp(transform, "Position"));
         group.position = pos;
+
+        const scale = this.parseVec3(this.getProp(transform, "Scale"), 1);
+        group.scaling = scale;
+
+        const rot = this.parseVec3(this.getProp(transform, "Rotation"));
+        group.rotation = new BABYLON.Vector3(
+            BABYLON.Tools.ToRadians(rot.x),
+            BABYLON.Tools.ToRadians(rot.y),
+            BABYLON.Tools.ToRadians(rot.z)
+        );
+
         if (transform && transform.isTrigger) {
             this.buildingTriggers.push({ name: name, pos: pos, radius: transform.triggerRadius || 3 });
         }

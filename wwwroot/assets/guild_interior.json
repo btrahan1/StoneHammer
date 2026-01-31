@@ -15,8 +15,8 @@
                 0.1,
                 150
             ],
-            "ColorHex": "#1E293B",
-            "Material": "Metal"
+            "ColorHex": "#334155",
+            "Material": "Brick"
         },
         {
             "Id": "wall_back",
@@ -31,8 +31,8 @@
                 100,
                 1
             ],
-            "ColorHex": "#0F172A",
-            "Material": "Metal"
+            "ColorHex": "#475569",
+            "Material": "Stone"
         },
         {
             "Id": "wall_left",
@@ -47,8 +47,8 @@
                 100,
                 150
             ],
-            "ColorHex": "#0F172A",
-            "Material": "Metal"
+            "ColorHex": "#475569",
+            "Material": "Stone"
         },
         {
             "Id": "wall_right",
@@ -63,8 +63,8 @@
                 100,
                 150
             ],
-            "ColorHex": "#0F172A",
-            "Material": "Metal"
+            "ColorHex": "#475569",
+            "Material": "Stone"
         },
         {
             "Id": "wall_front",
@@ -79,88 +79,101 @@
                 100,
                 1
             ],
-            "ColorHex": "#0F172A",
-            "Material": "Metal"
+            "ColorHex": "#475569",
+            "Material": "Stone"
+        }
+    ],
+    "Children": [
+        {
+            "Path": "assets/exit_crystal.json",
+            "Name": "GuildExit",
+            "Transform": {
+                "Position": [
+                    -15,
+                    0,
+                    -15
+                ]
+            }
         },
         {
-            "Id": "quest_board",
-            "Shape": "Box",
-            "Position": [
-                0,
-                15,
-                -74
-            ],
-            "Scale": [
-                30,
-                20,
-                0.5
-            ],
-            "ColorHex": "#DC2626",
-            "Material": "Glow"
+            "Path": "assets/quest_board.json",
+            "Name": "MainQuestBoard",
+            "Transform": {
+                "Position": [
+                    0,
+                    15,
+                    -74
+                ],
+                "Scale": [
+                    30,
+                    20,
+                    0.5
+                ]
+            }
         },
         {
-            "Id": "pillar_front_l",
-            "Shape": "Cylinder",
-            "Position": [
-                -35,
-                50,
-                40
-            ],
-            "Scale": [
-                8,
-                100,
-                8
-            ],
-            "ColorHex": "#334155",
-            "Material": "Metal"
+            "Path": "assets/pillar.json",
+            "Name": "GuildPillar_FL",
+            "Transform": {
+                "Position": [
+                    -35,
+                    50,
+                    40
+                ],
+                "Scale": [
+                    8,
+                    100,
+                    8
+                ]
+            }
         },
         {
-            "Id": "pillar_front_r",
-            "Shape": "Cylinder",
-            "Position": [
-                35,
-                50,
-                40
-            ],
-            "Scale": [
-                8,
-                100,
-                8
-            ],
-            "ColorHex": "#334155",
-            "Material": "Metal"
+            "Path": "assets/pillar.json",
+            "Name": "GuildPillar_FR",
+            "Transform": {
+                "Position": [
+                    35,
+                    50,
+                    40
+                ],
+                "Scale": [
+                    8,
+                    100,
+                    8
+                ]
+            }
         },
         {
-            "Id": "pillar_back_l",
-            "Shape": "Cylinder",
-            "Position": [
-                -35,
-                50,
-                -40
-            ],
-            "Scale": [
-                8,
-                100,
-                8
-            ],
-            "ColorHex": "#334155",
-            "Material": "Metal"
+            "Path": "assets/pillar.json",
+            "Name": "GuildPillar_BL",
+            "Transform": {
+                "Position": [
+                    -35,
+                    50,
+                    -40
+                ],
+                "Scale": [
+                    8,
+                    100,
+                    8
+                ]
+            }
         },
         {
-            "Id": "pillar_back_r",
-            "Shape": "Cylinder",
-            "Position": [
-                35,
-                50,
-                -40
-            ],
-            "Scale": [
-                8,
-                100,
-                8
-            ],
-            "ColorHex": "#334155",
-            "Material": "Metal"
+            "Path": "assets/pillar.json",
+            "Name": "GuildPillar_BR",
+            "Transform": {
+                "Position": [
+                    35,
+                    50,
+                    -40
+                ],
+                "Scale": [
+                    8,
+                    100,
+                    8
+                ]
+            }
         }
     ]
 }

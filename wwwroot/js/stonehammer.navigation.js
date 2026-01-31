@@ -1,5 +1,5 @@
 /**
- * StoneHammer v10.1: Navigation Module
+ * StoneHammer v10.6: Navigation Module
  * Teleportation hub, building transitions, and scene cleanup.
  */
 (function () {
@@ -29,6 +29,14 @@
         if (!this.currentBuilding) return;
         this.log("Exiting to Town Atmosphere...", "cyan");
         this.currentBuilding = null;
+
+        // v10.6: Prevent immediate re-entry bounce
+        this.triggerLockout = true;
+        setTimeout(() => {
+            this.triggerLockout = false;
+            this.log("Building triggers re-enabled", "gray");
+        }, 2000);
+
         this.clearAll();
 
         if (this.ground) this.ground.setEnabled(true);

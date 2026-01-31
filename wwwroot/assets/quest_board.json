@@ -1,0 +1,22 @@
+{
+    "Name": "Quest Board",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "board",
+            "Shape": "Box",
+            "Position": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1,
+                1,
+                1
+            ],
+            "ColorHex": "#e11d48",
+            "Material": "Glow"
+        }
+    ]
+}

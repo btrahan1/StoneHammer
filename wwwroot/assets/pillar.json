@@ -1,0 +1,22 @@
+{
+    "Name": "Stone Pillar",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "shaft",
+            "Shape": "Cylinder",
+            "Position": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1,
+                1,
+                1
+            ],
+            "ColorHex": "#64748b",
+            "Material": "Stone"
+        }
+    ]
+}

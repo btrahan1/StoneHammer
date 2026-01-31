@@ -22,9 +22,12 @@
     };
 
     sh.parseVec3 = function (data, defaultVal = { x: 0, y: 0, z: 0 }) {
-        if (!data) return new BABYLON.Vector3(defaultVal.x, defaultVal.y, defaultVal.z);
-        if (Array.isArray(data)) return new BABYLON.Vector3(data[0] ?? defaultVal.x, data[1] ?? defaultVal.y, data[2] ?? defaultVal.z);
-        if (typeof data === 'object') return new BABYLON.Vector3(data.x ?? data.X ?? defaultVal.x, data.y ?? data.Y ?? defaultVal.y, data.z ?? data.Z ?? defaultVal.z);
-        return new BABYLON.Vector3(defaultVal.x, defaultVal.y, defaultVal.z);
+        let def = defaultVal;
+        if (typeof defaultVal === 'number') def = { x: defaultVal, y: defaultVal, z: defaultVal };
+
+        if (!data) return new BABYLON.Vector3(def.x, def.y, def.z);
+        if (Array.isArray(data)) return new BABYLON.Vector3(data[0] ?? def.x, data[1] ?? def.y, data[2] ?? def.z);
+        if (typeof data === 'object') return new BABYLON.Vector3(data.x ?? data.X ?? def.x, data.y ?? data.Y ?? def.y, data.z ?? data.Z ?? def.z);
+        return new BABYLON.Vector3(def.x, def.y, def.z);
     };
 })();
