@@ -25,7 +25,7 @@ window.stoneHammer = {
 
     init: function (canvasId) {
         try {
-            this.log("Engine Init v2.5 (NPC Mapping Fix)", "cyan");
+            this.log("Engine Init v2.6 (Voxel Robustness)", "cyan");
             this.canvas = document.getElementById(canvasId);
             this.engine = new BABYLON.Engine(this.canvas, true);
             this.scene = new BABYLON.Scene(this.engine);
@@ -89,7 +89,7 @@ window.stoneHammer = {
             this.engine.runRenderLoop(() => { this.scene.render(); this.updateAnimations(); });
             window.addEventListener("resize", () => { this.engine.resize(); });
 
-            this.log("StoneHammer v2.5 Online", "lime");
+            this.log("StoneHammer v2.6 Online", "lime");
         } catch (err) {
             this.log("CRITICAL ERR: " + err.message, "red");
         }
@@ -187,7 +187,11 @@ window.stoneHammer = {
 
     spawnVoxel: function (asset, name, isPlayer, transform) {
         const group = new BABYLON.TransformNode("voxel_" + name, this.scene);
-        const parts = asset.parts || this.generateHumanoidParts(asset.proceduralColors);
+        const parts = (asset.parts && asset.parts.length > 0) ? asset.parts : this.generateHumanoidParts(asset.proceduralColors);
+
+        if (!parts || parts.length === 0) {
+            this.log("WARNING: No parts generated for " + name, "orange");
+        }
 
         parts.forEach(p => {
             const mesh = BABYLON.MeshBuilder.CreateBox(name + "_" + p.id, {
