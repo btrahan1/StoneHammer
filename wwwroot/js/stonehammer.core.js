@@ -124,5 +124,18 @@ window.stoneHammer = {
         // 2. Restore Town (Re-handled by C# usually calling EnterBuilding("Town"))
         // But we ensure the ground is back
         if (this.ground) this.ground.setEnabled(true);
+    },
+
+    storage: {
+        getSaves: (prefix) => {
+            const saves = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith(prefix)) {
+                    saves.push(key);
+                }
+            }
+            return saves;
+        }
     }
 };

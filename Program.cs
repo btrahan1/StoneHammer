@@ -11,5 +11,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddScoped<CityBridge>();
 builder.Services.AddScoped<AssetManager>();
 builder.Services.AddScoped<CombatService>();
+builder.Services.AddScoped<CharacterService>();
+builder.Services.AddScoped<SaveService>();
 
 await builder.Build().RunAsync();

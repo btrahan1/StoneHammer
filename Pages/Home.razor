@@ -13,6 +13,7 @@
     <div class="row mt-2">
         <div class="col">
             <button class="btn btn-primary" @onclick="SpawnAsPlayer">Spawn as Master Mason</button>
+            <button class="btn btn-secondary" @onclick="ToggleCharacter">👤 Character</button>
             <button class="btn btn-info" @onclick="SpawnBartender">Spawn Bartender</button>
             <button class="btn btn-warning" @onclick="SpawnStore">Spawn General Store</button>
             <button class="btn btn-success" @onclick="GenerateTown">Generate High-Fidelity Town</button>
@@ -25,6 +26,7 @@
 
 <SceneView />
 <CombatView />
+<CharacterSheet @ref="_charSheet" />
 
 @code {
     private DotNetObjectReference<Home>? _objRef;
@@ -65,6 +67,9 @@
     private async Task SpawnGuildMaster() => await AssetManager.SpawnGuildMaster(0, 5);
     private async Task ClearScene() => await AssetManager.ClearAll();
     private async Task SpawnSandboxPillar() => await JSRuntime.InvokeVoidAsync("stoneHammer.spawnSandboxPillar");
+
+    private CharacterSheet? _charSheet;
+    private void ToggleCharacter() => _charSheet?.Toggle();
 
     public void Dispose() => _objRef?.Dispose();
 }

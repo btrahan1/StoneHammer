@@ -1,0 +1,360 @@
+@using StoneHammer.Systems
+@using static StoneHammer.Systems.CharacterModels
+@inject IJSRuntime JSRuntime
+@inject CharacterService CharService
+
+@if (IsVisible && _selected != null)
+{
+    <div class="char-sheet-overlay">
+        <div class="char-window">
+             <!-- Header -->
+             <div class="window-header">
+                 <span>CHARACTER SHEET</span>
+                 <button class="close-btn" @onclick="Toggle">X</button>
+             </div>
+             
+             <div class="window-body">
+                 <!-- Party Sidebar -->
+                 <div class="party-sidebar">
+                     @foreach(var member in CharService.Party)
+                     {
+                         <div class="party-slot @(member == _selected ? "active" : "")" @onclick="() => SelectMember(member)">
+                             <div class="slot-icon">@(member.Class == CharacterClass.Mage ? "🧙‍♂️" : member.Class == CharacterClass.Rogue ? "🥷" : member.Class == CharacterClass.Healer ? "🩹" : "⚔️")</div>
+                             <div class="slot-name">@member.Name</div>
+                         </div>
+                     }
+                     
+                     @if(CharService.Party.Count < 4)
+                     {
+                         <div class="party-slot add" @onclick="Recruit">
+                             <div class="slot-icon">➕</div>
+                             <div class="slot-name">Recruit</div>
+                         </div>
+                     }
+                 </div>
+
+                 <div class="window-content">
+                     <!-- LEFT: Stats -->
+                     <div class="panel stats-panel">
+                         <h3>@_selected.Name (Lvl @_selected.Level)</h3>
+                         <div class="stat-row"><span>STR</span> <span>@_selected.Stats.Strength</span></div>
+                         <div class="stat-row"><span>DEX</span> <span>@_selected.Stats.Dexterity</span></div>
+                         <div class="stat-row"><span>CON</span> <span>@_selected.Stats.Constitution</span></div>
+                         <div class="stat-row"><span>INT</span> <span>@_selected.Stats.Intelligence</span></div>
+                         <div class="stat-row"><span>WIS</span> <span>@_selected.Stats.Wisdom</span></div>
+                         <div class="stat-row"><span>CHA</span> <span>@_selected.Stats.Charisma</span></div>
+                         <hr/>
+                         <div class="stat-row derived"><span>HP</span> <span>@_selected.Stats.MaxHP</span></div>
+                         <div class="stat-row derived"><span>DEF</span> <span>@_selected.Stats.Defense</span></div>
+                         <div class="stat-row derived"><span>GOLD</span> <span style="color:gold">@_selected.Gold G</span></div>
+                     </div>
+                     
+                     <!-- CENTER: Equipment -->
+                     <div class="panel dolls-panel">
+                         <div class="equipment-grid">
+                            <!-- Head -->
+                            <div class="equip-slot head" @onclick='() => Unequip(CharacterModels.EquipmentSlot.Head)'>
+                                 @(GetIcon(CharacterModels.EquipmentSlot.Head) ?? "👤")
+                            </div>
+                            <!-- Chest -->
+                            <div class="equip-slot chest" @onclick='() => Unequip(CharacterModels.EquipmentSlot.Chest)'>
+                                @(GetIcon(CharacterModels.EquipmentSlot.Chest) ?? "👕")
+                            </div>
+                            <!-- Legs -->
+                            <div class="equip-slot legs" @onclick='() => Unequip(CharacterModels.EquipmentSlot.Legs)'>
+                                @(GetIcon(CharacterModels.EquipmentSlot.Legs) ?? "👖")
+                            </div>
+                            <!-- Feet -->
+                            <div class="equip-slot feet" @onclick='() => Unequip(CharacterModels.EquipmentSlot.Feet)'>
+                                @(GetIcon(CharacterModels.EquipmentSlot.Feet) ?? "👢")
+                            </div>
+                            <!-- MainHand -->
+                            <div class="equip-slot hand-r" @onclick='() => Unequip(CharacterModels.EquipmentSlot.MainHand)'>
+                                @(GetIcon(CharacterModels.EquipmentSlot.MainHand) ?? "🗡️")
+                            </div>
+                             <!-- OffHand -->
+                            <div class="equip-slot hand-l" @onclick='() => Unequip(CharacterModels.EquipmentSlot.OffHand)'>
+                                @(GetIcon(CharacterModels.EquipmentSlot.OffHand) ?? "🛡️")
+                            </div>
+                         </div>
+                     </div>
+    
+                     <!-- RIGHT: Inventory & Skills OR Save System -->
+                     <div class="panel inventory-panel">
+                         <div class="header-row">
+                             <div class="tabs">
+                                 <button class="@(_viewMode == "INVO" ? "active" : "")" @onclick='() => _viewMode = "INVO"'>INVO</button>
+                                 <button class="@(_viewMode == "SYS" ? "active" : "")" @onclick='() => _viewMode = "SYS"'>SYS</button>
+                             </div>
+                         </div>
+                         
+                         @if(_viewMode == "INVO")
+                         {
+                             <div class="sub-header">
+                                 <select @onchange="OnClassChanged" value="@_selected.Class" style="width: 100%; color: black;">
+                                    @foreach(CharacterClass c in Enum.GetValues(typeof(CharacterClass)))
+                                    {
+                                        <option value="@c">@c</option>
+                                    }
+                                 </select>
+                             </div>
+                             
+                             <div class="inv-grid">
+                                 @foreach(var item in _selected.Inventory)
+                                 {
+                                     <div class="inv-item" @onclick="() => UseOrEquip(item)" title="@item.Name (@item.Type)">
+                                         <span class="icon">@item.Icon</span>
+                                         @if(item.ValidSlot.HasValue && _selected.Equipment.ContainsValue(item))
+                                         {
+                                             <span class="equipped-badge">E</span>
+                                         }
+                                     </div>
+                                 }
+                             </div>
+                             
+                             <hr/>
+                             <h3>SKILLS</h3>
+                             <div class="skills-list">
+                                 @foreach(var skill in _selected.Skills)
+                                 {
+                                     <div class="skill-row" title="@skill.Description">
+                                         <span class="skill-icon">@skill.Icon</span>
+                                         <span class="skill-name">@skill.Name</span>
+                                         <span class="skill-cost">(@skill.ManaCost MP)</span>
+                                     </div>
+                                 }
+                             </div>
+                         }
+                         else if (_viewMode == "SYS")
+                         {
+                             <div class="save-system">
+                                 <h3>Save Game</h3>
+                                 <div class="input-group">
+                                     <input @bind="_saveName" placeholder="Save Name..." />
+                                     <button class="btn-save" @onclick="SaveGame">💾 Save</button>
+                                 </div>
+                                 
+                                 <hr/>
+                                 <h3>Load Game</h3>
+                                 <div class="save-list">
+                                     @foreach(var file in _saveFiles)
+                                     {
+                                         <div class="save-file">
+                                             <span>@file</span>
+                                             <button class="btn-load" @onclick="() => LoadGame(file)">📂</button>
+                                         </div>
+                                     }
+                                     @if(_saveFiles.Count == 0)
+                                     {
+                                         <div class="no-saves">No saves found.</div>
+                                     }
+                                 </div>
+                             </div>
+                         }
+                     </div>
+                 </div>
+             </div>
+        </div>
+    </div>
+}
+
+@inject SaveService SaveService
+
+@code {
+    public bool IsVisible { get; private set; } = false;
+    private CharacterData? _selected;
+    private string _viewMode = "INVO"; // INVO or SYS
+    private string _saveName = "MyGame";
+    private List<string> _saveFiles = new List<string>();
+
+    protected override void OnInitialized()
+    {
+        CharService.OnCharacterUpdated += StateHasChanged;
+        // Default to player if available, otherwise first party member
+        _selected = CharService.Party.FirstOrDefault();
+    }
+    
+    private async Task SaveGame()
+    {
+        if(!string.IsNullOrWhiteSpace(_saveName))
+        {
+            await SaveService.SaveGame(_saveName);
+            await RefreshSaveList();
+        }
+    }
+    
+    private async Task LoadGame(string name)
+    {
+        await SaveService.LoadGame(name);
+        _selected = CharService.Party.FirstOrDefault(); // Reset selection
+        StateHasChanged();
+    }
+    
+    private async Task RefreshSaveList()
+    {
+        _saveFiles = await SaveService.GetSaveFiles();
+        StateHasChanged();
+    }
+
+    public async Task Toggle()
+    {
+        IsVisible = !IsVisible;
+        if(IsVisible) await RefreshSaveList();
+        if(_selected == null) _selected = CharService.Player;
+        StateHasChanged();
+    }
+
+    private void SelectMember(CharacterData member)
+    {
+        _selected = member;
+        StateHasChanged();
+    }
+
+    private void Recruit()
+    {
+        CharService.RecruitMember();
+    }
+
+    private string? GetIcon(CharacterModels.EquipmentSlot slot)
+    {
+        if (_selected == null) return null;
+        var item = _selected.Equipment.GetValueOrDefault(slot);
+        return item?.Icon;
+    }
+
+    private void Unequip(CharacterModels.EquipmentSlot slot)
+    {
+        if (_selected != null) CharService.Unequip(_selected, slot);
+    }
+    
+    private void UseOrEquip(CharacterModels.InventoryItem item)
+    {
+        if (_selected != null && item.ValidSlot.HasValue)
+        {
+            CharService.Equip(_selected, item);
+        }
+    }
+
+    private async Task OnClassChanged(ChangeEventArgs e)
+    {
+        if (_selected != null && Enum.TryParse(typeof(CharacterClass), e.Value?.ToString(), out var result))
+        {
+            var newClass = (CharacterClass)result;
+            CharService.SetClass(_selected, newClass);
+            
+            // Only update visuals if it's the main player (for now)
+            if (_selected == CharService.Player) {
+                 await JSRuntime.InvokeVoidAsync("stoneHammer.character.setClassVisuals", newClass.ToString());
+            }
+        }
+    }
+}
+
+<style>
+    .char-sheet-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex; justify-content: center; align-items: center;
+        z-index: 3000;
+        pointer-events: auto;
+    }
+    .char-window {
+        width: 900px; height: 500px;
+        background: #2a2a2a;
+        border: 4px solid #8e8e8e;
+        display: flex; flex-direction: column;
+        color: white;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    .window-header {
+        background: #444; padding: 10px; display: flex; justify-content: space-between; font-weight: bold;
+    }
+    .close-btn { background: red; color: white; border: none; font-weight: bold; cursor: pointer; }
+    
+    .window-body { display: flex; flex: 1; overflow: hidden; }
+    
+    .party-sidebar {
+        width: 120px; background: #222; border-right: 1px solid #555;
+        padding: 10px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .party-slot {
+        background: #333; border: 1px solid #555; padding: 5px; cursor: pointer;
+        display: flex; flex-direction: column; align-items: center;
+        transition: all 0.2s;
+    }
+    .party-slot:hover { background: #444; border-color: #888; }
+    .party-slot.active { border-color: gold; background: #443300; }
+    .party-slot.add { border-style: dashed; opacity: 0.7; }
+    
+    .slot-icon { font-size: 24px; margin-bottom: 5px; }
+    .slot-name { font-size: 10px; text-align: center; overflow: hidden; width: 100%; white-space: nowrap; text-overflow: ellipsis; }
+
+    .window-content {
+        display: flex; flex: 1; padding: 10px; gap: 10px;
+    }
+    .panel {
+        background: #1a1a1a; padding: 10px; border: 1px solid #555;
+    }
+    .stats-panel { width: 200px; }
+    .stat-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .stat-row.derived { font-weight: bold; color: #aaaaff; }
+    
+    .dolls-panel { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+    .equipment-grid {
+        position: relative; width: 200px; height: 300px;
+        background: url('images/silhouette.png') no-repeat center; /* Optional bg */
+    }
+    .equip-slot {
+        width: 50px; height: 50px; border: 2px solid #666; background: #333;
+        position: absolute; display: flex; justify-content: center; align-items: center;
+        font-size: 24px; cursor: pointer;
+    }
+    .equip-slot:hover { border-color: yellow; }
+    
+    /* Simple doll layout */
+    .head { top: 10px; left: 75px; }
+    .chest { top: 70px; left: 75px; }
+    .legs { top: 130px; left: 75px; }
+    .feet { top: 220px; left: 75px; }
+    .hand-r { top: 80px; left: 140px; }
+    .hand-l { top: 80px; left: 10px; }
+    
+    .inventory-panel { width: 250px; }
+    .inv-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+    .inv-item {
+        width: 40px; height: 40px; border: 1px solid #555; background: #222;
+        display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative;
+    }
+    .inv-item:hover { border-color: white; }
+    .equipped-badge {
+        position: absolute; bottom: 0; right: 0; background: gold; color: black; font-size: 10px; padding: 0 2px;
+    }
+    
+    .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    
+    .skills-list { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+    .skill-row { 
+        display: flex; align-items: center; background: #222; padding: 4px; border: 1px solid #444; 
+        font-size: 14px;
+    }
+    .skill-icon { font-size: 18px; margin-right: 8px; }
+    .skill-name { flex: 1; font-weight: bold; }
+    .skill-name { flex: 1; font-weight: bold; }
+    .skill-cost { color: #aaaaff; font-size: 12px; }
+    
+    /* Tabs */
+    .tabs { display: flex; gap: 5px; }
+    .tabs button { background: #333; border: 1px solid #555; color: #888; cursor: pointer; padding: 2px 8px; }
+    .tabs button.active { background: #555; color: white; border-bottom: 2px solid gold; }
+    
+    .save-system { display: flex; flex-direction: column; gap: 10px; }
+    .input-group { display: flex; gap: 5px; }
+    .input-group input { flex: 1; background: #222; border: 1px solid #555; color: white; padding: 4px; }
+    .btn-save { background: #005500; color: white; border: none; cursor: pointer; }
+    
+    .save-list { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+    .save-file { display: flex; justify-content: space-between; background: #222; padding: 4px; border: 1px solid #444; align-items: center; }
+    .btn-load { background: #004488; color: white; border: none; cursor: pointer; padding: 2px 6px; }
+    .no-saves { font-style: italic; color: #666; text-align: center; }
+</style>
