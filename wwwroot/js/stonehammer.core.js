@@ -77,7 +77,7 @@ window.stoneHammer = {
             });
             window.addEventListener("resize", () => { this.engine.resize(); });
 
-            this.log("StoneHammer v11.5 Online (Modularized)", "lime");
+            this.log("StoneHammer v12.1 Online (Modularized)", "lime");
         } catch (err) {
             this.log("CRITICAL ERR: " + err.message, "red");
         }

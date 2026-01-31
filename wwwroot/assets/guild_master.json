@@ -1,0 +1,12 @@
+{
+    "Id": "GuildMaster",
+    "Name": "Guild Master",
+    "Type": "Voxel",
+    "ProceduralColors": {
+        "Skin": "#8D5524",
+        "Cloth": "#1e293b",
+        "Accent": "#e11d48"
+    },
+    "Parts": [],
+    "Children": []
+}

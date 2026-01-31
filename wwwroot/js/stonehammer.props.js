@@ -27,10 +27,18 @@
 
     sh.spawnVoxel = function (asset, name, isPlayer, transform) {
         const group = new BABYLON.TransformNode("voxel_" + name, this.scene);
-        const parts = (asset.parts && asset.parts.length > 0) ? asset.parts : this.generateHumanoidParts(asset.proceduralColors);
+
+        let rawParts = this.getProp(asset, "Parts");
+        let rawColors = this.getProp(asset, "ProceduralColors");
+
+        const parts = (rawParts && rawParts.length > 0) ? rawParts : this.generateHumanoidParts(rawColors);
 
         if (!parts || parts.length === 0) {
             this.log("WARNING: No parts generated for " + name, "orange");
+        } else {
+            if (!rawParts) {
+                this.log("Generating Humanoid Parts for " + name + " (Skin: " + (this.getProp(rawColors, "Skin") || "Default") + ")", "cyan");
+            }
         }
 
         const meshMap = {};

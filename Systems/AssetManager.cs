@@ -35,6 +35,7 @@ namespace StoneHammer.Systems
         public async Task SpawnTavern(float x = 0, float z = 0) => await SpawnAsset("assets/tavern.json", "Tavern", false, new { Position = new[] { x, 0, z } });
         public async Task SpawnGuild(float x = 0, float z = 0) => await SpawnAsset("assets/guild.json", "Guild", false, new { Position = new[] { x, 0, z }, isTrigger = true, triggerRadius = 5.0f });
         public async Task SpawnStore(float x = 0, float z = 0) => await SpawnAsset("assets/general_store.json", "General Store", false, new { Position = new[] { x, 0, z } });
+        public async Task SpawnGuildMaster(float x = 0, float z = 0) => await SpawnAsset("assets/guild_master.json", "Guild Master Debug", false, new { Position = new[] { x, 0, z } }); // Debug helper
 
         public async Task EnterBuilding(string buildingName)
         {
@@ -98,23 +99,28 @@ namespace StoneHammer.Systems
         {
             try 
             {
+                System.Console.WriteLine($"[AssetManager] Requesting spawn for: {name} from {path}");
+
                 string json;
                 if (!string.IsNullOrEmpty(path))
                 {
-                    json = await _http.GetStringAsync(path);
+                    // v11.8: Add cache buster to prevent stale JSON (missing properties like Type: Voxel)
+                    var url = path.Contains("?") ? path + "&" : path + "?";
+                    url += "v=" + System.DateTime.Now.Ticks;
+                    json = await _http.GetStringAsync(url);
                 }
                 else 
                 {
-                    // v11.1: If no path, we assume the transform or a separate data source might contain it
-                    // but for children with inline data, we can serialize the child object itself back to JSON 
-                    // or just pass the child object if we refactor more. 
-                    // For now, let's just log that we need a path or inline support.
                     System.Console.WriteLine($"Error: Asset {name} has no path and inline data is not yet supported in SpawnAsset.");
                     return;
                 }
 
-                if (json.Contains("\"Voxel\""))
+                // Robust check for Voxel type
+                bool isVoxel = json.Contains("\"Voxel\"", System.StringComparison.OrdinalIgnoreCase);
+
+                if (isVoxel)
                 {
+                    System.Console.WriteLine($"[AssetManager] Identifed {name} as VOXEL (SpawnVoxel).");
                     var asset = JsonSerializer.Deserialize<VoxelAsset>(json, _options);
                     if (asset != null) 
                     {
@@ -127,6 +133,7 @@ namespace StoneHammer.Systems
                 }
                 else
                 {
+                    System.Console.WriteLine($"[AssetManager] Identifed {name} as PROCEDURAL (SpawnRecipe).");
                     var asset = JsonSerializer.Deserialize<ProceduralAsset>(json, _options);
                     if (asset != null) 
                     {

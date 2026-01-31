@@ -128,6 +128,38 @@
             }
         },
         {
+            "Path": "assets/desk.json",
+            "Name": "ReceptionDesk",
+            "Transform": {
+                "Position": [
+                    0,
+                    0,
+                    10
+                ],
+                "Rotation": [
+                    0,
+                    180,
+                    0
+                ]
+            }
+        },
+        {
+            "Path": "assets/guild_master.json",
+            "Name": "GuildMasterNPC",
+            "Transform": {
+                "Position": [
+                    0,
+                    0,
+                    12
+                ],
+                "Rotation": [
+                    0,
+                    180,
+                    0
+                ]
+            }
+        },
+        {
             "Path": "assets/pillar.json",
             "Name": "GuildPillar_FR",
             "Transform": {

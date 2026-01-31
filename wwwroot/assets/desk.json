@@ -1,0 +1,70 @@
+{
+    "Name": "Reception Desk",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "top",
+            "Shape": "Box",
+            "Position": [
+                0,
+                1,
+                0
+            ],
+            "Scale": [
+                5,
+                0.2,
+                2
+            ],
+            "ColorHex": "#5D4037",
+            "Material": "Wood"
+        },
+        {
+            "Id": "front_panel",
+            "Shape": "Box",
+            "Position": [
+                0,
+                0.5,
+                0.9
+            ],
+            "Scale": [
+                5,
+                1,
+                0.2
+            ],
+            "ColorHex": "#4E342E",
+            "Material": "Wood"
+        },
+        {
+            "Id": "side_l",
+            "Shape": "Box",
+            "Position": [
+                -2.4,
+                0.5,
+                0
+            ],
+            "Scale": [
+                0.2,
+                1,
+                2
+            ],
+            "ColorHex": "#4E342E",
+            "Material": "Wood"
+        },
+        {
+            "Id": "side_r",
+            "Shape": "Box",
+            "Position": [
+                2.4,
+                0.5,
+                0
+            ],
+            "Scale": [
+                0.2,
+                1,
+                2
+            ],
+            "ColorHex": "#4E342E",
+            "Material": "Wood"
+        }
+    ]
+}
