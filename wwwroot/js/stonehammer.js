@@ -25,7 +25,7 @@ window.stoneHammer = {
 
     init: function (canvasId) {
         try {
-            this.log("Engine Init v2.6 (Voxel Robustness)", "cyan");
+            this.log("Engine Init v2.7 (Classic Rotation)", "cyan");
             this.canvas = document.getElementById(canvasId);
             this.engine = new BABYLON.Engine(this.canvas, true);
             this.scene = new BABYLON.Scene(this.engine);
@@ -89,7 +89,7 @@ window.stoneHammer = {
             this.engine.runRenderLoop(() => { this.scene.render(); this.updateAnimations(); });
             window.addEventListener("resize", () => { this.engine.resize(); });
 
-            this.log("StoneHammer v2.6 Online", "lime");
+            this.log("StoneHammer v2.7 Online", "lime");
         } catch (err) {
             this.log("CRITICAL ERR: " + err.message, "red");
         }
@@ -258,38 +258,37 @@ window.stoneHammer = {
     updateAnimations: function () {
         if (!this.player) return;
 
-        let moved = false;
-        const forward = this.camera.getFrontPosition(1).subtract(this.camera.position);
-        forward.y = 0;
-        forward.normalize();
-        const right = BABYLON.Vector3.Cross(BABYLON.Vector3.Up(), forward);
+        // Rotation: A/D or Left/Right arrows rotate the character
+        if (this.inputMap["a"] || this.inputMap["arrowleft"]) {
+            this.player.rotation.y -= this.playerRotationSpeed;
+        }
+        if (this.inputMap["d"] || this.inputMap["arrowright"]) {
+            this.player.rotation.y += this.playerRotationSpeed;
+        }
 
+        // Movement: W/S or Up/Down arrows move forward/backward along character's forward vector
         let moveDir = BABYLON.Vector3.Zero();
+        let moved = false;
 
         if (this.inputMap["w"] || this.inputMap["arrowup"]) {
+            // Get local forward vector
+            const forward = this.player.forward.clone();
+            forward.y = 0;
+            forward.normalize();
             moveDir.addInPlace(forward);
             moved = true;
         }
         if (this.inputMap["s"] || this.inputMap["arrowdown"]) {
+            const forward = this.player.forward.clone();
+            forward.y = 0;
+            forward.normalize();
             moveDir.subtractInPlace(forward);
-            moved = true;
-        }
-        if (this.inputMap["a"] || this.inputMap["arrowleft"]) {
-            moveDir.subtractInPlace(right);
-            moved = true;
-        }
-        if (this.inputMap["d"] || this.inputMap["arrowright"]) {
-            moveDir.addInPlace(right);
             moved = true;
         }
 
         if (moved) {
             moveDir.normalize();
             this.player.position.addInPlace(moveDir.scale(this.playerSpeed));
-
-            // Rotate player to face movement direction
-            const targetRotation = Math.atan2(moveDir.x, moveDir.z);
-            this.player.rotation.y = targetRotation;
         }
     },
 
