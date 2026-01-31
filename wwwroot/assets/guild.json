@@ -1,0 +1,210 @@
+{
+    "Name": "Ironblood Guildhall",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "main_hall",
+            "Shape": "Box",
+            "Position": [
+                0,
+                4,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                15,
+                8,
+                12
+            ],
+            "ColorHex": "#1E3A8A",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "tower_left",
+            "Shape": "Cylinder",
+            "Position": [
+                -8,
+                6,
+                4
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                4,
+                12,
+                4
+            ],
+            "ColorHex": "#334155",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "tower_right",
+            "Shape": "Cylinder",
+            "Position": [
+                8,
+                6,
+                4
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                4,
+                12,
+                4
+            ],
+            "ColorHex": "#334155",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "roof_spire_left",
+            "Shape": "Cylinder",
+            "ParentId": "tower_left",
+            "Position": [
+                0,
+                8,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1.1,
+                4,
+                1.1
+            ],
+            "ColorHex": "#0F172A",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "roof_spire_right",
+            "Shape": "Cylinder",
+            "ParentId": "tower_right",
+            "Position": [
+                0,
+                8,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1.1,
+                4,
+                1.1
+            ],
+            "ColorHex": "#0F172A",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "banner_left",
+            "Shape": "Box",
+            "ParentId": "main_hall",
+            "Position": [
+                -4,
+                2,
+                6.1
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                2,
+                6,
+                0.1
+            ],
+            "ColorHex": "#DC2626",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "banner_right",
+            "Shape": "Box",
+            "ParentId": "main_hall",
+            "Position": [
+                4,
+                2,
+                6.1
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                2,
+                6,
+                0.1
+            ],
+            "ColorHex": "#DC2626",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "pillar_1",
+            "Shape": "Cylinder",
+            "ParentId": "main_hall",
+            "Position": [
+                -6,
+                -4,
+                5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1.5,
+                8,
+                1.5
+            ],
+            "ColorHex": "#94A3B8",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "pillar_2",
+            "Shape": "Cylinder",
+            "ParentId": "main_hall",
+            "Position": [
+                6,
+                -4,
+                5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1.5,
+                8,
+                1.5
+            ],
+            "ColorHex": "#94A3B8",
+            "Material": "Metal",
+            "Operation": "Union"
+        }
+    ]
+}

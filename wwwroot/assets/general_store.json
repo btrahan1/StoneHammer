@@ -1,0 +1,216 @@
+{
+    "Name": "Hammer & Sickle Store",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "foundation",
+            "Shape": "Box",
+            "Position": [
+                0,
+                0.5,
+                0
+            ],
+            "Scale": [
+                16,
+                1,
+                13
+            ],
+            "ColorHex": "#374151",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "walls",
+            "Shape": "Box",
+            "ParentId": "foundation",
+            "Position": [
+                0,
+                3.5,
+                0
+            ],
+            "Scale": [
+                15,
+                6,
+                12
+            ],
+            "ColorHex": "#F9FAFB",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "pillar_fl",
+            "Shape": "Box",
+            "ParentId": "walls",
+            "Position": [
+                -7.4,
+                0,
+                5.9
+            ],
+            "Scale": [
+                0.5,
+                6.1,
+                0.5
+            ],
+            "ColorHex": "#451A03",
+            "Material": "Plastic"
+        },
+        {
+            "Id": "pillar_fr",
+            "Shape": "Box",
+            "ParentId": "walls",
+            "Position": [
+                7.4,
+                0,
+                5.9
+            ],
+            "Scale": [
+                0.5,
+                6.1,
+                0.5
+            ],
+            "ColorHex": "#451A03",
+            "Material": "Plastic"
+        },
+        {
+            "Id": "pillar_bl",
+            "Shape": "Box",
+            "ParentId": "walls",
+            "Position": [
+                -7.4,
+                0,
+                -5.9
+            ],
+            "Scale": [
+                0.5,
+                6.1,
+                0.5
+            ],
+            "ColorHex": "#451A03",
+            "Material": "Plastic"
+        },
+        {
+            "Id": "pillar_br",
+            "Shape": "Box",
+            "ParentId": "walls",
+            "Position": [
+                7.4,
+                0,
+                -5.9
+            ],
+            "Scale": [
+                0.5,
+                6.1,
+                0.5
+            ],
+            "ColorHex": "#451A03",
+            "Material": "Plastic"
+        },
+        {
+            "Id": "awning",
+            "Shape": "Box",
+            "ParentId": "walls",
+            "Position": [
+                0,
+                2,
+                6.1
+            ],
+            "Rotation": [
+                25,
+                0,
+                0
+            ],
+            "Scale": [
+                15.5,
+                0.3,
+                4
+            ],
+            "ColorHex": "#BE123C",
+            "Material": "Plastic"
+        },
+        {
+            "Id": "window_main",
+            "Shape": "Box",
+            "ParentId": "walls",
+            "Position": [
+                3,
+                -0.5,
+                6.1
+            ],
+            "Scale": [
+                5,
+                3,
+                0.1
+            ],
+            "ColorHex": "#A5F3FC",
+            "Material": "Glass"
+        },
+        {
+            "Id": "door_main",
+            "Shape": "Box",
+            "ParentId": "walls",
+            "Position": [
+                -3,
+                -1,
+                6.1
+            ],
+            "Scale": [
+                2.5,
+                4,
+                0.2
+            ],
+            "ColorHex": "#451A03",
+            "Material": "Plastic"
+        },
+        {
+            "Id": "roof",
+            "Shape": "Box",
+            "ParentId": "walls",
+            "Position": [
+                0,
+                3.5,
+                0
+            ],
+            "Scale": [
+                16,
+                1,
+                13
+            ],
+            "ColorHex": "#78350F",
+            "Material": "Plastic"
+        },
+        {
+            "Id": "sign_post",
+            "Shape": "Box",
+            "ParentId": "walls",
+            "Position": [
+                5,
+                6,
+                4
+            ],
+            "Scale": [
+                0.3,
+                4,
+                0.3
+            ],
+            "ColorHex": "#1A1A1A",
+            "Material": "Metal"
+        },
+        {
+            "Id": "sign_board",
+            "Shape": "Box",
+            "ParentId": "sign_post",
+            "Position": [
+                0,
+                1.5,
+                0
+            ],
+            "Scale": [
+                4,
+                2,
+                0.2
+            ],
+            "ColorHex": "#1F2937",
+            "Material": "Plastic"
+        }
+    ]
+}

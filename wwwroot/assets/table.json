@@ -1,0 +1,272 @@
+{
+  "Name": "Blackjack_Table_Void_Edition",
+  "Type": "Procedural",
+  "Parts": [
+    {
+      "Id": "table_base",
+      "Shape": "Cylinder",
+      "Position": [
+        0,
+        0.4,
+        0
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ],
+      "Scale": [
+        0.6,
+        0.8,
+        0.6
+      ],
+      "ColorHex": "#121212",
+      "Material": "Metal",
+      "Operation": "Union"
+    },
+    {
+      "Id": "table_main_slab",
+      "Shape": "Box",
+      "Position": [
+        0,
+        0.85,
+        0
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ],
+      "Scale": [
+        2.5,
+        0.1,
+        1.5
+      ],
+      "ColorHex": "#080808",
+      "Material": "Plastic",
+      "Operation": "Union"
+    },
+    {
+      "Id": "felt_surface",
+      "Shape": "Box",
+      "Position": [
+        0,
+        0.91,
+        0
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ],
+      "Scale": [
+        2.3,
+        0.02,
+        1.3
+      ],
+      "ColorHex": "#1a0033",
+      "Material": "Leather",
+      "Operation": "Union"
+    },
+    {
+      "Id": "padded_rim_back",
+      "Shape": "Box",
+      "Position": [
+        0,
+        0.93,
+        0.7
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ],
+      "Scale": [
+        2.5,
+        0.15,
+        0.1
+      ],
+      "ColorHex": "#000000",
+      "Material": "Leather",
+      "Operation": "Union"
+    },
+    {
+      "Id": "padded_rim_front",
+      "Shape": "Box",
+      "Position": [
+        0,
+        0.93,
+        -0.7
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ],
+      "Scale": [
+        2.5,
+        0.15,
+        0.1
+      ],
+      "ColorHex": "#000000",
+      "Material": "Leather",
+      "Operation": "Union"
+    },
+    {
+      "Id": "padded_rim_left",
+      "Shape": "Box",
+      "Position": [
+        1.2,
+        0.93,
+        0
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ],
+      "Scale": [
+        0.1,
+        0.15,
+        1.5
+      ],
+      "ColorHex": "#000000",
+      "Material": "Leather",
+      "Operation": "Union"
+    },
+    {
+      "Id": "padded_rim_right",
+      "Shape": "Box",
+      "Position": [
+        -1.2,
+        0.93,
+        0
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ],
+      "Scale": [
+        0.1,
+        0.15,
+        1.5
+      ],
+      "ColorHex": "#000000",
+      "Material": "Leather",
+      "Operation": "Union"
+    },
+    {
+      "Id": "void_glow_strip_front",
+      "Shape": "Box",
+      "Position": [
+        0,
+        0.83,
+        -0.76
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ],
+      "Scale": [
+        2.6,
+        0.03,
+        0.02
+      ],
+      "ColorHex": "#00f2ff",
+      "Material": "Glow",
+      "Operation": "Union"
+    },
+    {
+      "Id": "void_glow_strip_back",
+      "Shape": "Box",
+      "Position": [
+        0,
+        0.83,
+        0.76
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ],
+      "Scale": [
+        2.6,
+        0.03,
+        0.02
+      ],
+      "ColorHex": "#00f2ff",
+      "Material": "Glow",
+      "Operation": "Union"
+    },
+    {
+      "Id": "dealer_chip_tray",
+      "Shape": "Box",
+      "Position": [
+        0,
+        0.91,
+        0.4
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ],
+      "Scale": [
+        0.8,
+        0.05,
+        0.3
+      ],
+      "ColorHex": "#222222",
+      "Material": "Metal",
+      "Operation": "Union"
+    },
+    {
+      "Id": "holographic_dealer_interface",
+      "Shape": "Box",
+      "Position": [
+        0.7,
+        1.0,
+        0.5
+      ],
+      "Rotation": [
+        -20,
+        0,
+        0
+      ],
+      "Scale": [
+        0.4,
+        0.01,
+        0.3
+      ],
+      "ColorHex": "#00f2ff",
+      "Material": "Glass",
+      "Operation": "Union"
+    }
+  ],
+  "Timeline": [
+    {
+      "Time": 0.0,
+      "Action": "Color",
+      "TargetId": "void_glow_strip_front",
+      "Value": [
+        0,
+        242,
+        255
+      ],
+      "Duration": 2.0
+    },
+    {
+      "Time": 2.0,
+      "Action": "Color",
+      "TargetId": "void_glow_strip_front",
+      "Value": [
+        255,
+        0,
+        255
+      ],
+      "Duration": 2.0
+    }
+  ]
+}

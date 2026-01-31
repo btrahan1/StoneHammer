@@ -1,0 +1,65 @@
+{
+"Name": "Casino Dealer",
+"Type": "Voxel",
+"ProceduralColors": {
+"Skin": "#F1C27D",
+"Shirt": "#FFFFFF",
+"Pants": "#1A1A1A",
+"Eyes": "#222222"
+},
+"Textures": {
+"Face": [
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D",
+"#F1C27D", "#222222", "#222222", "#F1C27D", "#F1C27D", "#222222", "#222222", "#F1C27D",
+"#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D",
+"#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D",
+"#F1C27D", "#F1C27D", "#D2A679", "#D2A679", "#D2A679", "#D2A679", "#F1C27D", "#F1C27D",
+"#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D"
+],
+"Chest": [
+"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
+"#FFFFFF", "#FFFFFF", "#000000", "#000000", "#000000", "#000000", "#FFFFFF", "#FFFFFF",
+"#1A1A1A", "#1A1A1A", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#FFFFFF", "#FFFFFF", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A"
+],
+"Arms": [
+"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
+"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
+"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
+"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
+"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
+"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
+"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
+"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
+"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
+"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
+"#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D",
+"#F1C27D", "#F1C27D", "#F1C27D", "#F1C27D"
+],
+"Legs": [
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#1A1A1A", "#1A1A1A", "#1A1A1A", "#1A1A1A",
+"#000000", "#000000", "#000000", "#000000",
+"#000000", "#000000", "#000000", "#000000"
+]
+},
+"Description": "A professional casino dealer styled in a traditional black waistcoat, white dress shirt, and a black bow tie."
+}

@@ -1,0 +1,51 @@
+﻿@page "/"
+@using StoneHammer.Components
+@using StoneHammer.Systems
+@inject AssetManager AssetManager
+
+@inject CityBridge CityBridge
+
+<PageTitle>StoneHammer</PageTitle>
+
+<div class="game-ui">
+    <div class="row mt-2">
+        <div class="col">
+            <button class="btn btn-primary" @onclick="SpawnAsPlayer">Spawn as Master Mason</button>
+            <button class="btn btn-info" @onclick="SpawnBartender">Spawn Bartender</button>
+            <button class="btn btn-warning" @onclick="SpawnStore">Spawn General Store</button>
+            <button class="btn btn-success" @onclick="GenerateTown">Generate High-Fidelity Town</button>
+            <button class="btn btn-danger" @onclick="ClearScene">Clear Scene</button>
+        </div>
+    </div>
+</div>
+
+<SceneView />
+
+@code {
+    private async Task SpawnAsPlayer() => await AssetManager.SpawnPlayer();
+    private async Task SpawnBartender() => await AssetManager.SpawnBartender(5, 5);
+    private async Task SpawnStore() => await AssetManager.SpawnStore(0, 0);
+    private async Task GenerateTown() => await AssetManager.GenerateTown();
+    private async Task ClearScene() => await AssetManager.ClearAll();
+}
+
+<style>
+    .game-btn {
+        background: rgba(0, 0, 0, 0.7);
+        color: #00f2ff;
+        border: 1px solid #00f2ff;
+        padding: 8px 16px;
+        margin-right: 8px;
+        cursor: pointer;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.2s;
+    }
+
+    .game-btn:hover {
+        background: #00f2ff;
+        color: #000;
+    }
+</style>
