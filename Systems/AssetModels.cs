@@ -4,12 +4,14 @@ namespace StoneHammer.Systems
 {
     public class VoxelPart
     {
+        public string Id { get; set; } = ""; // Was missing, needed for bones
         public string Name { get; set; } = "";
         public float[] Offset { get; set; } = new float[3];
         public float[] Dimensions { get; set; } = new float[3];
         public float[] Pivot { get; set; } = new float[3];
         public float[] Rotation { get; set; } = new float[3];
         public string? HexColor { get; set; }
+        public string? ParentLimb { get; set; } // New: For hierarchical rigs
         public int[] TextureOffset { get; set; } = new int[2];
         public int[]? TextureDimensions { get; set; }
     }

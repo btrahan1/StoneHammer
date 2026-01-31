@@ -32,14 +32,21 @@ namespace StoneHammer.Systems
                     new ProceduralPart { Id = "wall_n", Shape = "Box", Position = new float[] { 0, 30, 120 }, Scale = new float[] { 180, 60, 1 }, ColorHex = "#A0AEC0", Material = "Stone" },
                     new ProceduralPart { Id = "wall_s", Shape = "Box", Position = new float[] { 0, 30, -120 }, Scale = new float[] { 180, 60, 1 }, ColorHex = "#A0AEC0", Material = "Stone" },
                     new ProceduralPart { Id = "wall_e", Shape = "Box", Position = new float[] { 90, 30, 0 }, Scale = new float[] { 1, 60, 240 }, ColorHex = "#A0AEC0", Material = "Stone" },
-                    new ProceduralPart { Id = "wall_w", Shape = "Box", Position = new float[] { -90, 30, 0 }, Scale = new float[] { 1, 60, 240 }, ColorHex = "#A0AEC0", Material = "Stone" }
+                    new ProceduralPart { Id = "wall_w", Shape = "Box", Position = new float[] { -90, 30, 0 }, Scale = new float[] { 1, 60, 240 }, ColorHex = "#A0AEC0", Material = "Stone" },
+                    // New: Entrance Stairs (Green/Up is meaningless here, but for consistency)
+                    new ProceduralPart { Id = "stairs_up", Shape = "Box", Position = new float[] { 0, 0, -110 }, Scale = new float[] { 20, 10, 20 }, ColorHex = "#48BB78", Material = "Stone" },
+                    // Exit Stairs (Blue/Down)
+                    new ProceduralPart { Id = "stairs_down", Shape = "Box", Position = new float[] { 0, 0, 110 }, Scale = new float[] { 20, 10, 20 }, ColorHex = "#4299E1", Material = "Stone" }
                 },
                 Children = new List<ChildAsset>
                 {
-                    // Exit to Town
-                    new ChildAsset { Path = "assets/exit_crystal.json", Name = "CryptExitCrystal", Transform = new { Position = new float[] { 0, 0, -100 } } },
-                    // Stairs Down (Blue)
-                    new ChildAsset { Path = "assets/stairs_down.json", Name = "StairsDown", Transform = new { Position = new float[] { 0, 0, 100 } } }
+                     // Mobs
+                     new ChildAsset { Path = "assets/skeleton.json", Name = "Skeleton_Lvl1_A", Transform = new { Position = new float[] { -20, 0, 20 }, Rotation = new float[] { 0, 135, 0 } } },
+                     new ChildAsset { Path = "assets/skeleton.json", Name = "Skeleton_Lvl1_B", Transform = new { Position = new float[] { 20, 0, 20 }, Rotation = new float[] { 0, -135, 0 } } },
+                     
+                     // Interactables
+                     new ChildAsset { Path = "assets/stairs.json", Name = "StairsDown", Transform = new { Position = new float[] { 0, 0, 110 }, Rotation = new float[] { 0, 0, 0 } } },
+                     new ChildAsset { Path = "assets/exit_crystal.json", Name = "CryptExit", Transform = new { Position = new float[] { 0, 10, -100 } } }
                 }
             };
             return asset;

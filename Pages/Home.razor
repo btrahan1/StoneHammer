@@ -5,6 +5,7 @@
 @inject AssetManager AssetManager
 @inject CityBridge CityBridge
 @inject IJSRuntime JSRuntime
+@inject CombatService CombatService
 
 <PageTitle>StoneHammer</PageTitle>
 
@@ -23,6 +24,7 @@
 </div>
 
 <SceneView />
+<CombatView />
 
 @code {
     private DotNetObjectReference<Home>? _objRef;
@@ -41,6 +43,20 @@
 
     [JSInvokable]
     public async Task HandleExitBuilding(float x, float z) => await AssetManager.ExitBuilding(x, z);
+    
+    [JSInvokable]
+    public async Task StartCombat(string mobName)
+    {
+        await CombatService.StartCombat(mobName);
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void ClaimLoot(int amount)
+    {
+        CombatService.LogLoot(amount);
+        StateHasChanged();
+    }
 
     private async Task SpawnAsPlayer() => await AssetManager.SpawnPlayer();
     private async Task SpawnBartender() => await AssetManager.SpawnBartender(5, 5);

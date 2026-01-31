@@ -1,0 +1,200 @@
+{
+    "Name": "Skeleton Warrior",
+    "Type": "Voxel",
+    "ProceduralColors": {
+        "Skin": "#DDDDDD",
+        "Shirt": "#333333",
+        "Pants": "#222222",
+        "Accent": "#550000"
+    },
+    "Parts": [
+        {
+            "Id": "torso",
+            "Shape": "Box",
+            "Dimensions": [
+                0.6,
+                1.0,
+                0.3
+            ],
+            "Offset": [
+                0,
+                1.6,
+                0
+            ],
+            "HexColor": "#DDDDDD"
+        },
+        {
+            "Id": "ribs",
+            "Shape": "Box",
+            "Dimensions": [
+                0.65,
+                0.5,
+                0.35
+            ],
+            "Offset": [
+                0,
+                1.8,
+                0
+            ],
+            "HexColor": "#EEEEEE"
+        },
+        {
+            "Id": "head",
+            "Shape": "Box",
+            "Dimensions": [
+                0.4,
+                0.45,
+                0.4
+            ],
+            "Offset": [
+                0,
+                2.3,
+                0
+            ],
+            "HexColor": "#FFFFFF"
+        },
+        {
+            "Id": "eye_l",
+            "Shape": "Box",
+            "Dimensions": [
+                0.1,
+                0.05,
+                0.05
+            ],
+            "Offset": [
+                -0.1,
+                2.35,
+                0.21
+            ],
+            "HexColor": "#000000"
+        },
+        {
+            "Id": "eye_r",
+            "Shape": "Box",
+            "Dimensions": [
+                0.1,
+                0.05,
+                0.05
+            ],
+            "Offset": [
+                0.1,
+                2.35,
+                0.21
+            ],
+            "HexColor": "#000000"
+        },
+        {
+            "Id": "arm_l",
+            "Shape": "Box",
+            "Dimensions": [
+                0.15,
+                1.0,
+                0.15
+            ],
+            "Offset": [
+                -0.45,
+                1.6,
+                0
+            ],
+            "HexColor": "#DDDDDD"
+        },
+        {
+            "Id": "arm_r",
+            "Shape": "Box",
+            "Dimensions": [
+                0.15,
+                1.0,
+                0.15
+            ],
+            "Offset": [
+                0.45,
+                1.6,
+                0
+            ],
+            "HexColor": "#DDDDDD"
+        },
+        {
+            "Id": "leg_l",
+            "Shape": "Box",
+            "Dimensions": [
+                0.18,
+                1.0,
+                0.18
+            ],
+            "Offset": [
+                -0.2,
+                0.5,
+                0
+            ],
+            "HexColor": "#DDDDDD"
+        },
+        {
+            "Id": "leg_r",
+            "Shape": "Box",
+            "Dimensions": [
+                0.18,
+                1.0,
+                0.18
+            ],
+            "Offset": [
+                0.2,
+                0.5,
+                0
+            ],
+            "HexColor": "#DDDDDD"
+        },
+        {
+            "Id": "sword_handle",
+            "Shape": "Box",
+            "Dimensions": [
+                0.08,
+                0.6,
+                0.08
+            ],
+            "Offset": [
+                0,
+                -0.4,
+                0.3
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "HexColor": "#5D4037",
+            "ParentLimb": "arm_r"
+        },
+        {
+            "Id": "sword_guard",
+            "Shape": "Box",
+            "Dimensions": [
+                0.3,
+                0.05,
+                0.1
+            ],
+            "Offset": [
+                0,
+                0.3,
+                0
+            ],
+            "HexColor": "#FFD700",
+            "ParentLimb": "sword_handle"
+        },
+        {
+            "Id": "sword_blade",
+            "Shape": "Box",
+            "Dimensions": [
+                0.1,
+                1.2,
+                0.05
+            ],
+            "Offset": [
+                0,
+                1.0,
+                0
+            ],
+            "HexColor": "#CCCCCC",
+            "ParentLimb": "sword_handle"
+        }
+    ]
+}

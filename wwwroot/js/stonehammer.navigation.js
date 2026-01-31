@@ -145,6 +145,42 @@
                         this.log("Warping to the Wasteland...", "orange");
                         this.enterBuilding("Desert");
                     }
+
+                    // v15.0: Combat Trigger (Skeleton Clicks)
+                    if (name.includes("Skeleton")) {
+                        // Find the root actor name
+                        let root = pointerInfo.pickInfo.pickedMesh;
+                        while (root.parent && root.parent.name.startsWith("voxel_")) {
+                            root = root.parent;
+                        }
+
+                        // root.name should be "voxel_Skeleton_Lvl1_A"
+                        // Remove "voxel_" prefix for the key
+                        let actorName = root.name.replace("voxel_", "");
+
+                        this.log("Engaging " + actorName + "!", "red");
+                        if (this.dotNetHelper) {
+                            this.dotNetHelper.invokeMethodAsync('StartCombat', actorName);
+                        }
+                    }
+
+                    // v15.1: Loot Chest Interaction
+                    if (name.includes("Loot Chest") || name.includes("LootChest")) {
+                        this.log("Looting...", "yellow");
+                        const chest = pointerInfo.pickInfo.pickedMesh;
+
+                        // Show visual popup for "50G"
+                        if (window.stoneHammer.showFloatingText) {
+                            window.stoneHammer.showFloatingText("+50 G", chest.position, "gold");
+                        }
+
+                        if (chest.parent) chest.parent.dispose();
+                        else chest.dispose();
+
+                        if (this.dotNetHelper) {
+                            this.dotNetHelper.invokeMethodAsync('ClaimLoot', 50);
+                        }
+                    }
                 }
             }
         });

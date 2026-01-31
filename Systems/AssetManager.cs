@@ -2,6 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.JSInterop;
 
 namespace StoneHammer.Systems
 {
@@ -9,15 +10,23 @@ namespace StoneHammer.Systems
     {
         private readonly HttpClient _http;
         private readonly CityBridge _bridge;
+        private readonly IJSRuntime _js; // Added for IJSRuntime
         private readonly JsonSerializerOptions _options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
 
-        public AssetManager(HttpClient http, CityBridge bridge)
+        public AssetManager(IJSRuntime js, HttpClient http, CityBridge bridge) // Modified constructor
         {
+            _js = js; // Initialized _js
             _http = http;
             _bridge = bridge;
+        }
+
+        // New SpawnAsset method as per instruction - Forwarding to main logic
+        public async Task SpawnAsset(string path, string name, object transform)
+        {
+             await SpawnAsset(path, name, false, transform);
         }
 
         public async Task SpawnPlayer(float x = 0, float z = 0)
@@ -63,7 +72,7 @@ namespace StoneHammer.Systems
 
             // 3. NPCs, Player & Decor
             await SpawnPlayer(x, z);
-            await SpawnBartender(x + 5, z + 5);
+            // await SpawnBartender(x + 5, z + 5);
             await SpawnAsset("assets/table.json", "Street Table 1", false, new { Position = new[] { 5, 0, 5 } });
             await SpawnAsset("assets/table.json", "Street Table 2", false, new { Position = new[] { -5, 0, 5 } });
 
@@ -147,7 +156,7 @@ namespace StoneHammer.Systems
              }
         }
 
-        private async Task SpawnAsset(string path, string name, bool isPlayer = false, object? transform = null)
+        public async Task SpawnAsset(string path, string name, bool isPlayer = false, object? transform = null)
         {
             try 
             {

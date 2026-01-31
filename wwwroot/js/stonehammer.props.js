@@ -26,8 +26,17 @@
     };
 
     sh.spawnVoxel = function (asset, name, isPlayer, transform) {
+        // v15.5: Singleton Enforcement (Prevent Double Spawns)
+        // Check if this actor already exists and remove it to prevent "Ghost Nodes"
+        const existingNode = this.scene.getTransformNodeByName("voxel_" + name) || this.scene.getMeshByName("voxel_" + name);
+        if (existingNode) {
+            console.warn(`[Props] Re-spawning '${name}'. Disposing existing instance (ID: ${existingNode.uniqueId}).`);
+            existingNode.dispose();
+        }
+
         const group = new BABYLON.TransformNode("voxel_" + name, this.scene);
 
+        // Handle rotation if provided
         let rawParts = this.getProp(asset, "Parts");
         let rawColors = this.getProp(asset, "ProceduralColors");
 
@@ -43,30 +52,52 @@
 
         const meshMap = {};
         parts.forEach(p => {
-            const mesh = BABYLON.MeshBuilder.CreateBox(name + "_" + p.id, {
-                width: p.scale[0],
-                height: p.scale[1],
-                depth: p.scale[2]
+            // Handle C# vs JS naming (Dimensions -> scale, Offset -> pos)
+            const scale = this.getProp(p, "Scale") || this.getProp(p, "Dimensions") || [1, 1, 1];
+            const pos = this.getProp(p, "Pos") || this.getProp(p, "Position") || this.getProp(p, "Offset") || [0, 0, 0];
+            const id = this.getProp(p, "Id") || p.id; // p.id might be direct from JS generator
+
+            const mesh = BABYLON.MeshBuilder.CreateBox(name + "_" + id, {
+                width: scale[0],
+                height: scale[1],
+                depth: scale[2]
             }, this.scene);
-            mesh.position = new BABYLON.Vector3(p.pos[0], p.pos[1], p.pos[2]);
-            if (p.rotation) {
+
+            // Debug: Log naming pattern
+            if (name === "Player") {
+                console.log(`[Props] Created Player Part: ${mesh.name} (Id: ${id})`);
+            }
+
+            mesh.position = new BABYLON.Vector3(pos[0], pos[1], pos[2]);
+
+            const rot = this.getProp(p, "Rotation");
+            if (rot) {
                 mesh.rotation = new BABYLON.Vector3(
-                    BABYLON.Tools.ToRadians(p.rotation[0]),
-                    BABYLON.Tools.ToRadians(p.rotation[1]),
-                    BABYLON.Tools.ToRadians(p.rotation[2])
+                    BABYLON.Tools.ToRadians(rot[0]),
+                    BABYLON.Tools.ToRadians(rot[1]),
+                    BABYLON.Tools.ToRadians(rot[2])
                 );
             }
-            meshMap[p.id] = mesh;
-            if (p.parentLimb && meshMap[p.parentLimb]) {
-                mesh.parent = meshMap[p.parentLimb];
+            meshMap[id] = mesh;
+
+            const parentLimb = this.getProp(p, "ParentLimb");
+            if (parentLimb && meshMap[parentLimb]) {
+                mesh.parent = meshMap[parentLimb];
             } else {
                 mesh.parent = group;
             }
-            if (p.id.includes("arm") || p.id.includes("leg")) {
-                mesh.setPivotPoint(new BABYLON.Vector3(0, p.scale[1] / 2, 0));
+
+            // Debug Parent
+            if (name === "Player") {
+                console.log(`[Props] ${mesh.name} parent set to: ${mesh.parent ? mesh.parent.name : "NULL"}`);
             }
-            const mat = new BABYLON.StandardMaterial("mat_" + name + "_" + p.id, this.scene);
-            mat.diffuseColor = BABYLON.Color3.FromHexString(p.color || "#FFFFFF");
+
+            if (id.includes("arm") || id.includes("leg")) {
+                mesh.setPivotPoint(new BABYLON.Vector3(0, scale[1] / 2, 0));
+            }
+
+            const mat = new BABYLON.StandardMaterial("mat_" + name + "_" + id, this.scene);
+            mat.diffuseColor = BABYLON.Color3.FromHexString(this.getProp(p, "Color") || this.getProp(p, "HexColor") || p.color || "#FFFFFF");
             mesh.material = mat;
         });
 
@@ -96,36 +127,64 @@
             this.buildingTriggers.push({ name: name, pos: pos, radius: transform.triggerRadius || 3 });
             this.log("Trigger: " + name, "orange");
         }
+
+        // v15.3: Post-Spawn Hierarchy Check
+        if (name === "Player") {
+            const playerNodes = this.scene.transformNodes.filter(n => n.name === "voxel_Player");
+            console.log(`[Props] Spawn Inspection: Found ${playerNodes.length} 'voxel_Player' nodes.`);
+
+            playerNodes.forEach((node, idx) => {
+                console.log(`[Props] Node #${idx} Children:`);
+                node.getChildren(null, false).forEach(c => console.log(`   - ${c.name} (Parent: ${c.parent.name})`));
+            });
+
+            // Verify if group matches this.player
+            if (this.player === group) {
+                console.log("[Props] this.player matches current group.");
+            } else {
+                console.warn("[Props] this.player DOES NOT match current group!");
+            }
+        }
+
         this.log("Spawned Actor: " + name, "lime");
     };
 
     sh.spawnRecipe = function (asset, name, transform) {
         const group = new BABYLON.TransformNode("recipe_" + name, this.scene);
-        asset.parts.forEach(p => {
-            const shape = (p.shape || "Box").toLowerCase();
+        const parts = this.getProp(asset, "Parts") || [];
+
+        parts.forEach(p => {
+            const shape = (this.getProp(p, "Shape") || "Box").toLowerCase();
             let mesh;
-            const w = (p.scale && p.scale[0]) || 1;
-            const h = (p.scale && p.scale[1]) || 1;
-            const d = (p.scale && p.scale[2]) || 1;
+            const scale = this.getProp(p, "Scale") || [1, 1, 1];
+            const w = scale[0];
+            const h = scale[1];
+            const d = scale[2];
+            const id = this.getProp(p, "Id");
 
             if (shape === "cylinder") {
-                mesh = BABYLON.MeshBuilder.CreateCylinder(name + "_" + p.id, { height: h, diameter: w }, this.scene);
+                mesh = BABYLON.MeshBuilder.CreateCylinder(name + "_" + id, { height: h, diameter: w }, this.scene);
             } else if (shape === "sphere") {
-                mesh = BABYLON.MeshBuilder.CreateSphere(name + "_" + p.id, { diameter: w }, this.scene);
+                mesh = BABYLON.MeshBuilder.CreateSphere(name + "_" + id, { diameter: w }, this.scene);
             } else {
-                mesh = BABYLON.MeshBuilder.CreateBox(name + "_" + p.id, { width: w, height: h, depth: d }, this.scene);
+                mesh = BABYLON.MeshBuilder.CreateBox(name + "_" + id, { width: w, height: h, depth: d }, this.scene);
             }
 
-            mesh.position = this.parseVec3(p.position);
-            if (p.rotation) mesh.rotation = new BABYLON.Vector3(
-                BABYLON.Tools.ToRadians(p.rotation[0] || 0),
-                BABYLON.Tools.ToRadians(p.rotation[1] || 0),
-                BABYLON.Tools.ToRadians(p.rotation[2] || 0)
-            );
-            mesh.material = this.createMaterial(name + "_" + p.id, p);
+            mesh.position = this.parseVec3(this.getProp(p, "Position"));
+            const rot = this.getProp(p, "Rotation") || [0, 0, 0];
 
-            if (p.parentId) {
-                const parent = this.scene.getNodeByName(name + "_" + p.parentId);
+            if (rot) mesh.rotation = new BABYLON.Vector3(
+                BABYLON.Tools.ToRadians(rot[0]),
+                BABYLON.Tools.ToRadians(rot[1]),
+                BABYLON.Tools.ToRadians(rot[2])
+            );
+
+            // Restore Texture/Material Logic
+            mesh.material = this.createMaterial(name + "_" + id, p);
+
+            const parentId = this.getProp(p, "ParentId");
+            if (parentId) {
+                const parent = this.scene.getNodeByName(name + "_" + parentId);
                 if (parent) mesh.parent = parent;
                 else mesh.parent = group;
             } else {
