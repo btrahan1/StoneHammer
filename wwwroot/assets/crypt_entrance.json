@@ -1,0 +1,86 @@
+{
+    "Name": "Crypt Entrance",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "base",
+            "Shape": "Box",
+            "Position": [
+                0,
+                0.5,
+                0
+            ],
+            "Scale": [
+                12,
+                1,
+                10
+            ],
+            "ColorHex": "#2d3748",
+            "Material": "Stone"
+        },
+        {
+            "Id": "wall_main",
+            "Shape": "Box",
+            "Position": [
+                0,
+                4,
+                0
+            ],
+            "Scale": [
+                10,
+                6,
+                8
+            ],
+            "ColorHex": "#4a5568",
+            "Material": "Stone"
+        },
+        {
+            "Id": "roof_slab",
+            "Shape": "Box",
+            "Position": [
+                0,
+                7.5,
+                0
+            ],
+            "Scale": [
+                11,
+                1,
+                9
+            ],
+            "ColorHex": "#2d3748",
+            "Material": "Stone"
+        },
+        {
+            "Id": "door_frame",
+            "Shape": "Box",
+            "Position": [
+                0,
+                3,
+                4.1
+            ],
+            "Scale": [
+                4,
+                5,
+                1
+            ],
+            "ColorHex": "#1a202c",
+            "Material": "Stone"
+        },
+        {
+            "Id": "door",
+            "Shape": "Box",
+            "Position": [
+                0,
+                2.5,
+                4.2
+            ],
+            "Scale": [
+                2.5,
+                4,
+                0.5
+            ],
+            "ColorHex": "#000000",
+            "Material": "Metal"
+        }
+    ]
+}

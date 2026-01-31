@@ -1,0 +1,184 @@
+{
+    "Name": "The Crypt Level 1",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "floor",
+            "Shape": "Box",
+            "Position": [
+                0,
+                -0.5,
+                0
+            ],
+            "Scale": [
+                60,
+                1,
+                80
+            ],
+            "ColorHex": "#1a202c",
+            "Material": "Stone"
+        },
+        {
+            "Id": "roof",
+            "Shape": "Box",
+            "Position": [
+                0,
+                20,
+                0
+            ],
+            "Scale": [
+                60,
+                1,
+                80
+            ],
+            "ColorHex": "#1a202c",
+            "Material": "Stone"
+        },
+        {
+            "Id": "wall_n",
+            "Shape": "Box",
+            "Position": [
+                0,
+                10,
+                40
+            ],
+            "Scale": [
+                60,
+                20,
+                1
+            ],
+            "ColorHex": "#2d3748",
+            "Material": "Stone"
+        },
+        {
+            "Id": "wall_s",
+            "Shape": "Box",
+            "Position": [
+                0,
+                10,
+                -40
+            ],
+            "Scale": [
+                60,
+                20,
+                1
+            ],
+            "ColorHex": "#2d3748",
+            "Material": "Stone"
+        },
+        {
+            "Id": "wall_e",
+            "Shape": "Box",
+            "Position": [
+                30,
+                10,
+                0
+            ],
+            "Scale": [
+                1,
+                20,
+                80
+            ],
+            "ColorHex": "#2d3748",
+            "Material": "Stone"
+        },
+        {
+            "Id": "wall_w",
+            "Shape": "Box",
+            "Position": [
+                -30,
+                10,
+                0
+            ],
+            "Scale": [
+                1,
+                20,
+                80
+            ],
+            "ColorHex": "#2d3748",
+            "Material": "Stone"
+        }
+    ],
+    "Children": [
+        {
+            "Path": "assets/exit_crystal.json",
+            "Name": "CryptExitCrystal",
+            "Transform": {
+                "Position": [
+                    0,
+                    0,
+                    -35
+                ],
+                "Scale": [
+                    1,
+                    1,
+                    1
+                ]
+            }
+        },
+        {
+            "Path": "assets/pillar.json",
+            "Name": "CryptPillar1",
+            "Transform": {
+                "Position": [
+                    -15,
+                    0,
+                    15
+                ],
+                "Scale": [
+                    4,
+                    20,
+                    4
+                ]
+            }
+        },
+        {
+            "Path": "assets/pillar.json",
+            "Name": "CryptPillar2",
+            "Transform": {
+                "Position": [
+                    15,
+                    0,
+                    15
+                ],
+                "Scale": [
+                    4,
+                    20,
+                    4
+                ]
+            }
+        },
+        {
+            "Path": "assets/pillar.json",
+            "Name": "CryptPillar3",
+            "Transform": {
+                "Position": [
+                    -15,
+                    0,
+                    -15
+                ],
+                "Scale": [
+                    4,
+                    20,
+                    4
+                ]
+            }
+        },
+        {
+            "Path": "assets/pillar.json",
+            "Name": "CryptPillar4",
+            "Transform": {
+                "Position": [
+                    15,
+                    0,
+                    -15
+                ],
+                "Scale": [
+                    4,
+                    20,
+                    4
+                ]
+            }
+        }
+    ]
+}

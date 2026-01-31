@@ -81,12 +81,28 @@
             ],
             "ColorHex": "#475569",
             "Material": "Stone"
+        },
+        {
+            "Id": "roof",
+            "Shape": "Box",
+            "Position": [
+                0,
+                100,
+                0
+            ],
+            "Scale": [
+                100,
+                1,
+                150
+            ],
+            "ColorHex": "#334155",
+            "Material": "Stone"
         }
     ],
     "Children": [
         {
             "Path": "assets/exit_crystal.json",
-            "Name": "GuildExit",
+            "Name": "GuildExitCrystal",
             "Transform": {
                 "Position": [
                     -15,

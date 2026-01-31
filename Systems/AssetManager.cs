@@ -37,31 +37,6 @@ namespace StoneHammer.Systems
         public async Task SpawnStore(float x = 0, float z = 0) => await SpawnAsset("assets/general_store.json", "General Store", false, new { Position = new[] { x, 0, z } });
         public async Task SpawnGuildMaster(float x = 0, float z = 0) => await SpawnAsset("assets/guild_master.json", "Guild Master Debug", false, new { Position = new[] { x, 0, z } }); // Debug helper
 
-        public async Task EnterBuilding(string buildingName)
-        {
-            await this.ClearAll();
-
-            if (buildingName.Contains("Guild"))
-            {
-                await SpawnAsset("assets/guild_interior.json", "Guild Interior");
-            }
-            else if (buildingName.Contains("Desert"))
-            {
-                await SpawnAsset("assets/desert_interior.json", "Desert Interior");
-            }
-            else if (buildingName.Contains("Lodge"))
-            {
-                await SpawnAsset("assets/lodge_interior.json", "Lodge Interior");
-            }
-            else
-            {
-                await SpawnAsset("assets/sandbox_interior.json", "Sandbox Interior");
-            }
-            
-            // v11.0: Child assets like Exit Crystals are now loaded via JSON nesting
-            await SpawnPlayer(0, 0);
-        }
-
         public async Task ExitBuilding(float x, float z)
         {
             await GenerateTown(x, z);
@@ -91,6 +66,39 @@ namespace StoneHammer.Systems
             await SpawnBartender(x + 5, z + 5);
             await SpawnAsset("assets/table.json", "Street Table 1", false, new { Position = new[] { 5, 0, 5 } });
             await SpawnAsset("assets/table.json", "Street Table 2", false, new { Position = new[] { -5, 0, 5 } });
+
+            // v12.3: The Crypt Entrance (Behind Tavern)
+            await SpawnAsset("assets/crypt_entrance.json", "CryptEntrance", false, new { Position = new[] { 0, 0, 60 } });
+        }
+
+        public async Task EnterBuilding(string buildingName)
+        {
+            await this.ClearAll();
+
+            if (buildingName.Contains("Guild"))
+            {
+                await SpawnAsset("assets/guild_interior.json", "Guild Interior");
+            }
+            else if (buildingName.Contains("Desert"))
+            {
+                await SpawnAsset("assets/desert_interior.json", "Desert Interior");
+            }
+            else if (buildingName.Contains("Lodge"))
+            {
+                await SpawnAsset("assets/lodge_interior.json", "Lodge Interior");
+            }
+            else if (buildingName.Contains("Crypt"))
+            {
+                // v12.3: Spawning the Crypt Interior
+                await SpawnAsset("assets/crypt_interior.json", "Crypt Interior");
+            }
+            else
+            {
+                await SpawnAsset("assets/sandbox_interior.json", "Sandbox Interior");
+            }
+            
+            // v11.0: Child assets like Exit Crystals are now loaded via JSON nesting
+            await SpawnPlayer(0, 0);
         }
 
         public async Task ClearAll() => await _bridge.ClearAll();

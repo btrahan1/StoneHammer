@@ -74,7 +74,6 @@
     sh.setupClickInteraction = function () {
         this.scene.onPointerDown = (evt, pickResult) => {
             if (!pickResult.hit || !pickResult.pickedMesh) return;
-
             const name = pickResult.pickedMesh.name;
 
             // v9.20: Teleport Hub Pillars
@@ -84,12 +83,25 @@
                 this.enterBuilding(target);
             }
 
-            // v10.1: Exit Crystal
+            // v10.1: Exit Crystal (Single Click)
             if (name.includes("ExitCrystal")) {
                 this.log("Returning to Town...", "magenta");
                 this.exitBuilding();
             }
         };
+
+        // v12.3: Double Click for Crypt
+        this.scene.onPointerObservable.add((pointerInfo) => {
+            if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOUBLETAP) {
+                if (pointerInfo.pickInfo.hit && pointerInfo.pickInfo.pickedMesh) {
+                    const name = pointerInfo.pickInfo.pickedMesh.name;
+                    if (name.includes("CryptEntrance")) {
+                        this.log("Descending into The Crypt...", "red");
+                        this.enterBuilding("Crypt");
+                    }
+                }
+            }
+        });
     };
 
     sh.clearAll = function () {
