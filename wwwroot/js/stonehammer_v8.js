@@ -34,10 +34,13 @@ window.stoneHammer = {
 
     init: function (canvasId) {
         try {
-            this.log("Engine Init v6.2 (True Stone Reconstruction)", "cyan");
+            this.log("Engine Init v9.8 (Ground Restoration)", "cyan");
             this.canvas = document.getElementById(canvasId);
             this.engine = new BABYLON.Engine(this.canvas, true);
             this.scene = new BABYLON.Scene(this.engine);
+
+            // v9.7: Hardware Antialiasing (MSAA 4x)
+            this.scene.samples = 4;
 
             // Register Escape for exit
             window.addEventListener("keydown", (e) => {
@@ -46,7 +49,18 @@ window.stoneHammer = {
                 }
             });
 
-            this.scene.clearColor = new BABYLON.Color4(0.1, 0.1, 0.15, 1);
+            this.scene.clearColor = new BABYLON.Color4(0.5, 0.7, 1.0, 1);
+
+            // v8.2: Hard Skybox (Guarantees no black voids)
+            var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 5000.0 }, this.scene);
+            var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.scene);
+            skyboxMaterial.backFaceCulling = false;
+            skyboxMaterial.disableLighting = true;
+            skyboxMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.7, 1.0);
+            skyboxMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.7, 1.0);
+            skybox.material = skyboxMaterial;
+            skybox.infiniteDistance = true;
+            skybox.isPickable = false;
 
             // Stable Camera
             this.camera = new BABYLON.ArcRotateCamera("camera1", -Math.PI / 2, Math.PI / 3, 20, BABYLON.Vector3.Zero(), this.scene);
@@ -54,11 +68,12 @@ window.stoneHammer = {
             this.camera.upperRadiusLimit = 1000;
             this.camera.lowerRadiusLimit = 2;
             this.camera.wheelPrecision = 50;
-            this.camera.minZ = 0.1;
+            this.camera.minZ = 0.5;
+            this.camera.maxZ = 10000;
 
             // Stable Lighting rig
             var hemi = new BABYLON.HemisphericLight("hemi", new BABYLON.Vector3(0, 1, 0), this.scene);
-            hemi.intensity = 1.0;
+            hemi.intensity = 1.5;
             hemi.groundColor = new BABYLON.Color3(0.1, 0.1, 0.2);
 
             var dir = new BABYLON.DirectionalLight("dir", new BABYLON.Vector3(-1, -2, -1), this.scene);
@@ -66,7 +81,8 @@ window.stoneHammer = {
             dir.intensity = 1.2;
 
             // v6.2 True Stone Floor (Robust Grid + Procedural Fallback)
-            var ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 1000, height: 1000 }, this.scene);
+            // v9.7: Persistent Ground Reference
+            this.ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 1000, height: 1000 }, this.scene);
 
             // Try everything to find the GridMaterial
             const Grid = BABYLON.GridMaterial || (BABYLON.Materials && BABYLON.Materials.GridMaterial) || window.GridMaterial;
@@ -78,7 +94,7 @@ window.stoneHammer = {
                 stoneGrid.gridRatio = 4; // Classic ratio
                 stoneGrid.majorUnitFrequency = 10;
                 stoneGrid.opacity = 0.99;
-                ground.material = stoneGrid;
+                this.ground.material = stoneGrid;
                 this.log("Stone Grid Material Active", "lime");
             } else {
                 // High-Quality Procedural Stone Fallback (v6.2 Fix)
@@ -99,16 +115,17 @@ window.stoneHammer = {
                     groundMat.diffuseColor = new BABYLON.Color3(0.15, 0.15, 0.18);
                     this.log("CRITICAL: All Stone Textures Missing", "orange");
                 }
-                ground.material = groundMat;
+                this.ground.material = groundMat;
             }
-            ground.receiveShadows = true;
+            this.ground.receiveShadows = true;
 
+            this.setupClickInteraction();
             this.setupInput();
 
             this.engine.runRenderLoop(() => { this.scene.render(); this.updateAnimations(); });
             window.addEventListener("resize", () => { this.engine.resize(); });
 
-            this.log("StoneHammer v6.2 Online", "lime");
+            this.log("StoneHammer v9.8 Online", "lime");
         } catch (err) {
             this.log("CRITICAL ERR: " + err.message, "red");
         }
@@ -386,28 +403,38 @@ window.stoneHammer = {
         this.currentBuilding = buildingName;
 
         // Save player position before clear
-        this.lastTownPosition = this.player.position.clone();
-        this.lastTownPosition.z += 2; // Offset slightly for return
+        if (this.player) {
+            this.lastTownPosition = this.player.position.clone();
+            this.lastTownPosition.z += 2; // Offset slightly for return
+        } else {
+            this.lastTownPosition = new BABYLON.Vector3(0, 0, 0);
+        }
+
+        // v9.8: Explicitly hide ground for interior only
+        if (this.ground) this.ground.setEnabled(false);
 
         this.clearAll();
 
-        // Standard interior brightness boost
-        const hemi = this.scene.getLightByName("hemi");
-        if (hemi) hemi.intensity = 1.3;
+        // v9.1: Zero Environment Shift. Atmosphere persists.
 
         // Callback to C# to load interior
         if (this.dotNetHelper) {
             this.dotNetHelper.invokeMethodAsync('HandleEnterBuilding', buildingName);
         }
 
-        this.log("Press 'Esc' to exit the building.", "yellow");
+        this.log("Skybox Active. Press 'Esc' to exit.", "yellow");
     },
 
     exitBuilding: function () {
         if (!this.currentBuilding) return;
-        this.log("Exiting to Town...", "cyan");
+        this.log("Exiting to Town Atmosphere...", "cyan");
         this.currentBuilding = null;
         this.clearAll();
+
+        // v8.2: Atmosphere persists.
+
+        // v9.7: Restore Town Ground
+        if (this.ground) this.ground.setEnabled(true);
 
         // Callback to C# to reload town
         if (this.dotNetHelper) {
@@ -415,13 +442,40 @@ window.stoneHammer = {
         }
     },
 
+    spawnSandboxPillar: function () {
+        if (this.scene.getMeshByName("teleport_pillar")) {
+            this.scene.getMeshByName("teleport_pillar").dispose();
+        }
+        var pillar = BABYLON.MeshBuilder.CreateCylinder("teleport_pillar", { height: 6, diameter: 2 }, this.scene);
+        pillar.position = new BABYLON.Vector3(10, 3, 10);
+        var mat = new BABYLON.StandardMaterial("pillarMat", this.scene);
+        mat.emissiveColor = new BABYLON.Color3(0, 1, 1);
+        pillar.material = mat;
+        this.log("Sandbox Teleport Pillar Spawned at (10, 10)", "lime");
+    },
+
+    setupClickInteraction: function () {
+        this.scene.onPointerDown = (evt, pickResult) => {
+            if (pickResult.hit && pickResult.pickedMesh && pickResult.pickedMesh.name === "teleport_pillar") {
+                this.log("Pillar clicked! Teleporting to Sandbox...", "lime");
+                this.enterBuilding("Sandbox");
+            }
+        };
+    },
+
     clearAll: function () {
-        this.scene.meshes.forEach(m => {
-            if (m.name !== "ground") m.dispose();
-        });
+        // Robust disposal (backwards iteration to avoid skipping)
+        const meshes = this.scene.meshes;
+        for (var i = meshes.length - 1; i >= 0; i--) {
+            var m = meshes[i];
+            if (m.name !== "ground" && m.name !== "skyBox") {
+                m.dispose();
+            }
+        }
+
         this.scene.transformNodes.forEach(t => t.dispose());
-        this.player = null; // Important: Clear player reference
-        this.buildingTriggers = []; // Reset triggers for the new scene
-        this.log("Scene Cleared", "orange");
+        this.player = null;
+        this.buildingTriggers = [];
+        this.log("Scene Cleared (Robust)", "orange");
     }
 };

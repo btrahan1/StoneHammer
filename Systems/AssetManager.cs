@@ -43,6 +43,11 @@ namespace StoneHammer.Systems
                 await SpawnAsset("assets/guild_interior.json", "Guild Interior");
                 await SpawnPlayer(0, 0); // Spawn at interior origin
             }
+            else if (buildingName.Contains("Sandbox"))
+            {
+                await SpawnAsset("assets/sandbox_interior.json", "Sandbox Interior");
+                await SpawnPlayer(0, 0);
+            }
         }
 
         public async Task ExitBuilding(float x, float z)
