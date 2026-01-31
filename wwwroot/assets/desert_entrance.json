@@ -1,0 +1,38 @@
+{
+    "Name": "Desert Teleporter",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "base",
+            "Shape": "Box",
+            "Position": [
+                0,
+                0.5,
+                0
+            ],
+            "Scale": [
+                2,
+                1,
+                2
+            ],
+            "ColorHex": "#E3C58E",
+            "Material": "Sand"
+        },
+        {
+            "Id": "crystal",
+            "Shape": "Sphere",
+            "Position": [
+                0,
+                2,
+                0
+            ],
+            "Scale": [
+                1,
+                2,
+                1
+            ],
+            "ColorHex": "#F6AD55",
+            "Material": "Stone"
+        }
+    ]
+}

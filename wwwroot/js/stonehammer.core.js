@@ -61,6 +61,8 @@ window.stoneHammer = {
             hemi.intensity = 1.5;
             hemi.groundColor = new BABYLON.Color3(0.1, 0.1, 0.2);
 
+            this.defaultHemi = hemi; // Store ref for restoration
+
             var dir = new BABYLON.DirectionalLight("dir", new BABYLON.Vector3(-1, -2, -1), this.scene);
             dir.position = new BABYLON.Vector3(50, 100, 50);
             dir.intensity = 1.2;
@@ -77,7 +79,7 @@ window.stoneHammer = {
             });
             window.addEventListener("resize", () => { this.engine.resize(); });
 
-            this.log("StoneHammer v13.3 Online (Modularized)", "lime");
+            this.log("StoneHammer v14.0 Online (Modularized)", "lime");
         } catch (err) {
             this.log("CRITICAL ERR: " + err.message, "red");
         }
@@ -88,5 +90,39 @@ window.stoneHammer = {
         window.addEventListener("keydown", (evt) => { this.inputMap[evt.key.toLowerCase()] = true; });
         window.addEventListener("keyup", (evt) => { this.inputMap[evt.key.toLowerCase()] = false; });
         this.log("Input management initialized", "cyan");
+    },
+
+    // v14.0: Desert Hybrid Mode
+    enterDesert: function () {
+        this.log("Entering The Wasteland...", "orange");
+
+        // 1. Clear Standard World
+        if (this.ground) this.ground.setEnabled(false);
+        // Don't dispose everything, just hide the town specific stuff if needed.
+        // Actually, clearAll() handles most of it, but we need to keep the player.
+
+        // 2. Init Desert Module
+        if (window.stoneHammer.desert) {
+            window.stoneHammer.desert.init(this.scene);
+            // Ensure player is positioned high enough (above terrain)
+            if (this.player) {
+                this.player.position.y = 20;
+                this.player.position.x = 0;
+                this.player.position.z = 0;
+            }
+        }
+    },
+
+    exitDesert: function () {
+        this.log("Returning to Civilization...", "cyan");
+
+        // 1. Cleanup Desert
+        if (window.stoneHammer.desert) {
+            window.stoneHammer.desert.cleanup();
+        }
+
+        // 2. Restore Town (Re-handled by C# usually calling EnterBuilding("Town"))
+        // But we ensure the ground is back
+        if (this.ground) this.ground.setEnabled(true);
     }
 };

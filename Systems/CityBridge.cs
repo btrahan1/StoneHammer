@@ -26,5 +26,10 @@ namespace StoneHammer.Systems
         {
             await _jsRuntime.InvokeVoidAsync("stoneHammer.clearAll");
         }
+
+        public async Task EnterDesert()
+        {
+            await _jsRuntime.InvokeVoidAsync("stoneHammer.enterDesert");
+        }
     }
 }

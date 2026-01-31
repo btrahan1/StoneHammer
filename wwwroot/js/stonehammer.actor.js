@@ -42,6 +42,12 @@
 
             moveDir.normalize();
             this.player.position.addInPlace(moveDir.scale(currentSpeed));
+
+            // v14.0: Terrain Clamping
+            if (this.desert && this.desert.ground) {
+                const y = this.desert.getHeightAt(this.player.position.x, this.player.position.z);
+                this.player.position.y = y + 1.6; // Keep feet on ground (approx 1.6 units to eyes/center)
+            }
         } else {
             this.walkTime *= 0.8;
             if (this.walkTime < 0.01) this.walkTime = 0;

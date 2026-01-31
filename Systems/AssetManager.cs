@@ -69,6 +69,9 @@ namespace StoneHammer.Systems
 
             // v12.3: The Crypt Entrance (Behind Tavern)
             await SpawnAsset("assets/crypt_entrance.json", "CryptEntrance", false, new { Position = new[] { 0, 0, 60 } });
+
+            // v14.0: The Desert Teleporter (East of Tavern)
+            await SpawnAsset("assets/desert_entrance.json", "DesertEntrance", false, new { Position = new[] { 50, 0, 50 } });
         }
 
         private int _currentDepth = 0;
@@ -81,13 +84,21 @@ namespace StoneHammer.Systems
             {
                 await SpawnAsset("assets/guild_interior.json", "Guild Interior");
             }
-            else if (buildingName.Contains("Desert"))
-            {
-                await SpawnAsset("assets/desert_interior.json", "Desert Interior");
-            }
             else if (buildingName.Contains("Lodge"))
             {
                 await SpawnAsset("assets/lodge_interior.json", "Lodge Interior");
+            }
+            else if (buildingName.Contains("Desert"))
+            {
+               // v14.0: Hybrid Desert Mode
+               // The terrain is procedural JS, but we need an exit mechanism.
+               // We will spawn the 'exit crystal' via the bridge, but let JS handle the world.
+               
+               System.Console.WriteLine("[AssetManager] Entering Procedural Desert...");
+               await _bridge.EnterDesert();
+               
+               // Spawn just the exit crystal so user can leave
+               await SpawnAsset("assets/exit_crystal.json", "DesertExit", false, new { Position = new float[] { 0, 10, 0 } });
             }
             else if (buildingName.Contains("Crypt"))
             {

@@ -89,6 +89,18 @@
                 this.exitBuilding();
             }
 
+            // v14.0: Desert Exit Crystal
+            if (name.includes("DesertExit")) {
+                this.log("Escaping the Wasteland...", "cyan");
+                this.exitDesert(); // Clean up Babylon meshes
+
+                // Invoke C# Interop to force a full Town Re-Gen
+                if (this.dotNetHelper) {
+                    // Position player back at town center (0,0) or near connection point
+                    this.dotNetHelper.invokeMethodAsync('HandleExitBuilding', 50, 50);
+                }
+            }
+
             // v13.0: Dungeon Navigation
             if (name.includes("StairsDown")) {
                 // Format: Crypt_Depth_X
@@ -122,9 +134,16 @@
             if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOUBLETAP) {
                 if (pointerInfo.pickInfo.hit && pointerInfo.pickInfo.pickedMesh) {
                     const name = pointerInfo.pickInfo.pickedMesh.name;
-                    if (name.includes("CryptEntrance")) {
+                    if (name.includes("CryptEntrance") || name.startsWith("Stairs")) {
                         this.log("Descending into The Crypt...", "red");
-                        this.enterBuilding("Crypt");
+                        // Pass the building name, which might include depth for dungeons
+                        this.enterBuilding(name.includes("Depth") ? name : `Crypt_Depth_${name.endsWith("Down") ? 1 : 0}`);
+                    }
+
+                    // v14.0: Desert Entrance
+                    if (name.includes("DesertEntrance")) {
+                        this.log("Warping to the Wasteland...", "orange");
+                        this.enterBuilding("Desert");
                     }
                 }
             }
