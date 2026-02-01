@@ -66,7 +66,7 @@ namespace StoneHammer.Systems
         }
 
         private CityBridge _bridge;
-        private IJSRuntime _js;
+        public IJSRuntime JS { get; private set; }
         private AssetManager _assets;
         private CharacterService _charService;
 
@@ -127,7 +127,7 @@ namespace StoneHammer.Systems
         public CombatService(CityBridge bridge, IJSRuntime js, AssetManager assets, CharacterService charService)
         {
             _bridge = bridge;
-            _js = js;
+            JS = js;
             _assets = assets;
             _charService = charService;
         }
@@ -253,7 +253,7 @@ namespace StoneHammer.Systems
                 await _assets.SpawnAsset("assets/skeleton.json", enemyId, false, new { Position = new float[] { 20, 0, (i * 8) - 4 }, Rotation = new float[] { 0, -90, 0 } });
             }
 
-            await _js.InvokeVoidAsync("stoneHammer.rotateCameraToBattle", "ArenaCenter"); // Adjust camera logic if needed
+            await JS.InvokeVoidAsync("stoneHammer.rotateCameraToBattle", "ArenaCenter"); // Adjust camera logic if needed
             CombatLog = "Battle Start!";
             OnStateChanged?.Invoke();
         }
@@ -386,16 +386,18 @@ namespace StoneHammer.Systems
                 // ANIMATION RESTORED
                 // Use the entity's ModelId for targeting (Hero_Name or Enemy_ID)
                 string animTarget = actor.ModelId;
-                await _js.InvokeVoidAsync("stoneHammer.playCombatAnimation", animTarget, "Attack");
+                await JS.InvokeVoidAsync("stoneHammer.playCombatAnimation", animTarget, "Attack");
                 
-                await Task.Delay(800); 
+                // Animation Manual (30fr Dash, 15fr Pause, Impact at Frame 55)
+                // Frame 55 / 60fps = 0.916 seconds.
+                await Task.Delay(925); 
                 
                 // STATS LOGIC
                 int damage = CalculateDamage(actor);
                 
                 // Anim Target Hit
                  string hitTarget = action.Target.ModelId;
-                await _js.InvokeVoidAsync("stoneHammer.playCombatAnimation", hitTarget, "Hit");
+                await JS.InvokeVoidAsync("stoneHammer.playCombatAnimation", hitTarget, "Hit");
 
                 action.Target.HP -= damage;
                 
@@ -405,6 +407,10 @@ namespace StoneHammer.Systems
                 if (action.Target.HP <= 0)
                 {
                     CombatLog = $"{action.Target.Name} fell!";
+                    // Play Death Animation
+                    string dieTarget = action.Target.ModelId;
+                    await JS.InvokeVoidAsync("stoneHammer.playCombatAnimation", dieTarget, "Die");
+                    await Task.Delay(500); // Wait for fall
                 }
             }
             // ... (Heal same) ...
@@ -449,7 +455,7 @@ namespace StoneHammer.Systems
             foreach(var enemy in Enemies)
             {
                  var id = !string.IsNullOrEmpty(enemy.ModelId) ? enemy.ModelId : enemy.Name;
-                 await _js.InvokeVoidAsync("stoneHammer.removeActor", id); 
+                 await JS.InvokeVoidAsync("stoneHammer.removeActor", id); 
             }
 
             await Task.Delay(1000);

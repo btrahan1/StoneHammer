@@ -10,53 +10,48 @@
             @CombatService.CombatLog
         </div>
 
-        <!-- Center: Battlefield (Enemies) -->
-        <div class="battlefield">
-            <div class="enemy-group">
-                @foreach(var enemy in CombatService.Enemies)
-                {
-                    <div class="combat-unit enemy @(enemy.HP <= 0 ? "dead" : "") @(_targetMode && enemy.HP > 0 ? "targetable" : "")" 
-                         @onclick="() => SelectTarget(enemy)">
-                        <div class="unit-model">👹</div>
-                        <div class="unit-name">@enemy.Name</div>
-                        <div class="unit-hp-bar">
-                            <div class="fill" style="width: @(GetHpPercent(enemy))%"></div>
-                        </div>
-                        <div class="unit-hp-text">@enemy.HP / @enemy.MaxHP</div>
-                    </div>
-                }
+        <!-- Floating Units (Positioned by JS) -->
+        <!-- Enemies -->
+        @foreach(var enemy in CombatService.Enemies)
+        {
+            <div id="@("ui-" + enemy.ModelId)" class="combat-unit enemy @(enemy.HP <= 0 ? "dead" : "") @(_targetMode && enemy.HP > 0 ? "targetable" : "")" 
+                 @onclick="() => SelectTarget(enemy)" style="display: none;"> <!-- Hidden until positioned -->
+                <div class="unit-name">@enemy.Name</div>
+                <div class="unit-hp-bar">
+                    <div class="fill" style="width: @(GetHpPercent(enemy))%"></div>
+                </div>
+                <div class="unit-hp-text">@enemy.HP / @enemy.MaxHP</div>
             </div>
-        </div>
+        }
 
-        <!-- Bottom: Heroes & Controls -->
-        <div class="control-deck">
-            <!-- Hero Cards -->
-            <div class="hero-group">
-                @foreach(var hero in CombatService.Heroes)
-                {
-                    <div class="combat-unit hero @(_selectedHero == hero ? "selected" : "") @(hero.HP <= 0 ? "dead" : "")"
-                         @onclick="() => SelectHero(hero)">
-                        <div class="unit-model">@(hero.Name.Substring(0,1))</div>
-                        <div class="unit-info">
-                            <div class="name">@hero.Name</div>
-                            <div class="class-label">@(hero.SourceCharacter?.Class.ToString() ?? "Unknown")</div>
-                            <div class="hp">@hero.HP / @hero.MaxHP</div>
-                            <div class="action-preview">
-                                @(hero.QueuedAction?.Type ?? "Waiting...")
-                                @if(hero.QueuedAction?.Target != null) { <span> > @hero.QueuedAction.Target.Name</span> }
-                            </div>
-                        </div>
+        <!-- Heroes -->
+        @foreach(var hero in CombatService.Heroes)
+        {
+            <div id="@("ui-" + hero.ModelId)" class="combat-unit hero @(_selectedHero == hero ? "selected" : "") @(hero.HP <= 0 ? "dead" : "")"
+                 @onclick="() => SelectHero(hero)" style="display: none;">
+                <div class="unit-model">@(hero.Name.Substring(0,1))</div>
+                <div class="unit-info">
+                     <!-- Simplified for Floating UI -->
+                    <div class="name">@hero.Name</div>
+                    <div class="unit-hp-bar">
+                        <div class="fill" style="width: @(GetHpPercent(hero))%"></div>
                     </div>
-                }
+                    <div class="hp">@hero.HP / @hero.MaxHP</div>
+                    <div class="action-preview">
+                        @(hero.QueuedAction?.Type ?? "Wait")
+                    </div>
+                </div>
             </div>
+        }
 
-            <!-- Command Menu (Only in Input Phase) -->
-            <div class="command-panel">
-                @if (CombatService.Phase == CombatPhase.Input)
-                {
+        <!-- Bottom Right: Command Menu (Fixed) -->
+        <div class="command-panel-wrapper">
+            @if (CombatService.Phase == CombatPhase.Input)
+            {
+                <div class="command-panel">
                     @if(_selectedHero != null && !_targetMode)
                     {
-                        <div class="menu-title">COMMAND: @_selectedHero.Name</div>
+                        <div class="menu-title">@_selectedHero.Name</div>
                         <div class="btn-grid">
                             <button @onclick='() => BeginTargeting("Attack")'>⚔️ Attack</button>
                             <button @onclick='() => QueueDirect("Heal")'>💖 Heal</button>
@@ -66,32 +61,22 @@
                     else if (_targetMode)
                     {
                         <div class="menu-title">SELECT TARGET</div>
-                        <div class="sub-text">Click an enemy above...</div>
+                        <div class="sub-text">Click an enemy...</div>
                         <button class="btn-cancel" @onclick="CancelTargeting">Cancel</button>
                     }
                     else
                     {
-                        <div class="menu-title">Select a Hero</div>
+                        <div class="menu-title">SELECT HERO</div>
                     }
 
-                    <!-- Fight Button -->
-                    <div style="display: flex; gap: 5px; margin-top: auto;">
-                        <button class="btn-fight" style="flex: 1;" @onclick="ExecuteRound">GO FIGHT!</button>
-                        <button class="btn-auto @(CombatService.IsAutoBattling ? "active" : "")" @onclick="ToggleAuto" title="Auto-Battle">
-                            @(CombatService.IsAutoBattling ? "🤖 ON" : "🤖 AUTO")
+                    <div style="display: flex; gap: 5px; margin-top: 10px;">
+                        <button class="btn-fight" style="flex: 1;" @onclick="ExecuteRound">FIGHT!</button>
+                        <button class="btn-auto @(CombatService.IsAutoBattling ? "active" : "")" @onclick="ToggleAuto">
+                            @(CombatService.IsAutoBattling ? "🤖" : "🤖")
                         </button>
                     </div>
-                }
-                else
-                {
-                    <div class="menu-title">EXECUTING...</div>
-                    @if(CombatService.IsAutoBattling)
-                    {
-                         <div style="color: cyan; font-size: 10px;">AUTO-BATTLE ACTIVE</div>
-                         <button class="btn-auto active" @onclick="ToggleAuto">STOP AUTO</button>
-                    }
-                }
-            </div>
+                </div>
+            }
         </div>
     </div>
 }
@@ -104,6 +89,16 @@
     protected override void OnInitialized()
     {
         CombatService.OnStateChanged += StateHasChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (CombatService.IsFighting)
+        {
+            // Tell JS to start tracking positions
+            var ids = CombatService.Heroes.Concat(CombatService.Enemies).Select(x => x.ModelId).ToList();
+            await CombatService.JS.InvokeVoidAsync("stoneHammer.startUITracking", ids);
+        }
     }
 
     private void ToggleAuto()
@@ -125,7 +120,6 @@
     {
         if (_selectedHero == null) return;
         CombatService.QueueAction(_selectedHero, action);
-        // Auto select next hero?
         AutoSelectNext();
     }
 
@@ -157,7 +151,6 @@
     
     private void AutoSelectNext()
     {
-        // Simple logic to move selection to next hero who hasn't queued yet
         _selectedHero = CombatService.Heroes.FirstOrDefault(h => h.QueuedAction == null && h.HP > 0);
         StateHasChanged();
     }
@@ -173,74 +166,47 @@
 <style>
     .combat-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        display: flex; flex-direction: column; pointer-events: none;
-        z-index: 2000; font-family: 'Segoe UI', sans-serif;
+        pointer-events: none; z-index: 2000; font-family: 'Segoe UI', sans-serif;
     }
     
     .combat-log {
-        background: rgba(0,0,0,0.7); color: white; text-align: center; padding: 10px;
-        font-size: 1.5rem; border-bottom: 2px solid #555;
+        position: absolute; top: 10%; width: 100%; text-align: center;
+        text-shadow: 0 0 5px black; font-size: 1.5rem; color: #fff; font-weight: bold;
     }
 
-    .battlefield {
-        flex: 1; display: flex; justify-content: center; align-items: center;
-    }
-    
-    .enemy-group {
-        display: flex; gap: 20px; pointer-events: auto;
-    }
-    
+    /* Floating Units */
     .combat-unit {
-        width: 100px; padding: 10px; background: rgba(0,0,0,0.6); border: 2px solid #555;
-        border-radius: 8px; color: white; display: flex; flex-direction: column; align-items: center;
-        transition: all 0.2s; cursor: pointer;
+        position: absolute; /* Floating */
+        width: 120px; padding: 5px; 
+        background: rgba(0,0,0,0.7); border: 2px solid #555;
+        border-radius: 6px; color: white; 
+        transition: transform 0.1s; pointer-events: auto; cursor: pointer;
+        display: flex; flex-direction: column; align-items: center;
+        font-size: 12px;
+        transform: translate(-50%, -100%); /* Center horizontally, sit ABOVE point */
     }
-    .combat-unit.enemy:hover { border-color: red; transform: scale(1.05); }
-    .combat-unit.dead { opacity: 0.5; filter: grayscale(100%); }
-    .combat-unit.targetable { border-color: yellow; animation: pulse 1s infinite; cursor: crosshair; }
     
-    .unit-model { font-size: 32px; margin-bottom: 5px; }
-    .unit-hp-bar { width: 100%; height: 6px; background: #333; margin-top: 5px; }
+    .combat-unit.enemy:hover { border-color: red; z-index: 2020; }
+    .combat-unit.hero:hover { border-color: gold; z-index: 2020; }
+    
+    .combat-unit.hero.selected { border-color: gold; box-shadow: 0 0 15px gold; }
+    .combat-unit.targetable { border-color: red; box-shadow: 0 0 15px red; cursor: crosshair; }
+    
+    .unit-hp-bar { width: 100%; height: 4px; background: #333; margin: 2px 0; }
     .unit-hp-bar .fill { height: 100%; background: #00ff00; }
     .enemy .unit-hp-bar .fill { background: #ff0000; }
 
-    .control-deck {
-        height: 200px; background: rgba(0,0,50,0.9); border-top: 4px solid gold;
-        display: flex; pointer-events: auto;
+    /* Command Panel Fixed Bottom Left */
+    .command-panel-wrapper {
+        position: absolute; bottom: 20px; right: 20px; pointer-events: auto;
     }
     
-    .hero-group {
-        flex: 1; display: flex; gap: 10px; padding: 20px;
-        overflow-x: auto;
-    }
-    
-    .combat-unit.hero {
-        width: 150px; flex-direction: row; text-align: left;
-    }
-    .combat-unit.hero.selected {
-        border-color: gold; background: rgba(50,50,100,0.8);
-    }
-    
-    .unit-info { margin-left: 10px; flex: 1; overflow: hidden; }
-    .class-label { font-size: 11px; color: #ffffaa; font-style: italic; margin-bottom: 2px; }
-    .action-preview { font-size: 10px; color: #aaaaff; margin-top: 5px; }
-
     .command-panel {
-        width: 300px; padding: 20px; border-left: 2px solid #555;
-        display: flex; flex-direction: column;
+        width: 200px; padding: 10px; background: rgba(0,0,30,0.9); 
+        border: 2px solid gold; border-radius: 8px;
     }
-    
-    .menu-title { font-weight: bold; color: yellow; margin-bottom: 10px; text-transform: uppercase; }
-    .btn-grid { display: flex; flex-direction: column; gap: 5px; }
-    button { background: #444; color: white; border: 1px solid #666; padding: 8px; cursor: pointer; }
-    button:hover { background: #666; border-color: white; }
-    
-    .btn-fight { margin-top: auto; background: #880000; font-weight: bold; font-size: 1.2rem; }
-    .btn-fight:hover { background: #aa0000; }
-    .btn-cancel { background: #555; }
-    
-    .btn-auto { background: #333; color: #aaa; border-color: #555; font-weight: bold; }
-    .btn-auto.active { background: #008888; color: white; border-color: cyan; box-shadow: 0 0 10px cyan; }
-    
-    @@keyframes pulse { 0% { border-color: yellow; } 50% { border-color: red; } 100% { border-color: yellow; } }
+    .menu-title { font-weight: bold; color: gold; text-align: center; margin-bottom: 5px; }
+    .btn-grid { display: flex; flex-direction: column; gap: 4px; }
+    button { background: #444; color: white; border: 1px solid #777; padding: 6px; cursor: pointer; }
+    .btn-fight { background: #800; font-weight: bold; }
 </style>

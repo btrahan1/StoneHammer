@@ -1,6 +1,7 @@
 @using StoneHammer.Systems
 @inject CombatService CombatService
 @inject CharacterService CharService
+@inject SaveService SaveService
 
 @if (CombatService.LootOpen)
 {
@@ -63,6 +64,9 @@
         {
             CharService.AddItem(CharService.Player, item);
         }
+        
+        // v20.7: Auto-Save on Loot
+        await SaveService.SaveGame("AutoSave");
 
         CombatService.ClearLoot();
         await CombatService.CloseLoot();
