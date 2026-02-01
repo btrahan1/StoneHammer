@@ -64,6 +64,7 @@
                             <button @onclick='() => BeginTargeting("Attack", "Enemy")'>⚔️ Attack</button>
                             <button @onclick='() => BeginTargeting("Heal", "Friendly")'>💖 Heal</button>
                             <button @onclick='() => QueueDirect("Defend")'>🛡️ Defend</button>
+                            <button @onclick="ToggleAuto" class="btn-auto">🤖 Auto</button>
                         </div>
                         <div class="skip-btn" @onclick="SkipHero">Skip ></div>
                     }
@@ -195,6 +196,18 @@
 
     private int GetHpPercent(CombatEntity e) => (int)((float)e.HP / e.MaxHP * 100);
 
+    private void ToggleAuto()
+    {
+        CombatService.ToggleAutoBattle();
+        // If we just turned it on, we might need to kickstart the loop
+        if (CombatService.IsAutoBattling)
+        {
+            // AutoSelectNext logic will likely handle it via StateHasChanged, 
+            // but we can force a check.
+             AutoSelectNext(); 
+        }
+    }
+
     public void Dispose()
     {
         CombatService.OnStateChanged -= HandleStateChange;
@@ -266,6 +279,7 @@
     button:hover { background: #666; border-color: gold; }
     
     .btn-cancel { background: #822; }
+    .btn-auto { background: #228; border-color: #66f; }
     .skip-btn { margin-top: 10px; color: #666; cursor: pointer; font-size: 0.8rem; }
     .skip-btn:hover { color: white; }
 </style>
