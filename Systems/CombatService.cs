@@ -211,7 +211,7 @@ namespace StoneHammer.Systems
                 Heroes.Add(new CombatEntity 
                 { 
                     Name = member.Name, 
-                    HP = member.Stats.MaxHP, 
+                    HP = member.CurrentHP, 
                     MaxHP = member.Stats.MaxHP,
                     IsHero = true,
                     SourceCharacter = member,
@@ -462,6 +462,8 @@ namespace StoneHammer.Systems
              
              await PlayAnim(target, "Hit");
              target.HP -= damage;
+             if (target.IsHero && target.SourceCharacter != null) target.SourceCharacter.CurrentHP = target.HP;
+
              CombatLog = $"{target.Name} took {damage} damage!";
              OnStateChanged?.Invoke();
              
@@ -479,6 +481,8 @@ namespace StoneHammer.Systems
              CombatLog = $"{effectEmoji} {target.Name} hit for {damage}!";
              await PlayAnim(target, "Hit");
              target.HP -= damage;
+             if (target.IsHero && target.SourceCharacter != null) target.SourceCharacter.CurrentHP = target.HP;
+
              OnStateChanged?.Invoke();
              
              if (target.HP <= 0) await HandleDeath(target);
@@ -493,6 +497,7 @@ namespace StoneHammer.Systems
 
                  int healAmount = 20 + (actor.SourceCharacter?.Stats.Wisdom * 2 ?? 0);
                  target.HP = Math.Min(target.HP + healAmount, target.MaxHP);
+                 if (target.IsHero && target.SourceCharacter != null) target.SourceCharacter.CurrentHP = target.HP;
                  
                  CombatLog = $"{target.Name} recovered {healAmount} HP!";
                  OnStateChanged?.Invoke();

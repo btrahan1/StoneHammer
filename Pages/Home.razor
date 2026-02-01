@@ -31,7 +31,9 @@
             <button class="btn btn-warning" @onclick="SpawnStore">Spawn General Store</button>
             <button class="btn btn-success" @onclick="GenerateTown">Generate High-Fidelity Town</button>
             <button class="btn btn-secondary" @onclick="SpawnSandboxPillar">Spawn Sandbox Pillar</button>
+            <button class="btn btn-secondary" @onclick="SpawnSandboxPillar">Spawn Sandbox Pillar</button>
             <button class="btn btn-info" @onclick="SpawnGuildMaster">Spawn Guild Master</button>
+            <button class="btn btn-dark" style="border:1px solid gold; color:gold" @onclick="OpenInn">🍺 Visit Inn</button>
             <button class="btn btn-danger" @onclick="ClearScene">Clear Scene</button>
         </div>
     </div>
@@ -41,6 +43,7 @@
 <CombatView />
 <LootDialog />
 <CharacterSheet @ref="_charSheet" />
+<InnDialog @ref="_innDialog" />
 
 @code {
     private DotNetObjectReference<Home>? _objRef;
@@ -101,6 +104,9 @@
 
     private CharacterSheet? _charSheet;
     private void ToggleCharacter() => _charSheet?.Toggle();
+
+    private InnDialog? _innDialog;
+    private void OpenInn() => _innDialog?.Open();
 
     public void Dispose() => _objRef?.Dispose();
 }

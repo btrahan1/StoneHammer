@@ -1,0 +1,112 @@
+@using StoneHammer.Systems
+@inject CharacterService CharService
+
+@if (_isOpen)
+{
+    <div class="inn-overlay">
+        <div class="inn-dialog">
+            <div class="inn-header">
+                <h2>🍺 The Stone Hearth Inn</h2>
+                <button class="close-btn" @onclick="Close">X</button>
+            </div>
+            
+            <div class="inn-content">
+                <p>The fire is warm, and the stew is thick.</p>
+                <div class="rest-status">
+                    @if (_rested)
+                    {
+                        <p class="rest-msg">The party is fully rested and healed!</p>
+                    }
+                    else
+                    {
+                        <p>Rest your weary bones?</p>
+                    }
+                </div>
+            </div>
+
+            <div class="inn-actions">
+                @if (!_rested)
+                {
+                    <button class="btn-rest" @onclick="RestParty">🛌 Rest (Free)</button>
+                }
+                else
+                {
+                    <button class="btn-leave" @onclick="Close">Leave</button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _isOpen = false;
+    private bool _rested = false;
+
+    public void Open()
+    {
+        _isOpen = true;
+        _rested = false;
+        StateHasChanged();
+    }
+
+    private void Close()
+    {
+        _isOpen = false;
+    }
+
+    private void RestParty()
+    {
+        CharService.Rest();
+        _rested = true;
+    }
+}
+
+<style>
+    .inn-overlay {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.8);
+        display: flex; justify-content: center; align-items: center;
+        z-index: 2000;
+    }
+
+    .inn-dialog {
+        width: 400px;
+        background: #2a1a10; /* Dark wood */
+        border: 2px solid #8b5a2b;
+        box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        color: #e0c0a0;
+        font-family: 'Georgia', serif;
+    }
+
+    .inn-header {
+        background: #3e2718;
+        padding: 10px;
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 2px solid #8b5a2b;
+    }
+
+    .inn-header h2 { margin: 0; font-size: 1.2rem; color: #ffaa00; }
+    
+    .inn-content { padding: 20px; text-align: center; }
+    
+    .rest-msg { color: #55ff55; font-weight: bold; }
+
+    .inn-actions {
+        padding: 15px;
+        display: flex; justify-content: center;
+        background: #1a100a;
+    }
+
+    .btn-rest {
+        background: #0055aa; color: white; border: none; padding: 10px 20px;
+        font-size: 1.1rem; cursor: pointer; border-radius: 4px;
+    }
+    .btn-rest:hover { background: #0077cc; }
+
+    .btn-leave {
+        background: #555; color: white; border: none; padding: 8px 16px; cursor: pointer;
+    }
+    
+    .close-btn { background: none; border: none; color: #888; cursor: pointer; font-weight: bold; }
+    .close-btn:hover { color: white; }
+</style>

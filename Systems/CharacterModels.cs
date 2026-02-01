@@ -94,6 +94,9 @@ namespace StoneHammer.Systems
             public int CurrentMana { get; set; } = 20;
             public int MaxMana { get; set; } = 20;
 
+            // Persistent Health
+            public int CurrentHP { get; set; } = 20;
+
             public CharacterData()
             {
                 // Init Slots

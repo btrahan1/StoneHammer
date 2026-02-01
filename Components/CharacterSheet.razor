@@ -49,10 +49,21 @@
                             <div class="xp-text">@_selected.CurrentXP / @(_selected.Level * 100) XP</div>
                          </div>
                          <hr/>
-                         <div class="stat-row derived"><span>HP</span> <span>@_selected.Stats.MaxHP</span></div>
-                         <div class="stat-row derived" style="color:white">
-                             <span style="color:@_selected.GetResourceColor()">@_selected.GetResourceName().ToUpper()</span> 
-                             <span>@_selected.CurrentMana / @_selected.MaxMana</span>
+                         <hr/>
+                         <!-- HP Bar -->
+                         <div class="stat-row derived"><span>HP</span></div>
+                         <div class="xp-container" style="margin-bottom: 5px;">
+                            <div class="xp-bar" style="background: #ff4444; width: @(Math.Min(100, (double)_selected.CurrentHP / _selected.Stats.MaxHP * 100))%"></div>
+                            <div class="xp-text">@_selected.CurrentHP / @_selected.Stats.MaxHP</div>
+                         </div>
+
+                         <!-- Resource Bar -->
+                         <div class="stat-row derived" style="color:@_selected.GetResourceColor()">
+                             <span>@_selected.GetResourceName().ToUpper()</span>
+                         </div>
+                         <div class="xp-container" style="margin-bottom: 5px;">
+                            <div class="xp-bar" style="background: @_selected.GetResourceColor(); width: @(Math.Min(100, (double)_selected.CurrentMana / _selected.MaxMana * 100))%"></div>
+                            <div class="xp-text">@_selected.CurrentMana / @_selected.MaxMana</div>
                          </div>
                          <div class="stat-row derived"><span>ATK</span> <span>@_selected.GetTotalAttack()</span></div>
                          <div class="stat-row derived"><span>DEF</span> <span>@_selected.GetTotalDefense()</span></div>
@@ -290,7 +301,7 @@
         pointer-events: auto;
     }
     .char-window {
-        width: 900px; height: 500px;
+        width: 900px; height: 650px;
         background: #2a2a2a;
         border: 4px solid #8e8e8e;
         display: flex; flex-direction: column;

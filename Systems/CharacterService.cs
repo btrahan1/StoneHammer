@@ -174,6 +174,7 @@ namespace StoneHammer.Systems
             // Recalc Max Resource
             target.MaxMana = target.GetMaxResource();
             target.CurrentMana = target.MaxMana;
+            target.CurrentHP = target.Stats.MaxHP;
             
             OnCharacterUpdated?.Invoke();
         }
@@ -209,6 +210,16 @@ namespace StoneHammer.Systems
             OnCharacterUpdated?.Invoke();
         }
 
+        public void Rest()
+        {
+            foreach(var member in Party)
+            {
+                member.CurrentHP = member.Stats.MaxHP;
+                member.CurrentMana = member.MaxMana;
+            }
+            OnCharacterUpdated?.Invoke();
+        }
+
         private void LevelUp(CharacterData target)
         {
             target.Level++;
@@ -226,10 +237,11 @@ namespace StoneHammer.Systems
                 case CharacterClass.Mage: stats.Intelligence++; break;
             }
 
-            // Restore HP/Mana on Level Up
+            // Restore HP/Mana on Level Up partially or fully? 
+            // Let's heal them fully on level up for gratification
             target.MaxMana = target.GetMaxResource();
             target.CurrentMana = target.MaxMana;
-            // MaxHP grows automatically via Constitution property in StatBlock
+            target.CurrentHP = target.Stats.MaxHP;
         }
     }
 }

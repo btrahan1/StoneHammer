@@ -38,10 +38,10 @@
                          <!-- Simplified for Floating UI -->
                         <div class="name">@hero.Name</div>
             <!-- HP Bar -->
-            <div class="hp-bar-container">
-                <div class="hp-bar-fill" style="width: @(GetHpPercent(hero))%;"></div>
-                <div class="hp-text">@hero.HP / @hero.MaxHP</div>
+            <div class="unit-hp-bar">
+                <div class="fill" style="width: @(GetHpPercent(hero))%;"></div>
             </div>
+            <div class="hp-text">@hero.HP / @hero.MaxHP</div>
             
             <!-- Resource Bar -->
             @if(hero.SourceCharacter != null)
