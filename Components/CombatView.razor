@@ -131,12 +131,35 @@
                 </div>
             </div>
         }
-        else if (CombatService.Phase == CombatPhase.Input && CombatService.Heroes.Any(h => h.HP > 0))
+        }
+        }
+
+        <!-- LOOT OVERLAY -->
+        @if (CombatService.LootOpen)
         {
-             /* All inputs done, waiting for round trigger or just empty state */
-             <div class="center-screen" style="color: white; font-weight: bold; font-size: 24px;">
-                 Executing...
-             </div>
+            <div class="loot-overlay">
+                <div class="loot-window">
+                    <div class="loot-title">Victory!</div>
+                    <div class="loot-gold">Found @CombatService.CurrentLootGold Gold</div>
+                    
+                    <div class="loot-grid">
+                        @foreach(var item in CombatService.CurrentLootItems)
+                        {
+                            <div class="loot-item @item.Rarity" title="@item.Description">
+                                <div class="item-icon">@item.Icon</div>
+                                <div class="item-details">
+                                    <div class="item-name">@item.Name</div>
+                                    <div class="item-type">@item.Rarity @item.Type</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="loot-actions">
+                        <button class="btn-take" @onclick="TakeAllLoot">Take All</button>
+                    </div>
+                </div>
+            </div>
         }
     </div>
 }
@@ -285,6 +308,28 @@
         }
     }
 
+    private async Task TakeAllLoot()
+    {
+        // Add Gold
+        if (CombatService.Heroes.Any())
+        {
+             // Give to first hero (shared party wallet eventually)
+             CombatService.Heroes.First().SourceCharacter.Gold += CombatService.CurrentLootGold;
+        }
+
+        // Add Items
+        foreach(var item in CombatService.CurrentLootItems)
+        {
+            if (CombatService.Heroes.Any())
+            {
+                CombatService.Heroes.First().SourceCharacter.Inventory.Add(item);
+            }
+        }
+        
+        CombatService.ClearLoot();
+        await CombatService.CloseLoot();
+    }
+
     public void Dispose()
     {
         CombatService.OnStateChanged -= HandleStateChange;
@@ -411,4 +456,51 @@
     .btn-auto { background: #228; border-color: #66f; }
     .skip-btn { margin-top: 10px; color: #666; cursor: pointer; font-size: 0.8rem; }
     .skip-btn:hover { color: white; }
+
+    /* LOOT UI */
+    .loot-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); z-index: 5000;
+        display: flex; justify-content: center; align-items: center;
+        pointer-events: auto;
+    }
+    .loot-window {
+        width: 400px; background: #222; border: 2px solid gold; border-radius: 8px;
+        padding: 20px; display: flex; flex-direction: column; gap: 15px;
+        box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+    }
+    .loot-title { font-size: 2rem; color: gold; text-align: center; text-transform: uppercase; font-weight: bold; }
+    .loot-gold { text-align: center; color: #ffaa00; font-size: 1.2rem; }
+    
+    .loot-grid { display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; }
+    
+    .loot-item {
+        display: flex; gap: 10px; padding: 10px; background: #333; border: 1px solid #555; align-items: center;
+    }
+    .loot-item .item-icon { font-size: 2rem; }
+    .loot-item .item-details { display: flex; flex-direction: column; }
+    .loot-item .item-name { font-weight: bold; color: white; }
+    .loot-item .item-type { font-size: 0.8rem; color: #aaa; }
+
+    /* RARITY COLORS */
+    .loot-item.Common { border-color: #9d9d9d; }
+    .loot-item.Common .item-name { color: #dcdcdc; }
+
+    .loot-item.Uncommon { border-color: #1eff00; background: rgba(30, 255, 0, 0.1); }
+    .loot-item.Uncommon .item-name { color: #1eff00; }
+
+    .loot-item.Rare { border-color: #0070dd; background: rgba(0, 112, 221, 0.1); }
+    .loot-item.Rare .item-name { color: #0070dd; text-shadow: 0 0 5px #0070dd; }
+
+    .loot-item.Epic { border-color: #a335ee; background: rgba(163, 53, 238, 0.15); }
+    .loot-item.Epic .item-name { color: #a335ee; text-shadow: 0 0 8px #a335ee; }
+
+    .loot-item.Legendary { border-color: #ff8000; background: rgba(255, 128, 0, 0.2); border-width: 2px; }
+    .loot-item.Legendary .item-name { color: #ff8000; text-shadow: 0 0 10px #ff8000; }
+
+    .btn-take {
+        width: 100%; padding: 15px; background: gold; color: black; font-weight: bold;
+        font-size: 1.2rem; border: none; cursor: pointer;
+    }
+    .btn-take:hover { background: #ffaa00; }
 </style>

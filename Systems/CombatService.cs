@@ -74,37 +74,102 @@ namespace StoneHammer.Systems
         {
             if (LootOpen) return;
             
-            // Random Generate
-            var rng = new Random();
-            CurrentLootGold = rng.Next(20, 100);
+            CurrentLootGold = new Random().Next(20, 100);
             CurrentLootItems.Clear();
             
-            // 30% chance for item
-            if (rng.NextDouble() > 0.7)
+            // Generate 1-3 items
+            int count = new Random().Next(1, 4);
+            for(int i=0; i<count; i++)
             {
-                CurrentLootItems.Add(new CharacterModels.InventoryItem 
-                { 
-                    Name = "Rusty Sword", 
-                    Type = CharacterModels.ItemType.Weapon, 
-                    ValidSlot = CharacterModels.EquipmentSlot.MainHand,
-                    Bonuses = new Dictionary<string, int> { { "Strength", 1 } },
-                    Icon = "🗡️",
-                    Description = "Better than nothing."
-                });
-            }
-             else if (rng.NextDouble() > 0.5)
-            {
-               CurrentLootItems.Add(new CharacterModels.InventoryItem 
-                { 
-                    Name = "Minor Potion", 
-                    Type = CharacterModels.ItemType.Consumable, 
-                    Icon = "🧪",
-                    Description = "Heals 10 HP."
-                });
+                var rarity = RollRarity();
+                var item = GenerateLootItem(rarity);
+                if (item != null) CurrentLootItems.Add(item);
             }
 
             LootOpen = true;
             OnStateChanged?.Invoke();
+        }
+
+        private CharacterModels.ItemRarity RollRarity()
+        {
+            double roll = new Random().NextDouble();
+            if (roll > 0.99) return CharacterModels.ItemRarity.Legendary; // 1%
+            if (roll > 0.95) return CharacterModels.ItemRarity.Epic;      // 4%
+            if (roll > 0.80) return CharacterModels.ItemRarity.Rare;      // 15%
+            if (roll > 0.50) return CharacterModels.ItemRarity.Uncommon;  // 30%
+            return CharacterModels.ItemRarity.Common;                     // 50%
+        }
+
+        private CharacterModels.InventoryItem GenerateLootItem(CharacterModels.ItemRarity rarity)
+        {
+            var rng = new Random();
+            var type = (CharacterModels.ItemType)rng.Next(0, 3); // Weapon, Armor, Consumable
+            
+            var item = new CharacterModels.InventoryItem { Rarity = rarity, Type = type };
+            
+            // Name & Stat Gen
+            string prefix = "";
+            string baseName = "";
+            
+            if (type == CharacterModels.ItemType.Weapon)
+            {
+                string[] weapons = { "Sword", "Axe", "Mace", "Dagger", "Staff", "Bow" };
+                baseName = weapons[rng.Next(weapons.Length)];
+                item.ValidSlot = CharacterModels.EquipmentSlot.MainHand;
+                item.Icon = "⚔️";
+                
+                int damage = 1;
+                switch(rarity)
+                {
+                    case CharacterModels.ItemRarity.Common: damage = 1; break;
+                    case CharacterModels.ItemRarity.Uncommon: damage = 2; prefix = "Sharp "; break;
+                    case CharacterModels.ItemRarity.Rare: damage = 3; prefix = "Honed "; item.Bonuses["Strength"] = 1; break;
+                    case CharacterModels.ItemRarity.Epic: damage = 5; prefix = "Runed "; item.Bonuses["Strength"] = 2; item.Bonuses["Crit"] = 1; break;
+                    case CharacterModels.ItemRarity.Legendary: damage = 8; prefix = "Godly "; item.Bonuses["Strength"] = 5; item.Bonuses["All"] = 2; break;
+                }
+                
+                // Class-specific stats
+                if (baseName == "Dagger") { item.Bonuses["Dexterity"] = damage; item.Icon = "🗡️"; }
+                else if (baseName == "Staff") { item.Bonuses["Intelligence"] = damage; item.Icon = "🪄"; }
+                else if (baseName == "Bow") { item.Bonuses["Dexterity"] = damage; item.Icon = "🏹"; }
+                else { item.Bonuses["Strength"] = damage; } // Default melee
+            }
+            else if (type == CharacterModels.ItemType.Armor)
+            {
+                string[] armors = { "Helmet", "Chestplate", "Boots" };
+                baseName = armors[rng.Next(armors.Length)];
+                if (baseName == "Helmet") { item.ValidSlot = CharacterModels.EquipmentSlot.Head; item.Icon = "⛑️"; }
+                else if (baseName == "Chestplate") { item.ValidSlot = CharacterModels.EquipmentSlot.Chest; item.Icon = "👕"; }
+                else if (baseName == "Boots") { item.ValidSlot = CharacterModels.EquipmentSlot.Feet; item.Icon = "🥾"; }
+
+
+                int def = 1;
+                switch(rarity)
+                {
+                    case CharacterModels.ItemRarity.Common: def = 1; break;
+                    case CharacterModels.ItemRarity.Uncommon: def = 2; prefix = "Sturdy "; break;
+                    case CharacterModels.ItemRarity.Rare: def = 3; prefix = "Reinforced "; item.Bonuses["Constitution"] = 1; break;
+                    case CharacterModels.ItemRarity.Epic: def = 5; prefix = "Enchanted "; item.Bonuses["Constitution"] = 3; break;
+                    case CharacterModels.ItemRarity.Legendary: def = 8; prefix = "Dragon "; item.Bonuses["Constitution"] = 5; item.Bonuses["Defense"] = 5; break;
+                }
+                item.Bonuses["Defense"] = def;
+            }
+            else
+            {
+                // Consumable
+                baseName = "Potion";
+                item.Icon = "🧪";
+                if (rarity >= CharacterModels.ItemRarity.Rare) { baseName = "Elixir"; item.Icon = "🏺"; }
+                item.Description = "Restores HP/Mana";
+            }
+
+            item.Name = $"{prefix}{baseName}";
+            if (string.IsNullOrEmpty(item.Description)) item.Description = $"{rarity} Quality.";
+            
+            // Value Calculation
+            item.Value = (int)rarity * 50 + rng.Next(10, 50);
+            
+            return item;
         }
 
         public async Task CloseLoot()

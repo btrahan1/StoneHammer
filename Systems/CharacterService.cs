@@ -113,6 +113,24 @@ namespace StoneHammer.Systems
             OnCharacterUpdated?.Invoke();
         }
 
+        public void TransferItem(CharacterData from, CharacterData to, InventoryItem item)
+        {
+            if (from == to) return;
+            if (!from.Inventory.Contains(item)) return;
+
+            // Unequip if currently equipped
+            if (item.ValidSlot.HasValue && from.Equipment.Values.Contains(item))
+            {
+                 var slot = item.ValidSlot.Value;
+                 from.Equipment[slot] = null;
+            }
+
+            from.Inventory.Remove(item);
+            to.Inventory.Add(item);
+            
+            OnCharacterUpdated?.Invoke();
+        }
+
         public void Equip(CharacterData target, InventoryItem? item)
         {
             if (item == null || !item.ValidSlot.HasValue) return;

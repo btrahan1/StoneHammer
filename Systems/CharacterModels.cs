@@ -58,10 +58,20 @@ namespace StoneHammer.Systems
             Quest
         }
 
+        public enum ItemRarity
+        {
+            Common,
+            Uncommon,
+            Rare,
+            Epic,
+            Legendary
+        }
+
         public class InventoryItem
         {
             public string Id { get; set; } = System.Guid.NewGuid().ToString();
             public string Name { get; set; } = "Unknown Item";
+            public ItemRarity Rarity { get; set; } = ItemRarity.Common;
             public string Description { get; set; } = "";
             public string Icon { get; set; } = "📦"; // Emoji fallback
             public ItemType Type { get; set; }

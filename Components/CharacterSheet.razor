@@ -107,6 +107,12 @@
                                  <button class="@(_viewMode == "INVO" ? "active" : "")" @onclick='() => _viewMode = "INVO"'>INVO</button>
                                  <button class="@(_viewMode == "SYS" ? "active" : "")" @onclick='() => _viewMode = "SYS"'>SYS</button>
                              </div>
+                             @if(_viewMode == "INVO")
+                             {
+                                <button class="btn-trade @(_tradeMode ? "active" : "")" @onclick="ToggleTradeMode">
+                                    @(_tradeMode ? "❌ Cancel" : "🤝 Trade")
+                                </button>
+                             }
                          </div>
                          
                          @if(_viewMode == "INVO")
@@ -123,7 +129,9 @@
                              <div class="inv-grid">
                                  @foreach(var item in _selected.Inventory)
                                  {
-                                    <div class="inv-item" @onclick="() => UseOrEquip(item)" title="@item.Name (@item.Type)">
+                                    <div class="inv-item @item.Rarity @(_tradeMode ? "trade-active" : "")" 
+                                         @onclick="() => HandleItemClick(item)" 
+                                         title="@item.Name (@item.Type) - @item.Rarity&#013;@item.Description">
                                          <span class="icon">@item.Icon</span>
                                          @if(item.ValidSlot.HasValue && _selected.Equipment.Values.Any(e => e?.Id == item.Id))
                                          {
@@ -132,6 +140,23 @@
                                      </div>
                                  }
                              </div>
+
+                             @if(_itemToTrade != null)
+                             {
+                                 <div class="trade-overlay">
+                                     <div class="trade-popup">
+                                         <div class="trade-title">Give @(_itemToTrade.Name) to:</div>
+                                         @foreach(var member in CharService.Party.Where(m => m != _selected))
+                                         {
+                                             <button class="trade-target" @onclick="() => ExecuteTrade(member)">
+                                                 @(member.Class == CharacterClass.Mage ? "🧙‍♂️" : member.Class == CharacterClass.Rogue ? "🥷" : member.Class == CharacterClass.Healer ? "🩹" : "⚔️")
+                                                 @member.Name
+                                             </button>
+                                         }
+                                         <button class="btn-cancel" @onclick="CancelTrade">Cancel</button>
+                                     </div>
+                                 </div>
+                             }
                              
                              <hr/>
                              <h3>SKILLS</h3>
@@ -276,6 +301,44 @@
         }
     }
 
+    private bool _tradeMode = false;
+    private InventoryItem? _itemToTrade;
+
+    private void ToggleTradeMode()
+    {
+        _tradeMode = !_tradeMode;
+        _itemToTrade = null;
+        StateHasChanged();
+    }
+
+    private void HandleItemClick(InventoryItem item)
+    {
+        if (_tradeMode)
+        {
+            _itemToTrade = item;
+        }
+        else
+        {
+            UseOrEquip(item);
+        }
+    }
+
+    private void ExecuteTrade(CharacterData target)
+    {
+        if (_selected != null && _itemToTrade != null)
+        {
+            CharService.TransferItem(_selected, target, _itemToTrade);
+            _itemToTrade = null; // Keep trade mode open for multiple items?
+            // _tradeMode = false; // Or close it? Let's keep it open.
+            StateHasChanged();
+        }
+    }
+    
+    private void CancelTrade()
+    {
+        _itemToTrade = null;
+    }
+
     private async Task OnClassChanged(ChangeEventArgs e)
     {
         if (_selected != null && Enum.TryParse(typeof(CharacterClass), e.Value?.ToString(), out var result))
@@ -377,7 +440,16 @@
         width: 40px; height: 40px; border: 1px solid #555; background: #222;
         display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative;
     }
+    .inv-item.trade-active { cursor: alias; }
+    .inv-item.trade-active:hover { border-color: gold; }
     .inv-item:hover { border-color: white; }
+    
+    /* RARITY */
+    .inv-item.Common { border-color: #555; }
+    .inv-item.Uncommon { border-color: #1eff00; box-shadow: inset 0 0 5px rgba(30, 255, 0, 0.2); }
+    .inv-item.Rare { border-color: #0070dd; box-shadow: inset 0 0 8px rgba(0, 112, 221, 0.2); }
+    .inv-item.Epic { border-color: #a335ee; box-shadow: inset 0 0 10px rgba(163, 53, 238, 0.3); }
+    .inv-item.Legendary { border-color: #ff8000; box-shadow: inset 0 0 12px rgba(255, 128, 0, 0.4); border-width: 2px; }
     .equipped-badge {
         position: absolute; bottom: 0; right: 0; background: gold; color: black; font-size: 10px; padding: 0 2px;
     }
@@ -410,4 +482,22 @@
     .save-file { display: flex; justify-content: space-between; background: #222; padding: 4px; border: 1px solid #444; align-items: center; }
     .btn-load { background: #004488; color: white; border: none; cursor: pointer; padding: 2px 6px; }
     .no-saves { font-style: italic; color: #666; text-align: center; }
+
+    .btn-trade { background: #333; color: #aaa; border: 1px solid #555; cursor: pointer; padding: 2px 8px; }
+    .btn-trade.active { background: gold; color: black; border-color: white; font-weight: bold; }
+    
+    .trade-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 100;
+        display: flex; justify-content: center; align-items: center;
+    }
+    .trade-popup {
+        background: #222; border: 2px solid gold; padding: 10px;
+        display: flex; flex-direction: column; gap: 5px; min-width: 150px;
+    }
+    .trade-title { color: white; font-weight: bold; text-align: center; margin-bottom: 5px; }
+    .trade-target {
+        padding: 8px; background: #333; color: white; border: 1px solid #555; cursor: pointer; text-align: left;
+    }
+    .trade-target:hover { background: #444; border-color: white; }
 </style>
