@@ -75,11 +75,21 @@
                     }
 
                     <!-- Fight Button -->
-                    <button class="btn-fight" @onclick="ExecuteRound">GO FIGHT!</button>
+                    <div style="display: flex; gap: 5px; margin-top: auto;">
+                        <button class="btn-fight" style="flex: 1;" @onclick="ExecuteRound">GO FIGHT!</button>
+                        <button class="btn-auto @(CombatService.IsAutoBattling ? "active" : "")" @onclick="ToggleAuto" title="Auto-Battle">
+                            @(CombatService.IsAutoBattling ? "🤖 ON" : "🤖 AUTO")
+                        </button>
+                    </div>
                 }
                 else
                 {
                     <div class="menu-title">EXECUTING...</div>
+                    @if(CombatService.IsAutoBattling)
+                    {
+                         <div style="color: cyan; font-size: 10px;">AUTO-BATTLE ACTIVE</div>
+                         <button class="btn-auto active" @onclick="ToggleAuto">STOP AUTO</button>
+                    }
                 }
             </div>
         </div>
@@ -94,6 +104,11 @@
     protected override void OnInitialized()
     {
         CombatService.OnStateChanged += StateHasChanged;
+    }
+
+    private void ToggleAuto()
+    {
+        CombatService.ToggleAutoBattle();
     }
 
     private void SelectHero(CombatEntity hero)
@@ -223,6 +238,9 @@
     .btn-fight { margin-top: auto; background: #880000; font-weight: bold; font-size: 1.2rem; }
     .btn-fight:hover { background: #aa0000; }
     .btn-cancel { background: #555; }
+    
+    .btn-auto { background: #333; color: #aaa; border-color: #555; font-weight: bold; }
+    .btn-auto.active { background: #008888; color: white; border-color: cyan; box-shadow: 0 0 10px cyan; }
     
     @@keyframes pulse { 0% { border-color: yellow; } 50% { border-color: red; } 100% { border-color: yellow; } }
 </style>

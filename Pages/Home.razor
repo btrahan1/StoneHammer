@@ -26,6 +26,7 @@
 
 <SceneView />
 <CombatView />
+<LootDialog />
 <CharacterSheet @ref="_charSheet" />
 
 @code {
@@ -54,9 +55,9 @@
     }
 
     [JSInvokable]
-    public void ClaimLoot(int amount)
+    public void OpenLoot()
     {
-        CombatService.LogLoot(amount);
+        CombatService.OpenLootChest();
         StateHasChanged();
     }
 

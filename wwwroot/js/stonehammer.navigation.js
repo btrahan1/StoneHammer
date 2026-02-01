@@ -169,16 +169,11 @@
                         this.log("Looting...", "yellow");
                         const chest = pointerInfo.pickInfo.pickedMesh;
 
-                        // Show visual popup for "50G"
-                        if (window.stoneHammer.showFloatingText) {
-                            window.stoneHammer.showFloatingText("+50 G", chest.position, "gold");
-                        }
-
                         if (chest.parent) chest.parent.dispose();
                         else chest.dispose();
 
                         if (this.dotNetHelper) {
-                            this.dotNetHelper.invokeMethodAsync('ClaimLoot', 50);
+                            this.dotNetHelper.invokeMethodAsync('OpenLoot');
                         }
                     }
                 }

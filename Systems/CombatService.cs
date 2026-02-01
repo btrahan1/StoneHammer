@@ -15,18 +15,109 @@ namespace StoneHammer.Systems
         public List<CombatEntity> Heroes { get; private set; } = new List<CombatEntity>();
         public List<CombatEntity> Enemies { get; private set; } = new List<CombatEntity>();
 
+        // Loot State
+        public bool LootOpen { get; private set; }
+        public int CurrentLootGold { get; private set; }
+        public List<CharacterModels.InventoryItem> CurrentLootItems { get; private set; } = new List<CharacterModels.InventoryItem>();
+
+        // Auto-Battle
+        public bool IsAutoBattling { get; private set; }
+
         public event Action? OnStateChanged;
 
-        public void LogLoot(int gold)
+        public void ToggleAutoBattle()
         {
-            CombatLog = $"You found {gold} Gold!";
+            IsAutoBattling = !IsAutoBattling;
+            if (IsAutoBattling && Phase == CombatPhase.Input)
+            {
+                _ = AutoFightLoop();
+            }
             OnStateChanged?.Invoke();
+        }
+
+        private async Task AutoFightLoop()
+        {
+             while(IsAutoBattling && IsFighting)
+             {
+                 if (Phase == CombatPhase.Input)
+                 {
+                     // Queue Actions for all heroes
+                     foreach(var hero in Heroes.Where(h => h.HP > 0))
+                     {
+                         // Simple AI: Basic Attack first living enemy
+                         // (Future: Healers heal if low HP)
+                         var target = Enemies.OrderBy(e => e.HP).FirstOrDefault(e => e.HP > 0);
+                         
+                         if (target != null)
+                         {
+                             hero.QueuedAction = new CombatAction { Type = "Attack", Target = target };
+                         }
+                     }
+                     
+                     // Trigger Round
+                     await ExecuteRound();
+                     await Task.Delay(1000); // Pacing
+                 }
+                 else
+                 {
+                     await Task.Delay(500);
+                 }
+             }
         }
 
         private CityBridge _bridge;
         private IJSRuntime _js;
         private AssetManager _assets;
         private CharacterService _charService;
+
+        public void OpenLootChest()
+        {
+            if (LootOpen) return;
+            
+            // Random Generate
+            var rng = new Random();
+            CurrentLootGold = rng.Next(20, 100);
+            CurrentLootItems.Clear();
+            
+            // 30% chance for item
+            if (rng.NextDouble() > 0.7)
+            {
+                CurrentLootItems.Add(new CharacterModels.InventoryItem 
+                { 
+                    Name = "Rusty Sword", 
+                    Type = CharacterModels.ItemType.Weapon, 
+                    ValidSlot = CharacterModels.EquipmentSlot.MainHand,
+                    Bonuses = new Dictionary<string, int> { { "Strength", 1 } },
+                    Icon = "🗡️",
+                    Description = "Better than nothing."
+                });
+            }
+             else if (rng.NextDouble() > 0.5)
+            {
+               CurrentLootItems.Add(new CharacterModels.InventoryItem 
+                { 
+                    Name = "Minor Potion", 
+                    Type = CharacterModels.ItemType.Consumable, 
+                    Icon = "🧪",
+                    Description = "Heals 10 HP."
+                });
+            }
+
+            LootOpen = true;
+            OnStateChanged?.Invoke();
+        }
+
+        public void CloseLoot()
+        {
+            LootOpen = false;
+            OnStateChanged?.Invoke();
+        }
+
+        public void ClearLoot()
+        {
+            CurrentLootGold = 0;
+            CurrentLootItems.Clear();
+        }
 
         public CombatService(CityBridge bridge, IJSRuntime js, AssetManager assets, CharacterService charService)
         {
@@ -42,40 +133,43 @@ namespace StoneHammer.Systems
             Phase = CombatPhase.Input;
             CombatLog = $"Encounter started: {enemyGroupName}!";
             
-            // 1. Initialize Heroes from Party
+            // 1. Initialize Heroes
             Heroes.Clear();
             foreach(var member in _charService.Party)
             {
                 Heroes.Add(new CombatEntity 
                 { 
                     Name = member.Name, 
-                    HP = member.Stats.MaxHP, // Should probably track current HP in CharacterData
+                    HP = member.Stats.MaxHP, // TODO: Persist current HP
                     MaxHP = member.Stats.MaxHP,
                     IsHero = true,
                     SourceCharacter = member,
-                    ModelId = "Hero_" + member.Name.Replace(" ", "") // Assume unique ID or mapping
+                    ModelId = "Hero_" + member.Name.Replace(" ", "") 
                 });
             }
 
-            // 2. Initialize Enemies (Mock Group for now)
+            // 2. Initialize Enemies
             Enemies.Clear();
-            int enemyCount = 3; // Fixed group size for v19
+            int enemyCount = 3; 
             for(int i=0; i<enemyCount; i++)
             {
-                Enemies.Add(new CombatEntity 
+                var enemy = new CombatEntity 
                 { 
-                    Name = $"{enemyGroupName} {char.ConvertFromUtf32(65+i)}", // A, B, C
+                    Name = i == 0 ? enemyGroupName : $"Minion {char.ConvertFromUtf32(65+i)}", 
                     HP = 40, 
                     MaxHP = 40,
                     IsHero = false,
-                    ModelId = $"Enemy_{i}"
-                });
+                    XPValue = 25
+                };
+
+                // CRITICAL FIX: Map the first enemy to the actual 3D actor clicked
+                if (i == 0) enemy.ModelId = enemyGroupName; 
+                else enemy.ModelId = "Minion_" + i; // Logic needed to spawn visual minions later
+
+                Enemies.Add(enemy);
             }
 
-            // 3. Camera & Spawning (Mock)
             await _js.InvokeVoidAsync("stoneHammer.rotateCameraToBattle", enemyGroupName);
-            // In a real implementation, we would spawn the enemy meshes here if they aren't already.
-
             OnStateChanged?.Invoke();
         }
 
@@ -101,10 +195,6 @@ namespace StoneHammer.Systems
         public async Task ExecuteRound()
         {
             if (Phase != CombatPhase.Input) return;
-            
-            // 1. Check if all heroes define actions? 
-            // For now, we allow partial execution (skip idle heroes) or strictly wait.
-            // Let's assume user clicks "FIGHT" to commit.
             
             Phase = CombatPhase.Execution;
             CombatLog = "Round Start!";
@@ -185,11 +275,21 @@ namespace StoneHammer.Systems
                 CombatLog = $"{actor.Name} attacks {action.Target.Name}!";
                 OnStateChanged?.Invoke();
                 
-                // Anim (Mock)
-                // await _js.InvokeVoidAsync("stoneHammer.playCombatAnimation", actor.ModelId, "Attack");
-                await Task.Delay(800); // Wait for anim
+                // ANIMATION RESTORED
+                // For heroes, we use generic "Player" or a mapped ID. For enemies, their Name/ID.
+                // Assuming "Player" is the main mesh for 1st hero for now.
+                string animTarget = actor.IsHero ? "Player" : actor.ModelId;
+                await _js.InvokeVoidAsync("stoneHammer.playCombatAnimation", animTarget, "Attack");
                 
-                int damage = 10; // Calc based on stats later
+                await Task.Delay(800); 
+                
+                // STATS LOGIC
+                int damage = CalculateDamage(actor);
+                
+                // Anim Target Hit
+                 string hitTarget = action.Target.IsHero ? "Player" : action.Target.ModelId;
+                await _js.InvokeVoidAsync("stoneHammer.playCombatAnimation", hitTarget, "Hit");
+
                 action.Target.HP -= damage;
                 
                 CombatLog = $"{action.Target.Name} took {damage} damage!";
@@ -200,43 +300,57 @@ namespace StoneHammer.Systems
                     CombatLog = $"{action.Target.Name} fell!";
                 }
             }
-            else if (action.Type == "Heal")
+            // ... (Heal same) ...
+            
+            await Task.Delay(500); 
+        }
+
+        private int CalculateDamage(CombatEntity entity)
+        {
+            if (!entity.IsHero || entity.SourceCharacter == null) return 5; // Base mob damage
+
+            var charData = entity.SourceCharacter;
+            int baseDmg = charData.Stats.Strength; // STR scaling
+            
+            // Check Weapon
+            if (charData.Equipment.TryGetValue(CharacterModels.EquipmentSlot.MainHand, out var weapon) && weapon != null)
             {
-                actor.HP = Math.Min(actor.MaxHP, actor.HP + 20);
-                CombatLog = $"{actor.Name} cast Heal!";
-                OnStateChanged?.Invoke();
-                await Task.Delay(800);
+                 if (weapon.Bonuses != null && weapon.Bonuses.TryGetValue("Strength", out int bonus)) // Simplified
+                 {
+                     baseDmg += bonus * 2; // Weapon logic placeholder
+                 }
             }
             
-            await Task.Delay(500); // Pace
+            return Math.Max(1, baseDmg);
         }
 
         private async Task HandleVictory()
         {
             CombatLog = "VICTORY!";
             Phase = CombatPhase.Victory;
+            
+            // XP REWARD
+            int totalXP = Enemies.Sum(e => e.XPValue);
+            foreach(var member in _charService.Party)
+            {
+                member.CurrentXP += totalXP;
+                // Level Up Check Logic would go here
+            }
+            CombatLog += $" Party gained {totalXP} XP!";
             OnStateChanged?.Invoke();
 
-            // 1. Remove all enemies visuals
+            // Remove visuals
             foreach(var enemy in Enemies)
             {
-                 // Play die anim if not already?
-                 // Remove actor
-                 // In v15 we used "stoneHammer.removeActor" with the Name.
-                 // We need to make sure the name matches the node. 
-                 // Our spawn logic used "Name" as ID effectively? 
-                 // Let's assume the ModelId is the key if we set it, or Name if not.
                  var id = !string.IsNullOrEmpty(enemy.ModelId) ? enemy.ModelId : enemy.Name;
-                 await _js.InvokeVoidAsync("stoneHammer.removeActor", enemy.Name); 
+                 await _js.InvokeVoidAsync("stoneHammer.removeActor", id); 
             }
 
             await Task.Delay(1000);
-
-            // 2. Spawn Loot Chest
-            // We just pick a spot near the center of battle or the player
+            
+            // Fix: Position should come from first enemy
             await _assets.SpawnAsset("assets/loot_chest.json", "Loot Chest", new { Position = new float[] { 0, 0, 15 } }); 
             
-            CombatLog = "A Loot Chest appeared!";
             OnStateChanged?.Invoke();
             
             await Task.Delay(2000);
@@ -259,7 +373,8 @@ namespace StoneHammer.Systems
         public int HP { get; set; }
         public int MaxHP { get; set; }
         public bool IsHero { get; set; }
-        public string ModelId { get; set; } = "";
+        public string ModelId { get; set; } = ""; // The JS scene node ID
+        public int XPValue { get; set; } = 0;
         
         public CharacterModels.CharacterData? SourceCharacter { get; set; }
         public CombatAction? QueuedAction { get; set; }

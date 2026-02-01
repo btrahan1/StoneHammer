@@ -1,0 +1,123 @@
+@using StoneHammer.Systems
+@inject CombatService CombatService
+@inject CharacterService CharService
+
+@if (CombatService.LootOpen)
+{
+    <div class="loot-overlay">
+        <div class="loot-window">
+            <div class="loot-header">
+                <span>LOOT CHEST</span>
+                <button class="close-btn" @onclick="Close">X</button>
+            </div>
+            
+            <div class="loot-body">
+                @if (CombatService.CurrentLootGold > 0)
+                {
+                    <div class="loot-row gold">
+                        <span class="icon">💰</span>
+                        <span class="name">@CombatService.CurrentLootGold Gold</span>
+                    </div>
+                }
+                
+                @foreach(var item in CombatService.CurrentLootItems)
+                {
+                    <div class="loot-row item">
+                        <span class="icon">@item.Icon</span>
+                        <div class="details">
+                            <span class="name">@item.Name</span>
+                            <span class="desc">@item.Description</span>
+                        </div>
+                    </div>
+                }
+                
+                @if (CombatService.CurrentLootGold == 0 && CombatService.CurrentLootItems.Count == 0)
+                {
+                    <div class="empty-msg">Empty...</div>
+                }
+            </div>
+            
+            <div class="loot-footer">
+                <button class="btn-take-all" @onclick="TakeAll">✋ TAKE ALL</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private void Close()
+    {
+        CombatService.CloseLoot();
+    }
+
+    private void TakeAll()
+    {
+        // Add Gold
+        if (CombatService.CurrentLootGold > 0)
+        {
+            CharService.AddGold(CharService.Player, CombatService.CurrentLootGold);
+        }
+
+        // Add Items
+        foreach(var item in CombatService.CurrentLootItems)
+        {
+            CharService.AddItem(CharService.Player, item);
+        }
+
+        CombatService.ClearLoot();
+        CombatService.CloseLoot();
+    }
+    
+    protected override void OnInitialized()
+    {
+        CombatService.OnStateChanged += StateHasChanged;
+    }
+    
+    public void Dispose()
+    {
+        CombatService.OnStateChanged -= StateHasChanged;
+    }
+}
+
+<style>
+    .loot-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 2500;
+        display: flex; justify-content: center; align-items: center;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    
+    .loot-window {
+        width: 400px; background: #2a2a2a; border: 4px solid gold;
+        color: white; display: flex; flex-direction: column;
+        box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+    
+    .loot-header {
+        background: #444; padding: 10px; font-weight: bold; display: flex; justify-content: space-between;
+    }
+    .close-btn { background: none; border: none; color: white; cursor: pointer; font-weight: bold; }
+    
+    .loot-body {
+        padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 10px;
+        max-height: 300px; overflow-y: auto;
+    }
+    
+    .loot-row {
+        background: #333; padding: 10px; border: 1px solid #555; display: flex; align-items: center;
+    }
+    .loot-row.gold { color: gold; border-color: gold; }
+    
+    .loot-row .icon { font-size: 24px; margin-right: 15px; }
+    .loot-row .details { display: flex; flex-direction: column; }
+    .loot-row .name { font-weight: bold; }
+    .loot-row .desc { font-size: 12px; color: #aaa; }
+    
+    .loot-footer { padding: 10px; display: flex; justify-content: flex-end; background: #222; }
+    .btn-take-all {
+        background: gold; color: black; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer;
+    }
+    .btn-take-all:hover { background: #ffeeaa; }
+    
+    .empty-msg { text-align: center; color: #666; font-style: italic; }
+</style>
