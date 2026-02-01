@@ -13,7 +13,7 @@
         <!-- Enemies -->
         @foreach(var enemy in CombatService.Enemies)
         {
-            @if (enemy.HP > 0)
+            @if (enemy.HP > 0 || (DateTime.Now - enemy.LastDamageTime).TotalSeconds < 1.0)
             {
                 <div id="@("ui-" + enemy.ModelId)" class="combat-unit enemy @(_targetMode && _pendingTargetType == "Enemy" ? "targetable" : "")" 
                      @onclick="() => SelectTarget(enemy)" style="display: none;"> <!-- Hidden until positioned -->
@@ -22,6 +22,14 @@
                         <div class="fill" style="width: @(GetHpPercent(enemy))%"></div>
                     </div>
                     <div class="unit-hp-text">@enemy.HP / @enemy.MaxHP</div>
+                    
+                     <!-- Floating Text -->
+                    @if ((DateTime.Now - enemy.LastDamageTime).TotalSeconds < 1.0)
+                    {
+                        <div class="damage-number @enemy.LastDamageType">
+                            @enemy.LastDamageAmount
+                        </div>
+                    }
                 </div>
             }
         }
@@ -42,6 +50,14 @@
                 <div class="fill" style="width: @(GetHpPercent(hero))%;"></div>
             </div>
             <div class="hp-text">@hero.HP / @hero.MaxHP</div>
+            
+            <!-- Floating Text -->
+            @if ((DateTime.Now - hero.LastDamageTime).TotalSeconds < 1.0)
+            {
+                <div class="damage-number @hero.LastDamageType">
+                    @hero.LastDamageAmount
+                </div>
+            }
             
             <!-- Resource Bar -->
             @if(hero.SourceCharacter != null)
@@ -303,6 +319,24 @@
     
     .combat-unit.hero.selected { border-color: gold; box-shadow: 0 0 15px gold; scale: 1.1; z-index: 2100; }
     .combat-unit.targetable { border-color: red; box-shadow: 0 0 15px red; cursor: crosshair; animation: pulse 1s infinite; }
+    
+    .damage-number {
+        position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+        font-size: 24px; font-weight: bold; z-index: 3000;
+        text-shadow: 0 0 3px black, 0 0 5px black;
+        opacity: 0; pointer-events: none;
+        animation: floatUp 1s forwards;
+    }
+    .damage-number.Phys { color: white; }
+    .damage-number.Crit { color: #ffeb3b; font-size: 32px; text-shadow: 0 0 10px gold; }
+    .damage-number.Magic { color: #2196f3; }
+    .damage-number.Heal { color: #4caf50; }
+
+    @@keyframes floatUp {
+        0% { transform: translate(-50%, 0) scale(0.5); opacity: 0; }
+        20% { transform: translate(-50%, -10px) scale(1.2); opacity: 1; }
+        100% { transform: translate(-50%, -50px) scale(1); opacity: 0; }
+    }
     
     @@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
     

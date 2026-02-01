@@ -481,11 +481,26 @@ namespace StoneHammer.Systems
              OnStateChanged?.Invoke();
              await PlayAnim(actor, actualAnim, target);
              
+             // SFX: Attack
+             string sfx = actualAnim == "Shoot" ? "attack_range" : "attack_melee";
+             await JS.InvokeVoidAsync("stoneHammer.audio.playSound", sfx);
+
              int damage = (int)(CalculateDamage(actor) * multiplier);
              
              await PlayAnim(target, "Hit");
+             await JS.InvokeVoidAsync("stoneHammer.flashTarget", target.ModelId, "#FF0000", 200);
+             if (multiplier > 1.2f) await JS.InvokeVoidAsync("stoneHammer.shakeCamera", 0.5, 200);
+             
+             // SFX: Impact
+             await JS.InvokeVoidAsync("stoneHammer.audio.playSound", "impact_flesh");
+             
              target.HP -= damage;
              if (target.IsHero && target.SourceCharacter != null) target.SourceCharacter.CurrentHP = target.HP;
+             
+             // Visual Feedback
+             target.LastDamageAmount = damage;
+             target.LastDamageType = multiplier > 1.0f ? "Crit" : "Phys";
+             target.LastDamageTime = DateTime.Now;
 
              CombatLog = $"{target.Name} took {damage} damage!";
              OnStateChanged?.Invoke();
@@ -498,13 +513,27 @@ namespace StoneHammer.Systems
              OnStateChanged?.Invoke();
              await PlayAnim(actor, anim, target);
              
-             // Magic Calc: Usage INT/WIS? For now just scale off TotalAttack (which uses INT/WIS)
+             // SFX: Cast
+             await JS.InvokeVoidAsync("stoneHammer.audio.playSound", "spell_fire"); // Generic magic sound
+
+             // Magic Calc
              int damage = (int)(CalculateDamage(actor) * multiplier);
              
              CombatLog = $"{effectEmoji} {target.Name} hit for {damage}!";
              await PlayAnim(target, "Hit");
+             await JS.InvokeVoidAsync("stoneHammer.flashTarget", target.ModelId, effectEmoji == "❄️" ? "#00FFFF" : "#FF5500", 300);
+             await JS.InvokeVoidAsync("stoneHammer.shakeCamera", 0.3, 200);
+             
+             // SFX: Impact
+             await JS.InvokeVoidAsync("stoneHammer.audio.playSound", "spell_fire"); // Reuse for explosion or specific hit
+
              target.HP -= damage;
              if (target.IsHero && target.SourceCharacter != null) target.SourceCharacter.CurrentHP = target.HP;
+             
+             // Visual Feedback
+             target.LastDamageAmount = damage;
+             target.LastDamageType = "Magic";
+             target.LastDamageTime = DateTime.Now;
 
              OnStateChanged?.Invoke();
              
@@ -518,11 +547,19 @@ namespace StoneHammer.Systems
                  // Determine Animation
                  string animType = "Cast_Heal"; // Default for healing
                  await PlayAnim(actor, animType, target);
+                 
+                 // SFX: Heal
+                 await JS.InvokeVoidAsync("stoneHammer.audio.playSound", "spell_fire"); // Placeholder
 
                  int healAmount = 20 + (actor.SourceCharacter?.Stats.Wisdom * 2 ?? 0);
                  target.HP = Math.Min(target.HP + healAmount, target.MaxHP);
                  if (target.IsHero && target.SourceCharacter != null) target.SourceCharacter.CurrentHP = target.HP;
                  
+                 // Visual Feedback
+                 target.LastDamageAmount = healAmount;
+                 target.LastDamageType = "Heal";
+                 target.LastDamageTime = DateTime.Now;
+
                  CombatLog = $"{target.Name} recovered {healAmount} HP!";
                  OnStateChanged?.Invoke();
         }
@@ -539,7 +576,11 @@ namespace StoneHammer.Systems
         private async Task HandleDeath(CombatEntity target)
         {
              CombatLog = $"{target.Name} fell!";
+             await JS.InvokeVoidAsync("stoneHammer.flashTarget", target.ModelId, "#FFFFFF", 500);
+             await JS.InvokeVoidAsync("stoneHammer.shakeCamera", 1.0, 400);
+
              await PlayAnim(target, "Die");
+             // SFX: Death (Could add specific later)
              await Task.Delay(200);
         }
 
@@ -555,6 +596,9 @@ namespace StoneHammer.Systems
             CombatLog = "VICTORY!";
             Phase = CombatPhase.Victory;
             
+            // SFX: Victory Fanfare?
+            await JS.InvokeVoidAsync("stoneHammer.audio.playSound", "impact_flesh"); // Placeholder cheer
+
             // XP REWARD
             int totalXP = Enemies.Sum(e => e.XPValue);
             foreach(var member in _charService.Party)
@@ -603,6 +647,11 @@ namespace StoneHammer.Systems
         
         public CharacterModels.CharacterData? SourceCharacter { get; set; }
         public CombatAction? QueuedAction { get; set; }
+        
+        // Visual Feedback State
+        public int LastDamageAmount { get; set; }
+        public string LastDamageType { get; set; } = "Phys"; // Phys, Crit, Magic, Heal
+        public DateTime LastDamageTime { get; set; }
     }
 
     public class CombatAction

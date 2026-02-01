@@ -254,4 +254,27 @@
 
         this.scene.beginDirectAnimation(bolt, [anim, animZ], 0, 25, false, 1.0, () => bolt.dispose());
     };
+    // HELPER: Flash Target
+    sh.flashTarget = function (targetId, colorHex, duration) {
+        const targetNode = this.scene.getTransformNodeByName("voxel_" + targetId) || this.scene.getMeshByName("voxel_" + targetId) || this.scene.getTransformNodeByName(targetId);
+        if (!targetNode) return;
+
+        const color = colorHex ? BABYLON.Color3.FromHexString(colorHex) : BABYLON.Color3.White();
+
+        targetNode.getChildren(null, true).forEach(mesh => {
+            if (mesh.material && mesh.material.diffuseColor) {
+                // Store original color if not already stored? 
+                // Simple version: just flash to color and back to original (assumed white/texture or current)
+                // Better: clone current, set to flash, restore.
+
+                // For Voxel models, we might need emissive to make it "bright"
+                const oldEmissive = mesh.material.emissiveColor.clone();
+                mesh.material.emissiveColor = color;
+
+                setTimeout(() => {
+                    if (mesh.material) mesh.material.emissiveColor = oldEmissive;
+                }, duration || 200);
+            }
+        });
+    };
 })();

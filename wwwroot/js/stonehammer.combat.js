@@ -121,4 +121,42 @@
             this.log(actorName + " defeated.", "gray");
         }
     };
+    sh.shakeCamera = function (intensity, duration) {
+        if (!this.camera) return;
+
+        const originalPos = this.camera.position.clone();
+        const startTime = Date.now();
+        const _this = this;
+
+        const obs = this.scene.onBeforeRenderObservable.add(() => {
+            const elapsed = Date.now() - startTime;
+            if (elapsed > duration) {
+                _this.scene.onBeforeRenderObservable.remove(obs);
+                // We rely on camera inputs/follow checking to reset, or just stop adding jitter
+                // If camera is ArcRotate, directly modifying position might fight with inputs, 
+                // but for a brief shake it works or we offset target.
+                // Better for ArcRotate: offset radius or target slightly? 
+                // Let's jitter the *Target* if locked, or position.
+
+                // Simple Position Jitter
+                return;
+            }
+
+            const jitter = new BABYLON.Vector3(
+                (Math.random() - 0.5) * intensity,
+                (Math.random() - 0.5) * intensity,
+                (Math.random() - 0.5) * intensity
+            );
+
+            // If following a target, this jitter effectively shakes the view
+            if (_this.camera.target) {
+                // _this.camera.target.addInPlace(jitter); // Persistent drift risk?
+                // Safest: Modify local frame position temporarily?
+                // Actually, just changing beta/alpha slightly is best for ArcRotate
+                _this.camera.alpha += (Math.random() - 0.5) * intensity * 0.1;
+                _this.camera.beta += (Math.random() - 0.5) * intensity * 0.1;
+                _this.camera.radius += (Math.random() - 0.5) * intensity * 0.5;
+            }
+        });
+    };
 })();
