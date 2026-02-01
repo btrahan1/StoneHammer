@@ -1,0 +1,225 @@
+@using StoneHammer.Systems
+@inject ShopService ShopService
+@inject CharacterService CharService
+
+@if (ShopService.IsOpen)
+{
+    var party = CharService.Party;
+    // ensure selection
+    if (_selectedChar == null && party.Any()) _selectedChar = party.First();
+    
+    // Shared Gold Calculation
+    int totalGold = party.Sum(p => p.Gold);
+    
+    <div class="shop-overlay">
+        <div class="shop-window">
+            <div class="shop-header">
+                <h2>Hammer & Sickle Store</h2>
+                <div class="gold-display">💰 @totalGold (Shared)</div>
+            </div>
+
+            <div class="shop-columns">
+                <!-- BUY (Stock) -->
+                <div class="shop-col">
+                    <h3>Available Goods</h3>
+                    <div class="item-list">
+                        @foreach(var item in ShopService.Stock)
+                        {
+                            <div class="shop-item">
+                                <div class="icon">@item.Icon</div>
+                                <div class="details">
+                                    <div class="name">@item.Name</div>
+                                    <div class="cost">@item.Value g</div>
+                                </div>
+                                @{
+                                    bool canAfford = totalGold >= item.Value;
+                                }
+                                <button class="btn-buy" disabled="@(!canAfford)" 
+                                        @onclick="() => ShopService.BuyItem(_selectedChar, item)">Buy</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- SELL (Inventory) -->
+                <div class="shop-col">
+                    <h3>Your Bags</h3>
+                    
+                    <!-- Character Tabs -->
+                    <div class="char-tabs">
+                        @foreach(var member in party)
+                        {
+                            <button class="char-tab @(_selectedChar == member ? "active" : "")"
+                                    @onclick="() => _selectedChar = member">
+                                @(member.Name.Substring(0,1))
+                            </button>
+                        }
+                    </div>
+                    <div class="char-name-label">
+                        @(_selectedChar?.Name ?? "Select Character") - 💰 @(_selectedChar?.Gold ?? 0)
+                    </div>
+
+                    <div class="item-list">
+                        @foreach(var item in _selectedChar?.Inventory ?? new List<CharacterModels.InventoryItem>())
+                        {
+                            <div class="shop-item">
+                                <div class="icon">@item.Icon</div>
+                                <div class="details">
+                                    <div class="name">@item.Name</div>
+                                    <div class="cost" style="color: #8f8;">+@(item.Value / 2) g</div>
+                                </div>
+                                <button class="btn-sell" @onclick="() => ShopService.SellItem(_selectedChar, item)">Sell</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- NEW: PAPERDOLL -->
+                <div class="shop-col paperdoll-col">
+                    <h3>Equipment</h3>
+                    <div class="char-details-header">
+                        <div class="char-class">@_selectedChar?.Class</div>
+                        <div class="char-level">Level @_selectedChar?.Level</div>
+                    </div>
+                    
+                    <div class="doll-grid">
+                        @foreach(var slot in Enum.GetValues<CharacterModels.EquipmentSlot>())
+                        {
+                            var equipped = _selectedChar?.Equipment.ContainsKey(slot) == true ? _selectedChar.Equipment[slot] : null;
+                            <div class="doll-slot">
+                                <div class="slot-label">@slot</div>
+                                @if (equipped != null)
+                                {
+                                    <div class="slot-icon">@equipped.Icon</div>
+                                    <div class="slot-name">@equipped.Name</div>
+                                }
+                                else
+                                {
+                                    <div class="slot-empty">Empty</div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    
+                    <div class="stats-preview">
+                        <div>STR: @_selectedChar?.Stats.Strength</div>
+                        <div>DEX: @_selectedChar?.Stats.Dexterity</div>
+                        <div>INT: @_selectedChar?.Stats.Intelligence</div>
+                        <div>WIS: @_selectedChar?.Stats.Wisdom</div>
+                        <div>DEF: @_selectedChar?.GetTotalDefense()</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-close" @onclick="ShopService.CloseShop">Leave Store</button>
+        </div>
+    </div>
+}
+
+@code {
+    private CharacterModels.CharacterData? _selectedChar;
+
+    protected override void OnInitialized()
+    {
+        ShopService.OnStateChanged += StateHasChanged;
+        CharService.OnCharacterUpdated += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        ShopService.OnStateChanged -= StateHasChanged;
+        CharService.OnCharacterUpdated -= StateHasChanged;
+    }
+}
+
+<style>
+    .shop-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); z-index: 3000;
+        display: flex; justify-content: center; align-items: center;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .shop-window {
+        width: 1000px; height: 700px;
+        background: #2a2a2a; border: 4px solid #8B4513;
+        display: flex; flex-direction: column;
+        padding: 20px; color: white; border-radius: 8px;
+        box-shadow: 0 0 50px black;
+    }
+
+    .shop-header {
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 2px solid #555; padding-bottom: 10px; margin-bottom: 10px;
+    }
+    
+    .gold-display { font-size: 1.5rem; color: gold; font-weight: bold; }
+
+    .shop-columns {
+        display: flex; gap: 20px; flex: 1; overflow: hidden;
+    }
+
+    .shop-col {
+        flex: 1; background: #222; padding: 10px; overflow-y: auto;
+        border: 1px solid #444; border-radius: 4px;
+        display: flex; flex-direction: column;
+    }
+    
+    /* Paperdoll Styles */
+    .paperdoll-col { background: #1a1a1a; border-color: #333; }
+    
+    .char-details-header {
+        display: flex; justify-content: space-between; align-items: center;
+        background: #333; padding: 5px 10px; border-radius: 4px; margin-bottom: 10px;
+        font-weight: bold; border: 1px solid #555;
+    }
+    .char-class { color: #4af; text-transform: uppercase; font-size: 0.9em; }
+    .char-level { color: gold; font-size: 0.9em; }
+
+    .doll-grid { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+    .doll-slot { 
+        display: flex; align-items: center; background: #2a2a2a; padding: 5px; 
+        border: 1px solid #444; gap: 10px;
+    }
+    .slot-label { width: 70px; color: #888; font-size: 0.8em; text-transform: uppercase; }
+    .slot-icon { font-size: 20px; }
+    .slot-name { color: #eee; font-weight: bold; }
+    .slot-empty { color: #444; font-style: italic; }
+    
+    .stats-preview { 
+        margin-top: auto; padding-top: 10px; border-top: 1px solid #444; 
+        display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color: #88ff88; font-family: monospace;
+    }
+
+    .char-tabs { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; }
+    .char-tab {
+        width: 30px; height: 30px; border-radius: 50%; border: 2px solid #555; background: #333;
+        color: white; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center;
+    }
+    .char-tab.active { border-color: gold; background: #555; }
+    
+    .char-name-label { color: #aaa; font-size: 0.9em; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px; }
+
+    .item-list { display: flex; flex-direction: column; gap: 5px; }
+
+    .shop-item {
+        display: flex; align-items: center; background: #333; padding: 10px;
+        border: 1px solid #555; border-radius: 4px; gap: 10px;
+    }
+    
+    .shop-item .icon { font-size: 24px; width: 40px; text-align: center; }
+    .shop-item .details { flex: 1; }
+    .shop-item .name { font-weight: bold; }
+    .shop-item .cost { color: gold; font-size: 0.9rem; }
+
+    .btn-buy { background: #228B22; color: white; border: none; padding: 8px 16px; cursor: pointer; border-radius: 4px; }
+    .btn-buy:disabled { background: #555; cursor: not-allowed; }
+    
+    .btn-sell { background: #B22222; color: white; border: none; padding: 8px 16px; cursor: pointer; border-radius: 4px; }
+
+    .btn-close {
+        margin-top: 20px; padding: 15px; background: #444; color: white; border: 2px solid #666;
+        cursor: pointer; font-weight: bold; font-size: 1.1rem;
+    }
+    .btn-close:hover { background: #666; border-color: white; }
+</style>

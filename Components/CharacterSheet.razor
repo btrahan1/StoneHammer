@@ -107,9 +107,9 @@
                              <div class="inv-grid">
                                  @foreach(var item in _selected.Inventory)
                                  {
-                                     <div class="inv-item" @onclick="() => UseOrEquip(item)" title="@item.Name (@item.Type)">
+                                    <div class="inv-item" @onclick="() => UseOrEquip(item)" title="@item.Name (@item.Type)">
                                          <span class="icon">@item.Icon</span>
-                                         @if(item.ValidSlot.HasValue && _selected.Equipment.ContainsValue(item))
+                                         @if(item.ValidSlot.HasValue && _selected.Equipment.Values.Any(e => e?.Id == item.Id))
                                          {
                                              <span class="equipped-badge">E</span>
                                          }

@@ -1,4 +1,5 @@
 @inject IJSRuntime JSRuntime
+@using StoneHammer.Systems
 @implements IAsyncDisposable
 
 <div class="scene-container">
@@ -8,16 +9,49 @@
         <div class="badge bg-dark text-info">StoneHammer Engine v14.0</div>
         <div id="debug-log" class="text-warning small mt-1" style="max-height: 100px; overflow-y: auto;"></div>
     </div>
+    
+    <ShopDialog />
 </div>
 
 @code {
+    [Inject] public ShopService ShopService { get; set; }
+    [Inject] public CombatService CombatService { get; set; }
+    [Inject] public AssetManager AssetManager { get; set; }
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            await JSRuntime.InvokeVoidAsync("stoneHammer.setDotNetHelper", DotNetObjectReference.Create(this));
             await JSRuntime.InvokeVoidAsync("stoneHammer.init", "renderCanvas");
         }
     }
+    
+    [JSInvokable]
+    public void OpenShop()
+    {
+        ShopService.OpenShop();
+    }
+    
+    [JSInvokable]
+    public async Task HandleEnterBuilding(string name)
+    {
+        Console.WriteLine($"[SceneView] Requesting Entry: {name}");
+        await AssetManager.EnterBuilding(name);
+    }
+    
+    [JSInvokable]
+    public async Task HandleExitBuilding(float x, float z)
+    {
+        Console.WriteLine($"[SceneView] Returning to Town at {x},{z}");
+        await AssetManager.ExitBuilding(x, z);
+    }
+
+    [JSInvokable]
+    public void OpenLoot() => CombatService.OpenLootChest();
+
+    [JSInvokable]
+    public async Task StartCombat(string actorId) => await CombatService.StartCombat(actorId);
 
     public async ValueTask DisposeAsync()
     {

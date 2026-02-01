@@ -13,5 +13,6 @@ builder.Services.AddScoped<AssetManager>();
 builder.Services.AddScoped<CombatService>();
 builder.Services.AddScoped<CharacterService>();
 builder.Services.AddScoped<SaveService>();
+builder.Services.AddScoped<ShopService>();
 
 await builder.Build().RunAsync();

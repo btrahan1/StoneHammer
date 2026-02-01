@@ -206,6 +206,15 @@
                     this.dotNetHelper.invokeMethodAsync('OpenLoot');
                 }
             }
+
+            // v21.0: Store Interaction
+            // Check for any part of the store (e.g. wall, door, sign)
+            if (name.includes("Hammer & Sickle Store") || name.includes("general_store") || name.toLowerCase().includes("store")) {
+                this.log("Opening Shop...", "gold");
+                if (this.dotNetHelper) {
+                    this.dotNetHelper.invokeMethodAsync('OpenShop');
+                }
+            }
         };
     };
 

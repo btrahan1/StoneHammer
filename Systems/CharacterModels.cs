@@ -102,6 +102,19 @@ namespace StoneHammer.Systems
                     Equipment[slot] = null;
                 }
             }
+
+            public int GetTotalDefense()
+            {
+                int total = Stats.Defense;
+                foreach(var item in Equipment.Values)
+                {
+                    if (item != null && item.Bonuses.ContainsKey("Defense"))
+                    {
+                        total += item.Bonuses["Defense"];
+                    }
+                }
+                return total;
+            }
         }
 
         public class SaveGame
