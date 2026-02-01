@@ -50,10 +50,14 @@
                          </div>
                          <hr/>
                          <div class="stat-row derived"><span>HP</span> <span>@_selected.Stats.MaxHP</span></div>
+                         <div class="stat-row derived" style="color:white">
+                             <span style="color:@_selected.GetResourceColor()">@_selected.GetResourceName().ToUpper()</span> 
+                             <span>@_selected.CurrentMana / @_selected.MaxMana</span>
+                         </div>
                          <div class="stat-row derived"><span>ATK</span> <span>@_selected.GetTotalAttack()</span></div>
                          <div class="stat-row derived"><span>DEF</span> <span>@_selected.GetTotalDefense()</span></div>
                          <div class="stat-row derived"><span>GOLD</span> <span style="color:gold">@_selected.Gold G</span></div>
-                     </div>
+                      </div>
                      
                      <!-- CENTER: Equipment -->
                      <div class="panel dolls-panel">
@@ -136,8 +140,10 @@
                              <div class="save-system">
                                  <h3>Save Game</h3>
                                  <div class="input-group">
-                                     <input @bind="_saveName" placeholder="Save Name..." />
                                      <button class="btn-save" @onclick="SaveGame">💾 Save</button>
+                                 </div>
+                                 <div style="margin-top: 5px;">
+                                     <button class="btn-new" @onclick="NewGame">✨ New Game</button>
                                  </div>
                                  
                                  <hr/>
@@ -210,6 +216,13 @@
     private async Task RefreshSaveList()
     {
         _saveFiles = await SaveService.GetSaveFiles();
+        StateHasChanged();
+    }
+    
+    private void NewGame()
+    {
+        CharService.ResetGame();
+        _selected = CharService.Player;
         StateHasChanged();
     }
 
@@ -378,7 +391,9 @@
     .save-system { display: flex; flex-direction: column; gap: 10px; }
     .input-group { display: flex; gap: 5px; }
     .input-group input { flex: 1; background: #222; border: 1px solid #555; color: white; padding: 4px; }
-    .btn-save { background: #005500; color: white; border: none; cursor: pointer; }
+    .btn-save { background: #005500; color: white; border: none; cursor: pointer; padding: 4px 8px; }
+    .btn-new { background: #550000; color: white; border: none; cursor: pointer; width: 100%; padding: 5px; margin-top: 5px; }
+    .btn-new:hover { background: #770000; }
     
     .save-list { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
     .save-file { display: flex; justify-content: space-between; background: #222; padding: 4px; border: 1px solid #444; align-items: center; }

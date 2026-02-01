@@ -21,6 +21,19 @@ namespace StoneHammer.Systems
 
         public CharacterService()
         {
+            Initialize();
+        }
+
+        public void ResetGame()
+        {
+            Initialize();
+            OnCharacterUpdated?.Invoke();
+        }
+
+        private void Initialize()
+        {
+            Party.Clear();
+            
             // Initialize with default player
             var mainChar = new CharacterData();
             Party.Add(mainChar);
@@ -158,6 +171,10 @@ namespace StoneHammer.Systems
                     break;
             }
             
+            // Recalc Max Resource
+            target.MaxMana = target.GetMaxResource();
+            target.CurrentMana = target.MaxMana;
+            
             OnCharacterUpdated?.Invoke();
         }
 
@@ -210,6 +227,7 @@ namespace StoneHammer.Systems
             }
 
             // Restore HP/Mana on Level Up
+            target.MaxMana = target.GetMaxResource();
             target.CurrentMana = target.MaxMana;
             // MaxHP grows automatically via Constitution property in StatBlock
         }

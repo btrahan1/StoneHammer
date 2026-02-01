@@ -37,10 +37,22 @@
                     <div class="unit-info">
                          <!-- Simplified for Floating UI -->
                         <div class="name">@hero.Name</div>
-                        <div class="unit-hp-bar">
-                            <div class="fill" style="width: @(GetHpPercent(hero))%"></div>
-                        </div>
-                        <div class="hp">@hero.HP / @hero.MaxHP</div>
+            <!-- HP Bar -->
+            <div class="hp-bar-container">
+                <div class="hp-bar-fill" style="width: @(GetHpPercent(hero))%;"></div>
+                <div class="hp-text">@hero.HP / @hero.MaxHP</div>
+            </div>
+            
+            <!-- Resource Bar -->
+            @if(hero.SourceCharacter != null)
+            {
+                <div class="res-bar-container">
+                    <div class="res-bar-fill" 
+                         style="width: @(GetResourcePercent(hero))%; background: @hero.SourceCharacter.GetResourceColor()">
+                    </div>
+                    <div class="res-text">@hero.SourceCharacter.CurrentMana / @hero.SourceCharacter.MaxMana</div>
+                </div>
+            }
                         <div class="action-preview">
                             @(hero.QueuedAction?.Type ?? "...")
                         </div>
@@ -59,14 +71,40 @@
                     
                     @if (!_targetMode)
                     {
-                        <div class="sub-text">Choose Action</div>
-                        <div class="btn-grid">
-                            <button @onclick='() => BeginTargeting("Attack", "Enemy")'>⚔️ Attack</button>
-                            <button @onclick='() => BeginTargeting("Heal", "Friendly")'>💖 Heal</button>
-                            <button @onclick='() => QueueDirect("Defend")'>🛡️ Defend</button>
-                            <button @onclick="ToggleAuto" class="btn-auto">🤖 Auto</button>
-                        </div>
-                        <div class="skip-btn" @onclick="SkipHero">Skip ></div>
+                        <div class="action-grid">
+                <button class="btn-action @(_pendingAction == "Attack" ? "active" : "")" 
+                        @onclick='() => SetAction("Attack")'>
+                    ⚔️ Attack
+                </button>
+                
+                <button class="btn-action @(_pendingAction == "Defend" ? "active" : "")" 
+                        @onclick='() => SetAction("Defend")'>
+                    🛡️ Defend
+                </button>
+                
+                <!-- Dynamic Skills -->
+                @if(_selectedHero?.SourceCharacter != null)
+                {
+                    @foreach(var skill in _selectedHero.SourceCharacter.Skills)
+                    {
+                        bool canAfford = _selectedHero.SourceCharacter.CurrentMana >= skill.ManaCost;
+                        <button class="btn-action skill @(_pendingAction == skill.Name ? "active" : "")" 
+                                disabled="@(!canAfford)"
+                                title="@skill.Description (@skill.ManaCost @(_selectedHero.SourceCharacter.GetResourceName()))"
+                                @onclick='() => SetAction(skill.Name)'>
+                            @skill.Icon @skill.Name
+                            <span class="cost">@skill.ManaCost</span>
+                        </button>
+                    }
+                }
+            </div>
+            
+            <!-- Target Selection Message -->
+            <div class="sub-text">Select an action or target.</div>
+            <div class="btn-grid">
+                <button @onclick="ToggleAuto" class="btn-auto">🤖 Auto</button>
+                <button @onclick="SkipHero" class="skip-btn">Skip ></button>
+            </div>
                     }
                     else
                     {
@@ -132,18 +170,35 @@
         }
     }
 
-    private void QueueDirect(string action)
-    {
-        if (_selectedHero == null) return;
-        CombatService.QueueAction(_selectedHero, action);
-        AutoSelectNext(); // Moves to next hero immediately
-    }
-
-    private void BeginTargeting(string action, string targetType)
+    private void SetAction(string action)
     {
         _pendingAction = action;
-        _pendingTargetType = targetType;
-        _targetMode = true;
+        
+        if (action == "Defend")
+        {
+            // Instant
+            CombatService.QueueAction(_selectedHero, action);
+            AutoSelectNext();
+        }
+        else if (action == "Attack")
+        {
+            _targetMode = true;
+            _pendingTargetType = "Enemy";
+        }
+        else 
+        {
+            // Skill Logic - Lookup skill to find target type
+            var skill = _selectedHero?.SourceCharacter?.Skills.FirstOrDefault(s => s.Name == action);
+            if (skill != null)
+            {
+                _targetMode = true;
+                // Heuristic: "Heal" is Friendly, others Enemy?
+                // Ideally Skill class has TargetType. For now, hardcode "Heal".
+                _pendingTargetType = (skill.Name.Contains("Heal")) ? "Friendly" : "Enemy";
+            }
+        }
+        
+        StateHasChanged();
     }
 
     private void SelectTarget(CombatEntity target)
@@ -194,7 +249,13 @@
         }
     }
 
-    private int GetHpPercent(CombatEntity e) => (int)((float)e.HP / e.MaxHP * 100);
+    private double GetHpPercent(CombatEntity e) => (double)e.HP / e.MaxHP * 100;
+    
+    private double GetResourcePercent(CombatEntity e)
+    {
+        if (e.SourceCharacter == null || e.SourceCharacter.MaxMana == 0) return 0;
+        return (double)e.SourceCharacter.CurrentMana / e.SourceCharacter.MaxMana * 100;
+    }
 
     private void ToggleAuto()
     {
@@ -267,6 +328,40 @@
         display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold;
         margin-bottom: 5px; color: white;
     }
+    .hp-text { position: absolute; width: 100%; text-align: center; top: 0; font-size: 10px; text-shadow: 1px 1px 1px black; }
+
+    .res-bar-container {
+        width: 100%; height: 6px; background: #333; position: relative; margin-top: 2px;
+        border: 1px solid #555;
+    }
+    .res-bar-fill { height: 100%; transition: width 0.3s; }
+    .res-text { display: none; } /* Hide text for tiny bar, maybe tooltip? */
+
+    .hero-panel.active { border-color: gold; box-shadow: 0 0 10px gold; }
+    .hero-panel.dead { opacity: 0.5; filter: grayscale(100%); }
+    
+    .command-panel {
+        margin-top: 10px; padding: 10px; background: #222; border: 2px solid #555;
+        display: flex; flex-direction: column; gap: 10px;
+    }
+    .action-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+    
+    .btn-action {
+        padding: 10px 20px; background: #444; color: white; border: 1px solid #777;
+        cursor: pointer; font-size: 1.1em; display: flex; flex-direction: column; align-items: center;
+        min-width: 80px;
+    }
+    .btn-action:hover { background: #555; border-color: white; }
+    .btn-action.active { background: #664400; border-color: gold; }
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .btn-action .cost { font-size: 0.7em; color: #aaaaff; }
+    
+    .target-prompt { color: gold; font-weight: bold; animation: pulse 1s infinite; }
+    
+    .btn-auto { margin-left: auto; background: #004444; color: #00ffff; border: 1px solid #00aaaa; padding: 5px 10px; cursor: pointer; }
+    .btn-action.skill { background: #004400; border-color: #00aa00; }
+    .btn-action.skill:hover { background: #005500; border-color: #00ff00; }
 
     .menu-title { font-weight: bold; color: gold; font-size: 1.2rem; }
     .sub-text { color: #aaa; font-size: 0.9rem; margin-bottom: 10px; }

@@ -384,62 +384,134 @@ namespace StoneHammer.Systems
 
         private async Task PerformAction(CombatEntity actor, CombatAction action)
         {
-            if (action.Type == "Attack" && action.Target != null)
+            // 1. Deduct Cost (if Hero)
+            if (actor.IsHero && actor.SourceCharacter != null)
             {
-                CombatLog = $"{actor.Name} attacks {action.Target.Name}!";
-                OnStateChanged?.Invoke();
-                
-                // ANIMATION RESTORED
-                // Use the entity's ModelId for targeting (Hero_Name or Enemy_ID)
-                string animTarget = actor.ModelId;
-                await JS.InvokeVoidAsync("stoneHammer.playCombatAnimation", animTarget, "Attack");
-                
-                // Animation Manual (30fr Dash, 15fr Pause, Impact at Frame 55)
-                // Frame 55 / 60fps = 0.916 seconds.
-                await Task.Delay(925); 
-                
-                // STATS LOGIC
-                int damage = CalculateDamage(actor);
-                
-                // Anim Target Hit
-                 string hitTarget = action.Target.ModelId;
-                await JS.InvokeVoidAsync("stoneHammer.playCombatAnimation", hitTarget, "Hit");
-
-                action.Target.HP -= damage;
-                
-                CombatLog = $"{action.Target.Name} took {damage} damage!";
-                OnStateChanged?.Invoke();
-                
-                if (action.Target.HP <= 0)
+                var skill = actor.SourceCharacter.Skills.FirstOrDefault(s => s.Name == action.Type);
+                if (skill != null)
                 {
-                    CombatLog = $"{action.Target.Name} fell!";
-                    // Play Death Animation
-                    string dieTarget = action.Target.ModelId;
-                    await JS.InvokeVoidAsync("stoneHammer.playCombatAnimation", dieTarget, "Die");
-                    await Task.Delay(500); // Wait for fall
+                    if (actor.SourceCharacter.CurrentMana < skill.ManaCost)
+                    {
+                        CombatLog = $"{actor.Name} fizzles! Not enough resource.";
+                        OnStateChanged?.Invoke();
+                        await Task.Delay(500);
+                        return;
+                    }
+                    actor.SourceCharacter.CurrentMana -= skill.ManaCost;
                 }
             }
+
+            if (action.Type == "Attack" && action.Target != null)
+            {
+                await PerformAttack(actor, action.Target, 1.0f);
+            }
+            else if (action.Type == "Defend")
+            {
+                CombatLog = $"{actor.Name} is guarding.";
+                OnStateChanged?.Invoke();
+                // Logic for reducing damage next turn? (Not implemented yet)
+            }
+            // --- FIGHTER SKILLS ---
+            else if (action.Type == "Power Strike" && action.Target != null)
+            {
+                CombatLog = $"{actor.Name} uses Power Strike!";
+                await PerformAttack(actor, action.Target, 1.5f, "Attack");
+            }
+            else if (action.Type == "Block")
+            {
+                 CombatLog = $"{actor.Name} hunkers down!";
+                 OnStateChanged?.Invoke();
+            }
+            // --- ROGUE SKILLS ---
+            else if (action.Type == "Backstab" && action.Target != null)
+            {
+                CombatLog = $"{actor.Name} Backstabs!";
+                await PerformAttack(actor, action.Target, 2.0f, "Attack");
+            }
+            // --- MAGE SKILLS ---
+            else if (action.Type == "Fireball" && action.Target != null)
+            {
+                CombatLog = $"{actor.Name} casts Fireball!";
+                await PerformMagic(actor, action.Target, 2.5f, "Attack", "🔥");
+            }
+            else if (action.Type == "Ice Bolt" && action.Target != null)
+            {
+                CombatLog = $"{actor.Name} casts Ice Bolt!";
+                await PerformMagic(actor, action.Target, 1.5f, "Attack", "❄️");
+            }
+            // --- HEALER SKILLS ---
             else if (action.Type == "Heal" && action.Target != null)
             {
-                 CombatLog = $"{actor.Name} casts Heal on {action.Target.Name}!";
-                 OnStateChanged?.Invoke();
-                 
-                 // Animation (Using Attack for now, or a "Cast" if available)
-                 string animTarget = actor.ModelId;
-                 await JS.InvokeVoidAsync("stoneHammer.playCombatAnimation", animTarget, "Attack"); // Reuse attack anim as cast for now
-                 await Task.Delay(925); 
-
-                 int healAmount = 20 + (actor.SourceCharacter?.Stats.Intelligence * 2 ?? 0);
-                 action.Target.HP = Math.Min(action.Target.HP + healAmount, action.Target.MaxHP);
-                 
-                 // Visual Effect (Green Flash?)
-                 // await JS.InvokeVoidAsync("stoneHammer.playEffect", action.Target.ModelId, "Heal"); 
-
-                 CombatLog = $"{action.Target.Name} recovered {healAmount} HP!";
-                 OnStateChanged?.Invoke();
+                 await PerformHeal(actor, action.Target);
+            }
+            else if (action.Type == "Smite" && action.Target != null)
+            {
+                CombatLog = $"{actor.Name} Smites the enemy!";
+                await PerformMagic(actor, action.Target, 1.8f, "Attack", "⚡");
             }
             
             await Task.Delay(500); 
+        }
+
+        private async Task PerformAttack(CombatEntity actor, CombatEntity target, float multiplier, string anim = "Attack")
+        {
+             OnStateChanged?.Invoke();
+             await PlayAnim(actor, anim);
+             
+             int damage = (int)(CalculateDamage(actor) * multiplier);
+             
+             await PlayAnim(target, "Hit");
+             target.HP -= damage;
+             CombatLog = $"{target.Name} took {damage} damage!";
+             OnStateChanged?.Invoke();
+             
+             if (target.HP <= 0) await HandleDeath(target);
+        }
+
+        private async Task PerformMagic(CombatEntity actor, CombatEntity target, float multiplier, string anim, string effectEmoji)
+        {
+             OnStateChanged?.Invoke();
+             await PlayAnim(actor, anim);
+             
+             // Magic Calc: Usage INT/WIS? For now just scale off TotalAttack (which uses INT/WIS)
+             int damage = (int)(CalculateDamage(actor) * multiplier);
+             
+             CombatLog = $"{effectEmoji} {target.Name} hit for {damage}!";
+             await PlayAnim(target, "Hit");
+             target.HP -= damage;
+             OnStateChanged?.Invoke();
+             
+             if (target.HP <= 0) await HandleDeath(target);
+        }
+
+        private async Task PerformHeal(CombatEntity actor, CombatEntity target)
+        {
+                 CombatLog = $"{actor.Name} casts Heal on {target.Name}!";
+                 OnStateChanged?.Invoke();
+                 
+                 await PlayAnim(actor, "Attack"); 
+
+                 int healAmount = 20 + (actor.SourceCharacter?.Stats.Wisdom * 2 ?? 0);
+                 target.HP = Math.Min(target.HP + healAmount, target.MaxHP);
+                 
+                 CombatLog = $"{target.Name} recovered {healAmount} HP!";
+                 OnStateChanged?.Invoke();
+        }
+
+        private async Task PlayAnim(CombatEntity entity, string anim)
+        {
+            if (!string.IsNullOrEmpty(entity.ModelId))
+            {
+                await JS.InvokeVoidAsync("stoneHammer.playCombatAnimation", entity.ModelId, anim);
+                await Task.Delay(800);
+            }
+        }
+        
+        private async Task HandleDeath(CombatEntity target)
+        {
+             CombatLog = $"{target.Name} fell!";
+             await PlayAnim(target, "Die");
+             await Task.Delay(200);
         }
 
         private int CalculateDamage(CombatEntity entity)

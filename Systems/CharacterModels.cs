@@ -156,6 +156,51 @@ namespace StoneHammer.Systems
                 
                 return damage;
             }
+
+            // RESOURCE SYSTEM
+            public string GetResourceName()
+            {
+                switch(Class)
+                {
+                    case CharacterClass.Rogue: return "Energy";
+                    case CharacterClass.Fighter: return "Energy";
+                    case CharacterClass.Healer: return "Faith";
+                    case CharacterClass.Mage: return "Mana";
+                    default: return "Mana";
+                }
+            }
+
+            public string GetResourceColor()
+            {
+                switch(Class)
+                {
+                    case CharacterClass.Rogue: return "#ffff00"; // Yellow
+                    case CharacterClass.Fighter: return "#ffaa00"; // Orange
+                    case CharacterClass.Healer: return "#aa00ff"; // Purple
+                    case CharacterClass.Mage: return "#0088ff"; // Blue
+                    default: return "gray";
+                }
+            }
+
+            public int GetMaxResource()
+            {
+                switch(Class)
+                {
+                    case CharacterClass.Fighter: 
+                         return Stats.Strength * 3;
+                         
+                    case CharacterClass.Rogue: 
+                         return Stats.Dexterity * 3;
+                    
+                    case CharacterClass.Healer: 
+                        return Stats.Wisdom * 3;
+                    
+                    case CharacterClass.Mage: 
+                        return Stats.Intelligence * 3;
+                        
+                    default: return 20;
+                }
+            }
         }
 
         public class SaveGame
