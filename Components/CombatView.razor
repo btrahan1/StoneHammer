@@ -9,14 +9,13 @@
         <div class="combat-log">
             @CombatService.CombatLog
         </div>
-
         <!-- Floating Units (Positioned by JS) -->
         <!-- Enemies -->
         @foreach(var enemy in CombatService.Enemies)
         {
             @if (enemy.HP > 0)
             {
-                <div id="@("ui-" + enemy.ModelId)" class="combat-unit enemy @(_targetMode ? "targetable" : "")" 
+                <div id="@("ui-" + enemy.ModelId)" class="combat-unit enemy @(_targetMode && _pendingTargetType == "Enemy" ? "targetable" : "")" 
                      @onclick="() => SelectTarget(enemy)" style="display: none;"> <!-- Hidden until positioned -->
                     <div class="unit-name">@enemy.Name</div>
                     <div class="unit-hp-bar">
@@ -32,8 +31,8 @@
         {
             @if (hero.HP > 0)
             {
-                <div id="@("ui-" + hero.ModelId)" class="combat-unit hero @(_selectedHero == hero ? "selected" : "")"
-                     @onclick="() => SelectHero(hero)" style="display: none;">
+                <div id="@("ui-" + hero.ModelId)" class="combat-unit hero @(_selectedHero == hero ? "selected" : "") @(_targetMode && _pendingTargetType == "Friendly" ? "targetable" : "")"
+                     @onclick="() => SelectTarget(hero)" style="display: none;">
                     <div class="unit-model">@(hero.Name.Substring(0,1))</div>
                     <div class="unit-info">
                          <!-- Simplified for Floating UI -->
@@ -43,47 +42,47 @@
                         </div>
                         <div class="hp">@hero.HP / @hero.MaxHP</div>
                         <div class="action-preview">
-                            @(hero.QueuedAction?.Type ?? "Wait")
+                            @(hero.QueuedAction?.Type ?? "...")
                         </div>
                     </div>
                 </div>
             }
         }
 
-        <!-- Bottom Right: Command Menu (Fixed) -->
-        <div class="command-panel-wrapper">
-            @if (CombatService.Phase == CombatPhase.Input)
-            {
+        <!-- CENTER: Command Panel -->
+        @if (CombatService.Phase == CombatPhase.Input && _selectedHero != null)
+        {
+            <div class="command-panel-wrapper center-screen">
                 <div class="command-panel">
-                    @if(_selectedHero != null && !_targetMode)
+                    <div class="hero-portrait">@(_selectedHero.Name.Substring(0,1))</div>
+                    <div class="menu-title">@_selectedHero.Name</div>
+                    
+                    @if (!_targetMode)
                     {
-                        <div class="menu-title">@_selectedHero.Name</div>
+                        <div class="sub-text">Choose Action</div>
                         <div class="btn-grid">
-                            <button @onclick='() => BeginTargeting("Attack")'>⚔️ Attack</button>
-                            <button @onclick='() => QueueDirect("Heal")'>💖 Heal</button>
+                            <button @onclick='() => BeginTargeting("Attack", "Enemy")'>⚔️ Attack</button>
+                            <button @onclick='() => BeginTargeting("Heal", "Friendly")'>💖 Heal</button>
                             <button @onclick='() => QueueDirect("Defend")'>🛡️ Defend</button>
                         </div>
-                    }
-                    else if (_targetMode)
-                    {
-                        <div class="menu-title">SELECT TARGET</div>
-                        <div class="sub-text">Click an enemy...</div>
-                        <button class="btn-cancel" @onclick="CancelTargeting">Cancel</button>
+                        <div class="skip-btn" @onclick="SkipHero">Skip ></div>
                     }
                     else
                     {
-                        <div class="menu-title">SELECT HERO</div>
+                        <div class="menu-title">SELECT TARGET</div>
+                        <div class="sub-text">Click a @(_pendingTargetType == "Enemy" ? "Enemy" : "Ally")...</div>
+                        <button class="btn-cancel" @onclick="CancelTargeting">Cancel</button>
                     }
-
-                    <div style="display: flex; gap: 5px; margin-top: 10px;">
-                        <button class="btn-fight" style="flex: 1;" @onclick="ExecuteRound">FIGHT!</button>
-                        <button class="btn-auto @(CombatService.IsAutoBattling ? "active" : "")" @onclick="ToggleAuto">
-                            @(CombatService.IsAutoBattling ? "🤖" : "🤖")
-                        </button>
-                    </div>
                 </div>
-            }
-        </div>
+            </div>
+        }
+        else if (CombatService.Phase == CombatPhase.Input && CombatService.Heroes.Any(h => h.HP > 0))
+        {
+             /* All inputs done, waiting for round trigger or just empty state */
+             <div class="center-screen" style="color: white; font-weight: bold; font-size: 24px;">
+                 Executing...
+             </div>
+        }
     </div>
 }
 
@@ -91,10 +90,11 @@
     private CombatEntity? _selectedHero;
     private bool _targetMode = false;
     private string _pendingAction = "";
+    private string _pendingTargetType = ""; // "Enemy" or "Friendly"
 
     protected override void OnInitialized()
     {
-        CombatService.OnStateChanged += StateHasChanged;
+        CombatService.OnStateChanged += HandleStateChange;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -107,31 +107,41 @@
         }
     }
 
-    private void ToggleAuto()
+    private void HandleStateChange()
     {
-        CombatService.ToggleAutoBattle();
+        // Auto-Selection Logic
+        if (CombatService.Phase == CombatPhase.Input)
+        {
+            // If no hero selected, or current one is done, find next
+            if (_selectedHero == null || (_selectedHero.QueuedAction != null))
+            {
+                 AutoSelectNext();
+            }
+        }
+        StateHasChanged();
     }
 
-    private void SelectHero(CombatEntity hero)
+    private void SkipHero()
     {
-        if (CombatService.Phase != CombatPhase.Input) return;
-        if (hero.HP <= 0) return;
-        
-        _selectedHero = hero;
-        _targetMode = false;
-        StateHasChanged();
+        if (_selectedHero != null)
+        {
+             // Wait logic? Or just null action?
+             CombatService.QueueAction(_selectedHero, "Wait");
+             AutoSelectNext();
+        }
     }
 
     private void QueueDirect(string action)
     {
         if (_selectedHero == null) return;
         CombatService.QueueAction(_selectedHero, action);
-        AutoSelectNext();
+        AutoSelectNext(); // Moves to next hero immediately
     }
 
-    private void BeginTargeting(string action)
+    private void BeginTargeting(string action, string targetType)
     {
         _pendingAction = action;
+        _pendingTargetType = targetType;
         _targetMode = true;
     }
 
@@ -139,9 +149,17 @@
     {
         if (!_targetMode || _selectedHero == null) return;
         
-        CombatService.QueueAction(_selectedHero, _pendingAction, target);
-        _targetMode = false;
-        AutoSelectNext();
+        // Validate Target Type
+        bool valid = false;
+        if (_pendingTargetType == "Enemy" && !target.IsHero) valid = true;
+        if (_pendingTargetType == "Friendly" && target.IsHero) valid = true;
+
+        if (valid)
+        {
+            CombatService.QueueAction(_selectedHero, _pendingAction, target);
+            _targetMode = false;
+            AutoSelectNext();
+        }
     }
 
     private void CancelTargeting()
@@ -149,23 +167,37 @@
         _targetMode = false;
     }
 
-    private async Task ExecuteRound()
+    // Crucial: Moves to next hero OR starts round
+    private async void AutoSelectNext()
     {
-        _selectedHero = null;
-        await CombatService.ExecuteRound();
-    }
-    
-    private void AutoSelectNext()
-    {
-        _selectedHero = CombatService.Heroes.FirstOrDefault(h => h.QueuedAction == null && h.HP > 0);
-        StateHasChanged();
+        if (CombatService.Heroes.Count == 0) return; // Wait for spawn
+
+        // Find first hero with no action and > 0 HP
+        var next = CombatService.Heroes.FirstOrDefault(h => h.QueuedAction == null && h.HP > 0);
+
+        if (next != null)
+        {
+            _selectedHero = next;
+            _targetMode = false;
+            StateHasChanged();
+        }
+        else
+        {
+            // ALL HEROES READY -> EXECUTE ROUND
+            _selectedHero = null;
+            StateHasChanged();
+            
+            // Brief delay for visual clarity?
+            await Task.Delay(500);
+            await CombatService.ExecuteRound();
+        }
     }
 
     private int GetHpPercent(CombatEntity e) => (int)((float)e.HP / e.MaxHP * 100);
 
     public void Dispose()
     {
-        CombatService.OnStateChanged -= StateHasChanged;
+        CombatService.OnStateChanged -= HandleStateChange;
     }
 }
 
@@ -195,24 +227,45 @@
     .combat-unit.enemy:hover { border-color: red; z-index: 2020; }
     .combat-unit.hero:hover { border-color: gold; z-index: 2020; }
     
-    .combat-unit.hero.selected { border-color: gold; box-shadow: 0 0 15px gold; }
-    .combat-unit.targetable { border-color: red; box-shadow: 0 0 15px red; cursor: crosshair; }
+    .combat-unit.hero.selected { border-color: gold; box-shadow: 0 0 15px gold; scale: 1.1; z-index: 2100; }
+    .combat-unit.targetable { border-color: red; box-shadow: 0 0 15px red; cursor: crosshair; animation: pulse 1s infinite; }
+    
+    @@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
     
     .unit-hp-bar { width: 100%; height: 4px; background: #333; margin: 2px 0; }
     .unit-hp-bar .fill { height: 100%; background: #00ff00; }
     .enemy .unit-hp-bar .fill { background: #ff0000; }
 
-    /* Command Panel Fixed Bottom Left */
-    .command-panel-wrapper {
-        position: absolute; bottom: 20px; right: 20px; pointer-events: auto;
+    /* CENTER COMMAND PANEL */
+    .center-screen {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        pointer-events: auto;
     }
     
     .command-panel {
-        width: 200px; padding: 10px; background: rgba(0,0,30,0.9); 
-        border: 2px solid gold; border-radius: 8px;
+        width: 250px; padding: 20px; background: rgba(0,0,20,0.95); 
+        border: 2px solid gold; border-radius: 12px;
+        box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
     }
-    .menu-title { font-weight: bold; color: gold; text-align: center; margin-bottom: 5px; }
-    .btn-grid { display: flex; flex-direction: column; gap: 4px; }
-    button { background: #444; color: white; border: 1px solid #777; padding: 6px; cursor: pointer; }
-    .btn-fight { background: #800; font-weight: bold; }
+
+    .hero-portrait {
+        width: 50px; height: 50px; border-radius: 50%; background: #444; border: 2px solid white;
+        display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold;
+        margin-bottom: 5px; color: white;
+    }
+
+    .menu-title { font-weight: bold; color: gold; font-size: 1.2rem; }
+    .sub-text { color: #aaa; font-size: 0.9rem; margin-bottom: 10px; }
+    
+    .btn-grid { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+    button { 
+        background: #444; color: white; border: 1px solid #777; padding: 12px; cursor: pointer; 
+        font-weight: bold; transition: all 0.2s; border-radius: 4px;
+    }
+    button:hover { background: #666; border-color: gold; }
+    
+    .btn-cancel { background: #822; }
+    .skip-btn { margin-top: 10px; color: #666; cursor: pointer; font-size: 0.8rem; }
+    .skip-btn:hover { color: white; }
 </style>

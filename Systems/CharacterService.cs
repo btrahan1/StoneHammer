@@ -67,14 +67,18 @@ namespace StoneHammer.Systems
         {
             if (Party.Count >= 4) return;
             
+            // Cycle classes: 1=Rogue, 2=Healer, 3=Mage
+            var newClass = (CharacterClass)(Party.Count % 4);
+            if (newClass == CharacterClass.Fighter) newClass = CharacterClass.Rogue; // Avoid duping fighter immediately if possible
+
             var recruit = new CharacterData 
             { 
-                Name = "Recruit " + (Party.Count + 1),
-                Class = CharacterClass.Fighter
+                Name = newClass.ToString() + " " + (Party.Count), // e.g. "Rogue 1"
+                Class = newClass
             };
             
             Party.Add(recruit);
-            SetClass(recruit, CharacterClass.Fighter); // Init stats
+            SetClass(recruit, newClass); // Init stats
             OnCharacterUpdated?.Invoke();
         }
 

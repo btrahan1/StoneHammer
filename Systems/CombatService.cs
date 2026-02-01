@@ -148,7 +148,7 @@ namespace StoneHammer.Systems
             if (IsFighting) return;
 
             IsFighting = true;
-            Phase = CombatPhase.Input;
+            // Phase = CombatPhase.Input; // Defer until spawned
             CombatLog = "Preparing for Battle...";
             
             // 1. Capture State
@@ -200,8 +200,12 @@ namespace StoneHammer.Systems
 
             // 3. Spawn Heroes (Party) - Left Side
             Heroes.Clear();
+            
+            // Fallback: If Party is empty, use Player
+            var combatParticipants = _charService.Party.Any() ? _charService.Party : new List<CharacterModels.CharacterData> { _charService.Player };
+
             int hIndex = 0;
-            foreach(var member in _charService.Party)
+            foreach(var member in combatParticipants)
             {
                 string heroId = "Hero_" + member.Name.Replace(" ", "");
                 Heroes.Add(new CombatEntity 
@@ -224,7 +228,6 @@ namespace StoneHammer.Systems
                 }
 
                 await _assets.SpawnAsset(assetPath, heroId, false, new { Position = new float[] { -20, 0, (hIndex * 8) - 4 }, Rotation = new float[] { 0, 90, 0 } });
-                 // Color customization could be passed here if AssetManager supported it
                 hIndex++;
             }
 
@@ -254,6 +257,9 @@ namespace StoneHammer.Systems
             }
 
             await JS.InvokeVoidAsync("stoneHammer.rotateCameraToBattle", "ArenaCenter"); // Adjust camera logic if needed
+            
+            // Ready to fight!
+            Phase = CombatPhase.Input;
             CombatLog = "Battle Start!";
             OnStateChanged?.Invoke();
         }
@@ -413,7 +419,25 @@ namespace StoneHammer.Systems
                     await Task.Delay(500); // Wait for fall
                 }
             }
-            // ... (Heal same) ...
+            else if (action.Type == "Heal" && action.Target != null)
+            {
+                 CombatLog = $"{actor.Name} casts Heal on {action.Target.Name}!";
+                 OnStateChanged?.Invoke();
+                 
+                 // Animation (Using Attack for now, or a "Cast" if available)
+                 string animTarget = actor.ModelId;
+                 await JS.InvokeVoidAsync("stoneHammer.playCombatAnimation", animTarget, "Attack"); // Reuse attack anim as cast for now
+                 await Task.Delay(925); 
+
+                 int healAmount = 20 + (actor.SourceCharacter?.Stats.Intelligence * 2 ?? 0);
+                 action.Target.HP = Math.Min(action.Target.HP + healAmount, action.Target.MaxHP);
+                 
+                 // Visual Effect (Green Flash?)
+                 // await JS.InvokeVoidAsync("stoneHammer.playEffect", action.Target.ModelId, "Heal"); 
+
+                 CombatLog = $"{action.Target.Name} recovered {healAmount} HP!";
+                 OnStateChanged?.Invoke();
+            }
             
             await Task.Delay(500); 
         }
