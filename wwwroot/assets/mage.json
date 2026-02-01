@@ -1,0 +1,154 @@
+{
+    "Name": "Mage",
+    "Type": "Voxel",
+    "ProceduralColors": {
+        "Skin": "#F1C27D",
+        "Shirt": "#1E88E5",
+        "Pants": "#0D47A1"
+    },
+    "Description": "A powerful mage.",
+    "Parts": [
+        {
+            "Id": "torso",
+            "Shape": "Box",
+            "Dimensions": [
+                0.8,
+                1.2,
+                0.4
+            ],
+            "Offset": [
+                0,
+                1.6,
+                0
+            ],
+            "HexColor": "#1E88E5"
+        },
+        {
+            "Id": "head",
+            "Shape": "Box",
+            "Dimensions": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "Offset": [
+                0,
+                2.4,
+                0
+            ],
+            "HexColor": "#F1C27D"
+        },
+        {
+            "Id": "arm_l",
+            "Shape": "Box",
+            "Dimensions": [
+                0.25,
+                1.0,
+                0.25
+            ],
+            "Offset": [
+                -0.6,
+                1.6,
+                0
+            ],
+            "HexColor": "#F1C27D"
+        },
+        {
+            "Id": "arm_r",
+            "Shape": "Box",
+            "Dimensions": [
+                0.25,
+                1.0,
+                0.25
+            ],
+            "Offset": [
+                0.6,
+                1.6,
+                0
+            ],
+            "HexColor": "#F1C27D"
+        },
+        {
+            "Id": "leg_l",
+            "Shape": "Box",
+            "Dimensions": [
+                0.3,
+                1.0,
+                0.3
+            ],
+            "Offset": [
+                -0.25,
+                0.5,
+                0
+            ],
+            "HexColor": "#0D47A1"
+        },
+        {
+            "Id": "leg_r",
+            "Shape": "Box",
+            "Dimensions": [
+                0.3,
+                1.0,
+                0.3
+            ],
+            "Offset": [
+                0.25,
+                0.5,
+                0
+            ],
+            "HexColor": "#0D47A1"
+        },
+        {
+            "Id": "hat",
+            "Shape": "Box",
+            "Dimensions": [
+                0.6,
+                0.1,
+                0.6
+            ],
+            "Offset": [
+                0,
+                2.7,
+                0
+            ],
+            "HexColor": "#0D47A1"
+        },
+        {
+            "Id": "staff_handle",
+            "Shape": "Box",
+            "Dimensions": [
+                0.08,
+                1.8,
+                0.08
+            ],
+            "Offset": [
+                0,
+                0,
+                0.4
+            ],
+            "Rotation": [
+                10,
+                0,
+                0
+            ],
+            "HexColor": "#5D4037",
+            "ParentLimb": "arm_r"
+        },
+        {
+            "Id": "staff_gem",
+            "Shape": "Box",
+            "Dimensions": [
+                0.2,
+                0.2,
+                0.2
+            ],
+            "Offset": [
+                0,
+                0.9,
+                0
+            ],
+            "HexColor": "#00E5FF",
+            "ParentLimb": "staff_handle"
+        }
+    ]
+}

@@ -1,0 +1,154 @@
+{
+    "Name": "Healer",
+    "Type": "Voxel",
+    "ProceduralColors": {
+        "Skin": "#F1C27D",
+        "Shirt": "#FFFFFF",
+        "Pants": "#BDBDBD"
+    },
+    "Description": "A holy healer.",
+    "Parts": [
+        {
+            "Id": "torso",
+            "Shape": "Box",
+            "Dimensions": [
+                0.8,
+                1.2,
+                0.4
+            ],
+            "Offset": [
+                0,
+                1.6,
+                0
+            ],
+            "HexColor": "#FFFFFF"
+        },
+        {
+            "Id": "head",
+            "Shape": "Box",
+            "Dimensions": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "Offset": [
+                0,
+                2.4,
+                0
+            ],
+            "HexColor": "#F1C27D"
+        },
+        {
+            "Id": "arm_l",
+            "Shape": "Box",
+            "Dimensions": [
+                0.25,
+                1.0,
+                0.25
+            ],
+            "Offset": [
+                -0.6,
+                1.6,
+                0
+            ],
+            "HexColor": "#F1C27D"
+        },
+        {
+            "Id": "arm_r",
+            "Shape": "Box",
+            "Dimensions": [
+                0.25,
+                1.0,
+                0.25
+            ],
+            "Offset": [
+                0.6,
+                1.6,
+                0
+            ],
+            "HexColor": "#F1C27D"
+        },
+        {
+            "Id": "leg_l",
+            "Shape": "Box",
+            "Dimensions": [
+                0.3,
+                1.0,
+                0.3
+            ],
+            "Offset": [
+                -0.25,
+                0.5,
+                0
+            ],
+            "HexColor": "#BDBDBD"
+        },
+        {
+            "Id": "leg_r",
+            "Shape": "Box",
+            "Dimensions": [
+                0.3,
+                1.0,
+                0.3
+            ],
+            "Offset": [
+                0.25,
+                0.5,
+                0
+            ],
+            "HexColor": "#BDBDBD"
+        },
+        {
+            "Id": "circlet",
+            "Shape": "Box",
+            "Dimensions": [
+                0.55,
+                0.1,
+                0.55
+            ],
+            "Offset": [
+                0,
+                2.5,
+                0
+            ],
+            "HexColor": "#FFD700"
+        },
+        {
+            "Id": "mace_handle",
+            "Shape": "Box",
+            "Dimensions": [
+                0.1,
+                0.8,
+                0.1
+            ],
+            "Offset": [
+                0,
+                -0.6,
+                0.4
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "HexColor": "#5D4037",
+            "ParentLimb": "arm_r"
+        },
+        {
+            "Id": "mace_head",
+            "Shape": "Box",
+            "Dimensions": [
+                0.3,
+                0.3,
+                0.3
+            ],
+            "Offset": [
+                0,
+                0.4,
+                0
+            ],
+            "HexColor": "#757575",
+            "ParentLimb": "mace_handle"
+        }
+    ]
+}

@@ -163,10 +163,26 @@ namespace StoneHammer.Systems
             // Improve ID Parsing
             string baseName = targetActorName.Replace("voxel_", "");
 
-            // Robust Cleaning (Copied from earlier fix)
-            // 1. Remove known sub-parts if present
-            if (baseName.Contains("_ribs")) baseName = baseName.Split(new[] { "_ribs" }, StringSplitOptions.None)[0];
-            if (baseName.Contains("_skull")) baseName = baseName.Split(new[] { "_skull" }, StringSplitOptions.None)[0];
+            // Robust Cleaning: Remove all known body parts to find the Root Actor
+            string[] knownParts = { 
+                "_ribs", "_skull", "_head", "_torso", 
+                "_arm_l", "_arm_r", "_leg_l", "_leg_r", 
+                "_eye_l", "_eye_r", 
+                "_sword_handle", "_sword_blade", "_sword_guard",
+                "_helmet", "_hammer_handle", "_hammer_head",
+                "_dagger_handle", "_dagger_blade",
+                "_staff_handle", "_staff_gem",
+                "_mace_handle", "_mace_head", "_circlet", "_hood", "_hat"
+            };
+
+            foreach(var part in knownParts)
+            {
+                if (baseName.Contains(part)) 
+                {
+                    baseName = baseName.Split(new[] { part }, StringSplitOptions.None)[0];
+                    break; // Assume only one part suffix
+                }
+            }
 
             // 2. Strip suffix _A, _B, _C to get Group ID
              if (baseName.EndsWith("_A") || baseName.EndsWith("_B") || baseName.EndsWith("_C"))
@@ -199,8 +215,15 @@ namespace StoneHammer.Systems
                 });
                 
                 // Spawn Visual
-                // Simple Humanoid parts (reusing Player asset for now)
-                await _assets.SpawnAsset("assets/player.json", heroId, false, new { Position = new float[] { -20, 0, (hIndex * 8) - 4 } });
+                string assetPath = "assets/player.json"; // Default/Fighter
+                switch(member.Class)
+                {
+                    case CharacterModels.CharacterClass.Rogue: assetPath = "assets/rogue.json"; break;
+                    case CharacterModels.CharacterClass.Mage: assetPath = "assets/mage.json"; break;
+                    case CharacterModels.CharacterClass.Healer: assetPath = "assets/healer.json"; break;
+                }
+
+                await _assets.SpawnAsset(assetPath, heroId, false, new { Position = new float[] { -20, 0, (hIndex * 8) - 4 }, Rotation = new float[] { 0, 90, 0 } });
                  // Color customization could be passed here if AssetManager supported it
                 hIndex++;
             }
@@ -361,9 +384,8 @@ namespace StoneHammer.Systems
                 OnStateChanged?.Invoke();
                 
                 // ANIMATION RESTORED
-                // For heroes, we use generic "Player" or a mapped ID. For enemies, their Name/ID.
-                // Assuming "Player" is the main mesh for 1st hero for now.
-                string animTarget = actor.IsHero ? "Player" : actor.ModelId;
+                // Use the entity's ModelId for targeting (Hero_Name or Enemy_ID)
+                string animTarget = actor.ModelId;
                 await _js.InvokeVoidAsync("stoneHammer.playCombatAnimation", animTarget, "Attack");
                 
                 await Task.Delay(800); 
@@ -372,7 +394,7 @@ namespace StoneHammer.Systems
                 int damage = CalculateDamage(actor);
                 
                 // Anim Target Hit
-                 string hitTarget = action.Target.IsHero ? "Player" : action.Target.ModelId;
+                 string hitTarget = action.Target.ModelId;
                 await _js.InvokeVoidAsync("stoneHammer.playCombatAnimation", hitTarget, "Hit");
 
                 action.Target.HP -= damage;
