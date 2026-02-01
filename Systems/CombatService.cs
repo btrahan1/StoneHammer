@@ -446,19 +446,7 @@ namespace StoneHammer.Systems
         {
             if (!entity.IsHero || entity.SourceCharacter == null) return 5; // Base mob damage
 
-            var charData = entity.SourceCharacter;
-            int baseDmg = charData.Stats.Strength; // STR scaling
-            
-            // Check Weapon
-            if (charData.Equipment.TryGetValue(CharacterModels.EquipmentSlot.MainHand, out var weapon) && weapon != null)
-            {
-                 if (weapon.Bonuses != null && weapon.Bonuses.TryGetValue("Strength", out int bonus)) // Simplified
-                 {
-                     baseDmg += bonus * 2; // Weapon logic placeholder
-                 }
-            }
-            
-            return Math.Max(1, baseDmg);
+            return Math.Max(1, entity.SourceCharacter.GetTotalAttack());
         }
 
         private async Task HandleVictory()

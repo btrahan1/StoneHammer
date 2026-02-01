@@ -102,11 +102,11 @@
                     </div>
                     
                     <div class="stats-preview">
-                        <div>STR: @_selectedChar?.Stats.Strength</div>
-                        <div>DEX: @_selectedChar?.Stats.Dexterity</div>
-                        <div>INT: @_selectedChar?.Stats.Intelligence</div>
-                        <div>WIS: @_selectedChar?.Stats.Wisdom</div>
+                        <div>ATK: @_selectedChar?.GetTotalAttack()</div>
                         <div>DEF: @_selectedChar?.GetTotalDefense()</div>
+                        <div style="grid-column: span 2; font-size: 0.8em; color: gray; margin-top: 5px;">
+                            (STR:@_selectedChar?.Stats.Strength DEX:@_selectedChar?.Stats.Dexterity INT:@_selectedChar?.Stats.Intelligence)
+                        </div>
                     </div>
                 </div>
             </div>

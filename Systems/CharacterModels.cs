@@ -115,6 +115,47 @@ namespace StoneHammer.Systems
                 }
                 return total;
             }
+            public int GetTotalAttack()
+            {
+                // 1. Determine Primary Stat
+                int baseStat = Stats.Strength;
+                string relevantBonus = "Strength";
+                
+                switch(Class)
+                {
+                    case CharacterClass.Rogue: 
+                        baseStat = Stats.Dexterity; 
+                        relevantBonus = "Dexterity";
+                        break;
+                    case CharacterClass.Mage: 
+                        baseStat = Stats.Intelligence; 
+                        relevantBonus = "Intelligence";
+                        break;
+                    case CharacterClass.Healer: 
+                        baseStat = Stats.Wisdom; 
+                        relevantBonus = "Wisdom";
+                        break;
+                }
+                
+                int damage = baseStat;
+
+                // 2. Add Weapon Bonus (Simplified: Scaled off primary stat bonus on weapon)
+                if (Equipment.TryGetValue(EquipmentSlot.MainHand, out var weapon) && weapon != null)
+                {
+                     // If weapon has a bonus to our primary stat, it counts double as "Damage"
+                     if (weapon.Bonuses.ContainsKey(relevantBonus))
+                     {
+                         damage += weapon.Bonuses[relevantBonus] * 2;
+                     }
+                     // If it has a generic "Damage" stat (future proofing)
+                     if (weapon.Bonuses.ContainsKey("Damage"))
+                     {
+                         damage += weapon.Bonuses["Damage"];
+                     }
+                }
+                
+                return damage;
+            }
         }
 
         public class SaveGame
