@@ -14,34 +14,40 @@
         <!-- Enemies -->
         @foreach(var enemy in CombatService.Enemies)
         {
-            <div id="@("ui-" + enemy.ModelId)" class="combat-unit enemy @(enemy.HP <= 0 ? "dead" : "") @(_targetMode && enemy.HP > 0 ? "targetable" : "")" 
-                 @onclick="() => SelectTarget(enemy)" style="display: none;"> <!-- Hidden until positioned -->
-                <div class="unit-name">@enemy.Name</div>
-                <div class="unit-hp-bar">
-                    <div class="fill" style="width: @(GetHpPercent(enemy))%"></div>
+            @if (enemy.HP > 0)
+            {
+                <div id="@("ui-" + enemy.ModelId)" class="combat-unit enemy @(_targetMode ? "targetable" : "")" 
+                     @onclick="() => SelectTarget(enemy)" style="display: none;"> <!-- Hidden until positioned -->
+                    <div class="unit-name">@enemy.Name</div>
+                    <div class="unit-hp-bar">
+                        <div class="fill" style="width: @(GetHpPercent(enemy))%"></div>
+                    </div>
+                    <div class="unit-hp-text">@enemy.HP / @enemy.MaxHP</div>
                 </div>
-                <div class="unit-hp-text">@enemy.HP / @enemy.MaxHP</div>
-            </div>
+            }
         }
 
         <!-- Heroes -->
         @foreach(var hero in CombatService.Heroes)
         {
-            <div id="@("ui-" + hero.ModelId)" class="combat-unit hero @(_selectedHero == hero ? "selected" : "") @(hero.HP <= 0 ? "dead" : "")"
-                 @onclick="() => SelectHero(hero)" style="display: none;">
-                <div class="unit-model">@(hero.Name.Substring(0,1))</div>
-                <div class="unit-info">
-                     <!-- Simplified for Floating UI -->
-                    <div class="name">@hero.Name</div>
-                    <div class="unit-hp-bar">
-                        <div class="fill" style="width: @(GetHpPercent(hero))%"></div>
-                    </div>
-                    <div class="hp">@hero.HP / @hero.MaxHP</div>
-                    <div class="action-preview">
-                        @(hero.QueuedAction?.Type ?? "Wait")
+            @if (hero.HP > 0)
+            {
+                <div id="@("ui-" + hero.ModelId)" class="combat-unit hero @(_selectedHero == hero ? "selected" : "")"
+                     @onclick="() => SelectHero(hero)" style="display: none;">
+                    <div class="unit-model">@(hero.Name.Substring(0,1))</div>
+                    <div class="unit-info">
+                         <!-- Simplified for Floating UI -->
+                        <div class="name">@hero.Name</div>
+                        <div class="unit-hp-bar">
+                            <div class="fill" style="width: @(GetHpPercent(hero))%"></div>
+                        </div>
+                        <div class="hp">@hero.HP / @hero.MaxHP</div>
+                        <div class="action-preview">
+                            @(hero.QueuedAction?.Type ?? "Wait")
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
         }
 
         <!-- Bottom Right: Command Menu (Fixed) -->
