@@ -333,8 +333,7 @@ namespace StoneHammer.Systems
             int totalXP = Enemies.Sum(e => e.XPValue);
             foreach(var member in _charService.Party)
             {
-                member.CurrentXP += totalXP;
-                // Level Up Check Logic would go here
+                _charService.GainXP(member, totalXP);
             }
             CombatLog += $" Party gained {totalXP} XP!";
             OnStateChanged?.Invoke();

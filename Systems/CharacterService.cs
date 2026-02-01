@@ -162,5 +162,52 @@ namespace StoneHammer.Systems
             target.Skills.Add(skill);
             OnCharacterUpdated?.Invoke();
         }
+
+        public void GainXP(CharacterData target, int amount)
+        {
+            target.CurrentXP += amount;
+
+            // Level Up Logic
+            // Curve: Level * 100 XP needed for next level
+            // e.g. Lvl 1 needs 100 XP to get to Lvl 2.
+            // Lvl 2 needs 200 XP to get to Lvl 3.
+            while (true)
+            {
+                int xpNeeded = target.Level * 100;
+                if (target.CurrentXP >= xpNeeded)
+                {
+                    target.CurrentXP -= xpNeeded;
+                    LevelUp(target);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            
+            OnCharacterUpdated?.Invoke();
+        }
+
+        private void LevelUp(CharacterData target)
+        {
+            target.Level++;
+            
+            // Stat Growth
+            // Simplified: +1 to Primary Stat, +1 to Con
+            var stats = target.Stats;
+            stats.Constitution++;
+            
+            switch(target.Class)
+            {
+                case CharacterClass.Fighter: stats.Strength++; break;
+                case CharacterClass.Rogue: stats.Dexterity++; break;
+                case CharacterClass.Healer: stats.Wisdom++; break;
+                case CharacterClass.Mage: stats.Intelligence++; break;
+            }
+
+            // Restore HP/Mana on Level Up
+            target.CurrentMana = target.MaxMana;
+            // MaxHP grows automatically via Constitution property in StatBlock
+        }
     }
 }

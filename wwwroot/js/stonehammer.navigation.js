@@ -71,69 +71,19 @@
         this.log("Teleport Hub Spawned (3 Pillars)", "lime");
     };
 
+    // v12.3: Double Click for Crypt
     sh.setupClickInteraction = function () {
-        this.scene.onPointerDown = (evt, pickResult) => {
-            if (!pickResult.hit || !pickResult.pickedMesh) return;
-            const name = pickResult.pickedMesh.name;
-
-            // v9.20: Teleport Hub Pillars
-            if (name.startsWith("pillar_")) {
-                const target = pickResult.pickedMesh.metadata.target;
-                this.log("Teleporting to " + target + "...", "lime");
-                this.enterBuilding(target);
-            }
-
-            // v10.1: Exit Crystal (Single Click)
-            if (name.includes("ExitCrystal")) {
-                this.log("Returning to Town...", "magenta");
-                this.exitBuilding();
-            }
-
-            // v14.0: Desert Exit Crystal
-            if (name.includes("DesertExit")) {
-                this.log("Escaping the Wasteland...", "cyan");
-                this.exitDesert(); // Clean up Babylon meshes
-
-                // Invoke C# Interop to force a full Town Re-Gen
-                if (this.dotNetHelper) {
-                    // Position player back at town center (0,0) or near connection point
-                    this.dotNetHelper.invokeMethodAsync('HandleExitBuilding', 50, 50);
-                }
-            }
-
-            // v13.0: Dungeon Navigation
-            if (name.includes("StairsDown")) {
-                // Format: Crypt_Depth_X
-                let currentDepth = 1;
-                if (this.currentBuilding && this.currentBuilding.includes("Depth")) {
-                    currentDepth = parseInt(this.currentBuilding.split('_')[2]);
-                }
-                const nextDepth = currentDepth + 1;
-                this.log("Descending to Depth " + nextDepth + "...", "orange");
-                this.enterBuilding("Crypt_Depth_" + nextDepth);
-            }
-
-            if (name.includes("StairsUp")) {
-                let currentDepth = 2; // If untracked, assume level 2 going to 1
-                if (this.currentBuilding && this.currentBuilding.includes("Depth")) {
-                    currentDepth = parseInt(this.currentBuilding.split('_')[2]);
-                }
-                const nextDepth = currentDepth - 1;
-                if (nextDepth < 1) {
-                    this.log("Leaving the Crypt...", "magenta");
-                    this.exitBuilding();
-                } else {
-                    this.log("Ascending to Depth " + nextDepth + "...", "cyan");
-                    this.enterBuilding("Crypt_Depth_" + nextDepth);
-                }
-            }
-        };
-
-        // v12.3: Double Click for Crypt
         this.scene.onPointerObservable.add((pointerInfo) => {
             if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOUBLETAP) {
                 if (pointerInfo.pickInfo.hit && pointerInfo.pickInfo.pickedMesh) {
-                    const name = pointerInfo.pickInfo.pickedMesh.name;
+                    let mesh = pointerInfo.pickInfo.pickedMesh;
+
+                    // Walk up hierarchy to find interactable root
+                    while (mesh.parent && !mesh.name.includes("CryptEntrance") && !mesh.name.includes("Stairs") && !mesh.name.includes("Skeleton") && !mesh.name.includes("Loot") && !mesh.name.includes("Exit")) {
+                        mesh = mesh.parent;
+                    }
+                    const name = mesh.name;
+
                     if (name.includes("CryptEntrance") || name.startsWith("Stairs")) {
                         this.log("Descending into The Crypt...", "red");
                         // Pass the building name, which might include depth for dungeons
@@ -149,14 +99,11 @@
                     // v15.0: Combat Trigger (Skeleton Clicks)
                     if (name.includes("Skeleton")) {
                         // Find the root actor name
-                        let root = pointerInfo.pickInfo.pickedMesh;
-                        while (root.parent && root.parent.name.startsWith("voxel_")) {
-                            root = root.parent;
-                        }
-
-                        // root.name should be "voxel_Skeleton_Lvl1_A"
-                        // Remove "voxel_" prefix for the key
-                        let actorName = root.name.replace("voxel_", "");
+                        // Already walked up? Maybe not if Voxel structure is complex.
+                        // Let's ensure we strip voxel_ prefix if present.
+                        let actorName = name.replace("voxel_", "");
+                        // Removing trailing parts like _A _B handled by StartCombat?
+                        // Actually the ID is usually "Skeleton_Lvl1_A".
 
                         this.log("Engaging " + actorName + "!", "red");
                         if (this.dotNetHelper) {
@@ -167,7 +114,7 @@
                     // v15.1: Loot Chest Interaction
                     if (name.includes("Loot Chest") || name.includes("LootChest")) {
                         this.log("Looting...", "yellow");
-                        const chest = pointerInfo.pickInfo.pickedMesh;
+                        const chest = mesh; // Use likely root
 
                         if (chest.parent) chest.parent.dispose();
                         else chest.dispose();
@@ -179,6 +126,74 @@
                 }
             }
         });
+
+        // SINGLE CLICK HANDLER UPDATE
+        this.scene.onPointerDown = (evt, pickResult) => {
+            if (!pickResult.hit || !pickResult.pickedMesh) return;
+
+            let mesh = pickResult.pickedMesh;
+            this.log("DEBUG: Clicked " + mesh.name, "gray"); // DEBUG
+
+            // Walk up for basic interactions
+            // Fix: Check lowercase for case-insensitive matching
+            while (mesh.parent &&
+                !mesh.name.startsWith("pillar_") &&
+                !mesh.name.includes("Exit") &&
+                !mesh.name.includes("LodgeExit") &&
+                !mesh.name.toLowerCase().includes("stairs")) {
+                mesh = mesh.parent;
+            }
+            const name = mesh.name;
+            this.log("DEBUG: Resolved Name: " + name, "gray"); // DEBUG
+
+            // v9.20: Teleport Hub Pillars
+            if (name.startsWith("pillar_")) {
+                const target = mesh.metadata?.target;
+                if (target) {
+                    this.log("Teleporting to " + target + "...", "lime");
+                    this.enterBuilding(target);
+                }
+            }
+
+            // v10.1: Exit Crystal (Single Click) - Supports "ExitCrystal", "LodgeExit", "CryptExit"
+            if (name.includes("Exit") || name.includes("LodgeExit")) { // "Exit" covers ExitCrystal, CryptExit, DesertExit
+                if (name.includes("DesertExit")) {
+                    this.log("Escaping the Wasteland...", "cyan");
+                    this.exitDesert();
+                    if (this.dotNetHelper) this.dotNetHelper.invokeMethodAsync('HandleExitBuilding', 50, 50);
+                }
+                else {
+                    this.log("Returning to Town...", "magenta");
+                    this.exitBuilding();
+                }
+            }
+
+            // v13.0: Dungeon Navigation
+            if (name.toLowerCase().includes("stairsdown") || name.toLowerCase().includes("stairs_down")) {
+                let currentDepth = 1;
+                if (this.currentBuilding && this.currentBuilding.includes("Depth")) {
+                    currentDepth = parseInt(this.currentBuilding.split('_')[2]);
+                }
+                const nextDepth = currentDepth + 1;
+                this.log("Descending to Depth " + nextDepth + "...", "orange");
+                this.enterBuilding("Crypt_Depth_" + nextDepth);
+            }
+
+            if (name.toLowerCase().includes("stairsup") || name.toLowerCase().includes("stairs_up")) {
+                let currentDepth = 2;
+                if (this.currentBuilding && this.currentBuilding.includes("Depth")) {
+                    currentDepth = parseInt(this.currentBuilding.split('_')[2]);
+                }
+                const nextDepth = currentDepth - 1;
+                if (nextDepth < 1) {
+                    this.log("Leaving the Crypt...", "magenta");
+                    this.exitBuilding();
+                } else {
+                    this.log("Ascending to Depth " + nextDepth + "...", "cyan");
+                    this.enterBuilding("Crypt_Depth_" + nextDepth);
+                }
+            }
+        };
     };
 
     sh.clearAll = function () {
