@@ -442,12 +442,12 @@ namespace StoneHammer.Systems
             else if (action.Type == "Fireball" && action.Target != null)
             {
                 CombatLog = $"{actor.Name} casts Fireball!";
-                await PerformMagic(actor, action.Target, 2.5f, "Attack", "🔥");
+                await PerformMagic(actor, action.Target, 2.5f, "Cast_Fire", "🔥");
             }
             else if (action.Type == "Ice Bolt" && action.Target != null)
             {
                 CombatLog = $"{actor.Name} casts Ice Bolt!";
-                await PerformMagic(actor, action.Target, 1.5f, "Attack", "❄️");
+                await PerformMagic(actor, action.Target, 1.5f, "Cast_Ice", "❄️");
             }
             // --- HEALER SKILLS ---
             else if (action.Type == "Heal" && action.Target != null)
@@ -457,7 +457,7 @@ namespace StoneHammer.Systems
             else if (action.Type == "Smite" && action.Target != null)
             {
                 CombatLog = $"{actor.Name} Smites the enemy!";
-                await PerformMagic(actor, action.Target, 1.8f, "Attack", "⚡");
+                await PerformMagic(actor, action.Target, 1.8f, "Cast_Smite", "⚡");
             }
             
             await Task.Delay(500); 

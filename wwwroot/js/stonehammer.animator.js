@@ -109,11 +109,14 @@
                     sh.spawnSmiteEffect(targetPos);
                 } else {
                     let color = BABYLON.Color3.White();
-                    if (animType === "Cast_Fire") color = BABYLON.Color3.Red();
-                    if (animType === "Cast_Ice") color = BABYLON.Color3.Teal();
+                    let isSpell = false;
+
+                    if (animType === "Cast_Fire") { color = BABYLON.Color3.Red(); isSpell = true; }
+                    if (animType === "Cast_Ice") { color = BABYLON.Color3.Teal(); isSpell = true; }
                     if (animType === "Shoot") color = new BABYLON.Color3(0.6, 0.4, 0.2); // Wood
 
-                    sh.spawnProjectile(root.position.add(new BABYLON.Vector3(0, 3, 0)), targetPos, color, animType === "Shoot");
+                    // Spawn Projectile
+                    sh.spawnProjectile(root.position.add(new BABYLON.Vector3(0, 3, 0)), targetPos, color, animType === "Shoot", isSpell);
                 }
 
                 // Trigger HIT Anim on target slightly later
@@ -162,7 +165,7 @@
     };
 
     // HELPER: Projectile
-    sh.spawnProjectile = function (start, end, color, isArrow) {
+    sh.spawnProjectile = function (start, end, color, isArrow, isSpell) {
         const mesh = isArrow
             ? BABYLON.MeshBuilder.CreateBox("arrow", { width: 0.1, height: 0.1, depth: 2 }, this.scene)
             : BABYLON.MeshBuilder.CreateSphere("orb", { diameter: 0.8 }, this.scene);
@@ -177,12 +180,33 @@
         // Rotate arrow to face target
         mesh.lookAt(end);
 
+        // Particle Trail?
+        let particleSystem = null;
+        if (isSpell) {
+            particleSystem = new BABYLON.ParticleSystem("particles", 200, this.scene);
+            particleSystem.emitter = mesh;
+            particleSystem.particleTexture = new BABYLON.Texture("https://www.babylonjs-playground.com/textures/flare.png", this.scene);
+            particleSystem.color1 = new BABYLON.Color4(color.r, color.g, color.b, 1.0);
+            particleSystem.color2 = new BABYLON.Color4(color.r * 0.5, color.g * 0.5, color.b * 0.5, 1.0);
+            particleSystem.colorDead = new BABYLON.Color4(0, 0, 0, 0.0);
+            particleSystem.minSize = 0.1;
+            particleSystem.maxSize = 0.5;
+            particleSystem.minLifeTime = 0.2;
+            particleSystem.maxLifeTime = 0.5;
+            particleSystem.emitRate = 100;
+            particleSystem.start();
+        }
+
         // Animate
         const dist = BABYLON.Vector3.Distance(start, end);
         const frames = 30; // 0.5s speed
 
         BABYLON.Animation.CreateAndStartAnimation("projMove", mesh, "position", 60, frames, start, end, 0, null, () => {
             // Impact
+            if (particleSystem) {
+                particleSystem.stop();
+                setTimeout(() => particleSystem.dispose(), 1000); // Allow trails to fade
+            }
             mesh.dispose();
             sh.spawnExplosion(end, color);
         });
