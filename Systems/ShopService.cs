@@ -59,7 +59,9 @@ namespace StoneHammer.Systems
                 new CharacterModels.InventoryItem { Name = "Bronze Sword", Type = CharacterModels.ItemType.Weapon, ValidSlot = CharacterModels.EquipmentSlot.MainHand, Icon = "⚔️", Value = 100, Bonuses = new Dictionary<string, int> { { "Strength", 3 } }, Description = "Standard issue." },
                 new CharacterModels.InventoryItem { Name = "Iron Dagger", Type = CharacterModels.ItemType.Weapon, ValidSlot = CharacterModels.EquipmentSlot.MainHand, Icon = "🗡️", Value = 80, Bonuses = new Dictionary<string, int> { { "Dexterity", 3 } }, Description = "Fast and sharp." },
                 new CharacterModels.InventoryItem { Name = "Oak Staff", Type = CharacterModels.ItemType.Weapon, ValidSlot = CharacterModels.EquipmentSlot.MainHand, Icon = "🪄", Value = 120, Bonuses = new Dictionary<string, int> { { "Intelligence", 3 } }, Description = "Arcane focus." },
-                new CharacterModels.InventoryItem { Name = "Cleric Mace", Type = CharacterModels.ItemType.Weapon, ValidSlot = CharacterModels.EquipmentSlot.MainHand, Icon = "🔨", Value = 110, Bonuses = new Dictionary<string, int> { { "Wisdom", 3 } }, Description = "For smiting." }
+                new CharacterModels.InventoryItem { Name = "Cleric Mace", Type = CharacterModels.ItemType.Weapon, ValidSlot = CharacterModels.EquipmentSlot.MainHand, Icon = "🔨", Value = 110, Bonuses = new Dictionary<string, int> { { "Wisdom", 3 } }, Description = "For smiting." },
+                // Guaranteed Item
+                new CharacterModels.InventoryItem { Name = "Wooden Bow", Type = CharacterModels.ItemType.Weapon, ValidSlot = CharacterModels.EquipmentSlot.MainHand, Icon = "🏹", Value = 75, Bonuses = new Dictionary<string, int> { { "Dexterity", 2 } }, Description = "A reliable ranged weapon." }
             };
 
             // Armor/Offhand
@@ -70,8 +72,8 @@ namespace StoneHammer.Systems
                 new CharacterModels.InventoryItem { Name = "Chainmail", Type = CharacterModels.ItemType.Armor, ValidSlot = CharacterModels.EquipmentSlot.Chest, Icon = "⛓️", Value = 250, Bonuses = new Dictionary<string, int> { { "Defense", 4 } }, Description = "Heavy protection." }
             };
 
-            // Randomly select a few
-            foreach(var w in weapons.OrderBy(x => rng.Next()).Take(3)) Stock.Add(w);
+            // Randomly select, but wait, let's just show all weapons for now to ensure testing
+            foreach(var w in weapons) Stock.Add(w);
             foreach(var a in armor.OrderBy(x => rng.Next()).Take(2)) Stock.Add(a);
         }
 

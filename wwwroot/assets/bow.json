@@ -1,0 +1,73 @@
+{
+    "id": "bow",
+    "name": "Wooden Bow",
+    "scale": 1,
+    "parts": [
+        {
+            "name": "grip",
+            "color": "#8B5A2B",
+            "position": [
+                0,
+                0,
+                0
+            ],
+            "scale": [
+                0.5,
+                4,
+                0.5
+            ]
+        },
+        {
+            "name": "limit_upper",
+            "color": "#A0522D",
+            "position": [
+                0,
+                3,
+                -1
+            ],
+            "scale": [
+                0.4,
+                3,
+                0.4
+            ],
+            "rotation": [
+                0.5,
+                0,
+                0
+            ]
+        },
+        {
+            "name": "limit_lower",
+            "color": "#A0522D",
+            "position": [
+                0,
+                -3,
+                -1
+            ],
+            "scale": [
+                0.4,
+                3,
+                0.4
+            ],
+            "rotation": [
+                -0.5,
+                0,
+                0
+            ]
+        },
+        {
+            "name": "string",
+            "color": "#DDDDDD",
+            "position": [
+                0,
+                0,
+                -2.5
+            ],
+            "scale": [
+                0.1,
+                7,
+                0.1
+            ]
+        }
+    ]
+}

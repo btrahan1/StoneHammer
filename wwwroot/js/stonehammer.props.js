@@ -263,4 +263,74 @@
             console.warn("Could not find actor to remove: " + id);
         }
     };
+
+    // v20.8: Dynamic Attachment
+    sh.attachAsset = async function (assetUrl, parentId, boneName) {
+        console.log(`[Props] Attaching ${assetUrl} to ${parentId}/${boneName}`);
+
+        // 1. Find Parent
+        let parentRoot = this.scene.getTransformNodeByName("voxel_" + parentId) || this.scene.getMeshByName("voxel_" + parentId);
+        if (!parentRoot) {
+            console.warn("Parent not found: " + parentId);
+            return;
+        }
+
+        // 2. Find Bone (Limb)
+        // Fuzzy search for children
+        let bone = parentRoot.getChildren((n) => n.name.toLowerCase().includes(boneName.toLowerCase()), false)[0];
+
+        // Fallback: If bone not found, use Hand R
+        if (!bone) bone = parentRoot.getChildren((n) => n.name.includes("arm_r") || n.name.includes("right"), false)[0];
+
+        if (!bone) {
+            console.warn("Bone/Limb not found on parent. Attaching to root.");
+            bone = parentRoot;
+        }
+
+        // 3. Load Asset JSON
+        try {
+            const response = await fetch(assetUrl);
+            const assetData = await response.json();
+
+            // 4. Create Asset Mesh (simplified spawnVoxel logic)
+            // We give it a unique name
+            const childName = parentId + "_attached_" + assetData.id;
+
+            // If exists, remove first
+            const existing = this.scene.getMeshByName("voxel_" + childName);
+            if (existing) existing.dispose();
+
+            // Spawn using internal spawn logic but treat 'bone' as parent group
+            // We manually build the parts because spawnVoxel assumes a world root
+            const parts = this.getProp(assetData, "Parts") || [];
+            parts.forEach(p => {
+                const scale = this.getProp(p, "Scale") || [1, 1, 1];
+                const pos = this.getProp(p, "Position") || [0, 0, 0];
+                const id = this.getProp(p, "Id") || p.id;
+                const color = this.getProp(p, "Color") || "#FFFFFF";
+                const rot = this.getProp(p, "Rotation") || [0, 0, 0];
+
+                const mesh = BABYLON.MeshBuilder.CreateBox(childName + "_" + id, {
+                    width: scale[0], height: scale[1], depth: scale[2]
+                }, this.scene);
+
+                mesh.parent = bone;
+                mesh.position = new BABYLON.Vector3(pos[0], pos[1], pos[2]);
+                mesh.rotation = new BABYLON.Vector3(
+                    BABYLON.Tools.ToRadians(rot[0]),
+                    BABYLON.Tools.ToRadians(rot[1]),
+                    BABYLON.Tools.ToRadians(rot[2])
+                );
+
+                const mat = new BABYLON.StandardMaterial("mat_" + childName, this.scene);
+                mat.diffuseColor = BABYLON.Color3.FromHexString(color);
+                mesh.material = mat;
+            });
+
+            console.log("Attached successfully.");
+
+        } catch (err) {
+            console.error("Failed to attach asset: " + err);
+        }
+    };
 })();

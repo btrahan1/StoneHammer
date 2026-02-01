@@ -228,6 +228,16 @@ namespace StoneHammer.Systems
                 }
 
                 await _assets.SpawnAsset(assetPath, heroId, false, new { Position = new float[] { -20, 0, (hIndex * 8) - 4 }, Rotation = new float[] { 0, 90, 0 } });
+                
+                // Attach Weapon Visuals
+                if (member.Equipment.TryGetValue(CharacterModels.EquipmentSlot.MainHand, out var weapon) && weapon != null)
+                {
+                    if (weapon.Name.ToLower().Contains("bow"))
+                    {
+                        await JS.InvokeVoidAsync("stoneHammer.attachAsset", "assets/bow.json", heroId, "arm_r");
+                    }
+                }
+                
                 hIndex++;
             }
 
@@ -455,8 +465,21 @@ namespace StoneHammer.Systems
 
         private async Task PerformAttack(CombatEntity actor, CombatEntity target, float multiplier, string anim = "Attack")
         {
+             string actualAnim = anim;
+             // Check Weapon for Ranged override
+             if (anim == "Attack" && actor.SourceCharacter != null)
+             {
+                 if (actor.SourceCharacter.Equipment.TryGetValue(CharacterModels.EquipmentSlot.MainHand, out var weapon) && weapon != null)
+                 {
+                     if (weapon.Name.ToLower().Contains("bow") || weapon.Name.ToLower().Contains("wand"))
+                     {
+                         actualAnim = "Shoot";
+                     }
+                 }
+             }
+
              OnStateChanged?.Invoke();
-             await PlayAnim(actor, anim);
+             await PlayAnim(actor, actualAnim, target);
              
              int damage = (int)(CalculateDamage(actor) * multiplier);
              
@@ -473,7 +496,7 @@ namespace StoneHammer.Systems
         private async Task PerformMagic(CombatEntity actor, CombatEntity target, float multiplier, string anim, string effectEmoji)
         {
              OnStateChanged?.Invoke();
-             await PlayAnim(actor, anim);
+             await PlayAnim(actor, anim, target);
              
              // Magic Calc: Usage INT/WIS? For now just scale off TotalAttack (which uses INT/WIS)
              int damage = (int)(CalculateDamage(actor) * multiplier);
@@ -492,8 +515,9 @@ namespace StoneHammer.Systems
         {
                  CombatLog = $"{actor.Name} casts Heal on {target.Name}!";
                  OnStateChanged?.Invoke();
-                 
-                 await PlayAnim(actor, "Attack"); 
+                 // Determine Animation
+                 string animType = "Cast_Heal"; // Default for healing
+                 await PlayAnim(actor, animType, target);
 
                  int healAmount = 20 + (actor.SourceCharacter?.Stats.Wisdom * 2 ?? 0);
                  target.HP = Math.Min(target.HP + healAmount, target.MaxHP);
@@ -503,11 +527,11 @@ namespace StoneHammer.Systems
                  OnStateChanged?.Invoke();
         }
 
-        private async Task PlayAnim(CombatEntity entity, string anim)
+        private async Task PlayAnim(CombatEntity entity, string anim, CombatEntity? target = null)
         {
             if (!string.IsNullOrEmpty(entity.ModelId))
             {
-                await JS.InvokeVoidAsync("stoneHammer.playCombatAnimation", entity.ModelId, anim);
+                await JS.InvokeVoidAsync("stoneHammer.playCombatAnimation", entity.ModelId, anim, target?.ModelId);
                 await Task.Delay(800);
             }
         }
