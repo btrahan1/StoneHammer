@@ -132,7 +132,6 @@
             if (!pickResult.hit || !pickResult.pickedMesh) return;
 
             let mesh = pickResult.pickedMesh;
-            this.log("DEBUG: Clicked " + mesh.name, "gray"); // DEBUG
 
             // Walk up for basic interactions
             // Fix: Check lowercase for case-insensitive matching
@@ -140,11 +139,11 @@
                 !mesh.name.startsWith("pillar_") &&
                 !mesh.name.includes("Exit") &&
                 !mesh.name.includes("LodgeExit") &&
+                !mesh.name.includes("Loot") &&
                 !mesh.name.toLowerCase().includes("stairs")) {
                 mesh = mesh.parent;
             }
             const name = mesh.name;
-            this.log("DEBUG: Resolved Name: " + name, "gray"); // DEBUG
 
             // v9.20: Teleport Hub Pillars
             if (name.startsWith("pillar_")) {
@@ -191,6 +190,20 @@
                 } else {
                     this.log("Ascending to Depth " + nextDepth + "...", "cyan");
                     this.enterBuilding("Crypt_Depth_" + nextDepth);
+                }
+            }
+
+            // v19.1: Loot Chest (Single Click)
+            if (name.includes("Loot Chest") || name.includes("LootChest")) {
+                this.log("Looting...", "yellow");
+
+                // Dispose visual chest
+                if (mesh.parent) mesh.parent.dispose();
+                else mesh.dispose();
+
+                // Trigger UI
+                if (this.dotNetHelper) {
+                    this.dotNetHelper.invokeMethodAsync('OpenLoot');
                 }
             }
         };

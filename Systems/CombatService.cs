@@ -107,10 +107,15 @@ namespace StoneHammer.Systems
             OnStateChanged?.Invoke();
         }
 
-        public void CloseLoot()
+        public async Task CloseLoot()
         {
             LootOpen = false;
             OnStateChanged?.Invoke();
+
+            if (Phase == CombatPhase.Victory)
+            {
+                await EndCombat();
+            }
         }
 
         public void ClearLoot()
@@ -127,49 +132,129 @@ namespace StoneHammer.Systems
             _charService = charService;
         }
 
-        public async Task StartCombat(string enemyGroupName)
+        // Instanced Combat State
+        private string _returnToScene = "";
+        private float _returnX = 0;
+        private float _returnZ = 0;
+        private string _engagedGroup = "";
+        
+        // Persistent Dead List (Ideally moved to a separate service later)
+        private HashSet<string> _defeatedGroups = new HashSet<string>();
+
+        public bool IsGroupDefeated(string groupName) => _defeatedGroups.Contains(groupName);
+
+        public async Task StartCombat(string targetActorName)
         {
+            if (IsFighting) return;
+
             IsFighting = true;
             Phase = CombatPhase.Input;
-            CombatLog = $"Encounter started: {enemyGroupName}!";
+            CombatLog = "Preparing for Battle...";
             
-            // 1. Initialize Heroes
+            // 1. Capture State
+            // We assume the JS tracks current building. We need to ask JS or AssetManager?
+            // AssetManager tracks _currentDepth but not full name string publicly easily.
+            // For now, let's assume we are in "Crypt_Depth_" + depth.
+            // A better way: Pass current scene from JS in StartCombat args? 
+            // Or just default to restoring the logical location.
+            // Temporary: Assume Crypt L1 if uncertain.
+            _returnToScene = "Crypt_Depth_1"; // Default
+            
+            // Improve ID Parsing
+            string baseName = targetActorName.Replace("voxel_", "");
+
+            // Robust Cleaning (Copied from earlier fix)
+            // 1. Remove known sub-parts if present
+            if (baseName.Contains("_ribs")) baseName = baseName.Split(new[] { "_ribs" }, StringSplitOptions.None)[0];
+            if (baseName.Contains("_skull")) baseName = baseName.Split(new[] { "_skull" }, StringSplitOptions.None)[0];
+
+            // 2. Strip suffix _A, _B, _C to get Group ID
+             if (baseName.EndsWith("_A") || baseName.EndsWith("_B") || baseName.EndsWith("_C"))
+            {
+                baseName = baseName.Substring(0, baseName.Length - 2);
+            }
+            _engagedGroup = baseName; // e.g., "Skeleton_Lvl1_G1"
+
+            CombatLog = $"Engaging {_engagedGroup}!";
+            OnStateChanged?.Invoke();
+
+            // 2. Transition to Arena
+            await _assets.EnterBuilding("BattleArena");
+            await Task.Delay(500); // Wait for scene clear/load
+
+            // 3. Spawn Heroes (Party) - Left Side
             Heroes.Clear();
+            int hIndex = 0;
             foreach(var member in _charService.Party)
             {
+                string heroId = "Hero_" + member.Name.Replace(" ", "");
                 Heroes.Add(new CombatEntity 
                 { 
                     Name = member.Name, 
-                    HP = member.Stats.MaxHP, // TODO: Persist current HP
+                    HP = member.Stats.MaxHP, 
                     MaxHP = member.Stats.MaxHP,
                     IsHero = true,
                     SourceCharacter = member,
-                    ModelId = "Hero_" + member.Name.Replace(" ", "") 
+                    ModelId = heroId 
                 });
+                
+                // Spawn Visual
+                // Simple Humanoid parts (reusing Player asset for now)
+                await _assets.SpawnAsset("assets/player.json", heroId, false, new { Position = new float[] { -20, 0, (hIndex * 8) - 4 } });
+                 // Color customization could be passed here if AssetManager supported it
+                hIndex++;
             }
 
-            // 2. Initialize Enemies
+            // 4. Spawn Enemies (Group) - Right Side
             Enemies.Clear();
-            int enemyCount = 3; 
-            for(int i=0; i<enemyCount; i++)
+            string[] suffixes = { "A", "B", "C" }; // Assume 3 per group
+            
+            for(int i=0; i<3; i++)
             {
+                string suffix = suffixes[i];
+                string enemyId = $"{_engagedGroup}_{suffix}"; // e.g. Skeleton_Lvl1_G1_A
+                
                 var enemy = new CombatEntity 
                 { 
-                    Name = i == 0 ? enemyGroupName : $"Minion {char.ConvertFromUtf32(65+i)}", 
+                    Name = $"Skeleton {suffix}", 
                     HP = 40, 
                     MaxHP = 40,
                     IsHero = false,
-                    XPValue = 25
+                    XPValue = 25,
+                    ModelId = enemyId
                 };
-
-                // CRITICAL FIX: Map the first enemy to the actual 3D actor clicked
-                if (i == 0) enemy.ModelId = enemyGroupName; 
-                else enemy.ModelId = "Minion_" + i; // Logic needed to spawn visual minions later
-
+                
                 Enemies.Add(enemy);
+                
+                // Spawn Visual
+                await _assets.SpawnAsset("assets/skeleton.json", enemyId, false, new { Position = new float[] { 20, 0, (i * 8) - 4 }, Rotation = new float[] { 0, -90, 0 } });
             }
 
-            await _js.InvokeVoidAsync("stoneHammer.rotateCameraToBattle", enemyGroupName);
+            await _js.InvokeVoidAsync("stoneHammer.rotateCameraToBattle", "ArenaCenter"); // Adjust camera logic if needed
+            CombatLog = "Battle Start!";
+            OnStateChanged?.Invoke();
+        }
+
+        public async Task EndCombat()
+        {
+            // Called after Loot
+            LootOpen = false;
+            IsFighting = false;
+            
+            // Record Victory
+            _defeatedGroups.Add(_engagedGroup);
+            
+            // Cleanup: The re-generated world will spawn the mobs again.
+            // We must mark them as dead in AssetManager so they are skipped during generation.
+            string[] suffixes = { "A", "B", "C" };
+            foreach(var s in suffixes)
+            {
+                 _assets.MarkAsDead($"{_engagedGroup}_{s}");
+            }
+            
+            // Return to World (This will regenerate the scene, now respecting the dead list)
+            await _assets.EnterBuilding(_returnToScene);
+            
             OnStateChanged?.Invoke();
         }
 

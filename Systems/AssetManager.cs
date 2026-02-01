@@ -130,6 +130,12 @@ namespace StoneHammer.Systems
                 var levelAsset = CryptGenerator.Generate(_currentDepth);
                 await SpawnGeneratedAsset(levelAsset, levelAsset.Name);
             }
+            else if (buildingName == "BattleArena")
+            {
+                await SpawnAsset("assets/battle_arena.json", "BattleArena");
+                // Do not spawn default player; CombatService handles unit placement
+                return; 
+            }
             else
             {
                 await SpawnAsset("assets/sandbox_interior.json", "Sandbox Interior");
@@ -156,11 +162,30 @@ namespace StoneHammer.Systems
              }
         }
 
+        // v20.0: Persistent Dead List
+        private HashSet<string> _deadActors = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        
+        public void MarkAsDead(string actorId)
+        {
+            if (!_deadActors.Contains(actorId))
+            {
+                _deadActors.Add(actorId);
+                System.Console.WriteLine($"[AssetManager] MarkAsDead: {actorId} (Total Dead: {_deadActors.Count})");
+            }
+        }
+
         public async Task SpawnAsset(string path, string name, bool isPlayer = false, object? transform = null)
         {
             try 
             {
-                System.Console.WriteLine($"[AssetManager] Requesting spawn for: {name} from {path}");
+                // Check Blacklist
+                if (_deadActors.Contains(name))
+                {
+                    System.Console.WriteLine($"[AssetManager] BLOCKED: {name} is on the dead list.");
+                    return;
+                }
+
+                System.Console.WriteLine($"[AssetManager] Spawning: {name}");
 
                 string json;
                 if (!string.IsNullOrEmpty(path))

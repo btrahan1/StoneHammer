@@ -45,12 +45,12 @@
 }
 
 @code {
-    private void Close()
+    private async Task Close()
     {
-        CombatService.CloseLoot();
+        await CombatService.CloseLoot();
     }
 
-    private void TakeAll()
+    private async Task TakeAll()
     {
         // Add Gold
         if (CombatService.CurrentLootGold > 0)
@@ -65,7 +65,7 @@
         }
 
         CombatService.ClearLoot();
-        CombatService.CloseLoot();
+        await CombatService.CloseLoot();
     }
     
     protected override void OnInitialized()

@@ -40,9 +40,15 @@ namespace StoneHammer.Systems
                 },
                 Children = new List<ChildAsset>
                 {
-                     // Mobs
-                     new ChildAsset { Path = "assets/skeleton.json", Name = "Skeleton_Lvl1_A", Transform = new { Position = new float[] { -20, 0, 20 }, Rotation = new float[] { 0, 135, 0 } } },
-                     new ChildAsset { Path = "assets/skeleton.json", Name = "Skeleton_Lvl1_B", Transform = new { Position = new float[] { 20, 0, 20 }, Rotation = new float[] { 0, -135, 0 } } },
+                     // Mobs - Group 1 (Near Entrance) - Tight Formation
+                     new ChildAsset { Path = "assets/skeleton.json", Name = "Skeleton_Lvl1_G1_A", Transform = new { Position = new float[] { -5, 0, 20 }, Rotation = new float[] { 0, 135, 0 } } },
+                     new ChildAsset { Path = "assets/skeleton.json", Name = "Skeleton_Lvl1_G1_B", Transform = new { Position = new float[] { 5, 0, 20 }, Rotation = new float[] { 0, -135, 0 } } },
+                     new ChildAsset { Path = "assets/skeleton.json", Name = "Skeleton_Lvl1_G1_C", Transform = new { Position = new float[] { 0, 0, 25 }, Rotation = new float[] { 0, 180, 0 } } },
+
+                     // Mobs - Group 2 (Guarding Exit) - Tight Formation
+                     new ChildAsset { Path = "assets/skeleton.json", Name = "Skeleton_Lvl1_G2_A", Transform = new { Position = new float[] { -5, 0, 80 }, Rotation = new float[] { 0, 135, 0 } } },
+                     new ChildAsset { Path = "assets/skeleton.json", Name = "Skeleton_Lvl1_G2_B", Transform = new { Position = new float[] { 5, 0, 80 }, Rotation = new float[] { 0, -135, 0 } } },
+                     new ChildAsset { Path = "assets/skeleton.json", Name = "Skeleton_Lvl1_G2_C", Transform = new { Position = new float[] { 0, 0, 85 }, Rotation = new float[] { 0, 180, 0 } } },
                      
                      // Interactables
                      new ChildAsset { Path = "assets/stairs.json", Name = "StairsDown", Transform = new { Position = new float[] { 0, 0, 110 }, Rotation = new float[] { 0, 0, 0 } } },

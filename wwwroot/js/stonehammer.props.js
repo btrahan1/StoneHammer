@@ -231,4 +231,36 @@
             building.material = buildingMat;
         }
     };
+
+    // v19.2: Actor Removal (Combat Death)
+    sh.removeActor = function (id) {
+        // Try exact name first
+        let mesh = this.scene.getMeshByName(id) || this.scene.getTransformNodeByName(id);
+
+        // Try voxel prefix
+        if (!mesh) {
+            mesh = this.scene.getMeshByName("voxel_" + id) || this.scene.getTransformNodeByName("voxel_" + id);
+        }
+
+        if (mesh) {
+            this.log(id + " has fallen!", "red");
+
+            // Simple Death Effect: Shrink to nothing
+            // (In future, spawn particle system)
+            var anim = new BABYLON.Animation("deathScale", "scaling", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+            var keys = [];
+            keys.push({ frame: 0, value: mesh.scaling.clone() });
+            keys.push({ frame: 20, value: new BABYLON.Vector3(0.1, 0.1, 0.1) });
+            anim.setKeys(keys);
+
+            mesh.animations = [];
+            mesh.animations.push(anim);
+
+            this.scene.beginAnimation(mesh, 0, 20, false, 1, () => {
+                mesh.dispose();
+            });
+        } else {
+            console.warn("Could not find actor to remove: " + id);
+        }
+    };
 })();
