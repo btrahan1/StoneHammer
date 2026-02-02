@@ -4,11 +4,11 @@
     "LayoutType": "Rooms",
     "DefaultDepth": 1,
     "Theme": {
-        "WallColor": "#555555",
+        "WallColor": "#444444",
         "WallMaterial": "Stone",
-        "FloorColor": "#333333",
+        "FloorColor": "#1a120b",
         "FloorMaterial": "Stone",
-        "AtmosphereColor": "#000000"
+        "AtmosphereColor": "#24180f"
     },
     "Enemies": [
         {

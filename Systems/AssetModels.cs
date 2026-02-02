@@ -90,6 +90,7 @@ namespace StoneHammer.Systems
     {
         public List<StaticBuildingPlacement> StaticBuildings { get; set; } = new();
         public List<DungeonEntrancePlacement> DungeonEntrances { get; set; } = new();
+        public DungeonTheme Theme { get; set; } = new();
     }
 
     public class StaticBuildingPlacement

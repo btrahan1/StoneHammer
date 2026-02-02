@@ -285,6 +285,12 @@ namespace StoneHammer.Systems
             await _assets.EnterBuilding("BattleArena");
             await Task.Delay(500); // Wait for scene clear/load
 
+            // v27.2: Custom Combat Atmosphere
+            await JS.InvokeVoidAsync("stoneHammer.setAtmosphere", "#e6ccb3"); // Sandy Brown
+            
+            // v27.3: Normalize Camera
+            await JS.InvokeVoidAsync("stoneHammer.combat.init", Enemies.Select(e => e.ModelId).ToArray());
+
             // 3. Spawn Heroes (Party) - Left Side
             Heroes.Clear();
             

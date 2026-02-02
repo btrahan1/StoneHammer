@@ -54,15 +54,15 @@ namespace StoneHammer.Systems
             // Room & Corridor Generation
             var rng = new System.Random();
             var rooms = new List<RoomRect>();
-            int mapWidth = 200;
-            int mapDepth = 200;
+            int mapWidth = 400;
+            int mapDepth = 400;
             int roomCount = rng.Next(8, 15);
 
             // 1. Place Rooms
             for (int i = 0; i < roomCount; i++)
             {
-                int w = rng.Next(15, 30);
-                int d = rng.Next(15, 30);
+                int w = rng.Next(30, 60);
+                int d = rng.Next(30, 60);
                 int x = rng.Next(-mapWidth / 2, mapWidth / 2 - w);
                 int z = rng.Next(-mapDepth / 2, mapDepth / 2 - d);
 
@@ -91,24 +91,27 @@ namespace StoneHammer.Systems
                     ColorHex = recipe.Theme.FloorColor, Material = recipe.Theme.FloorMaterial 
                 });
 
-                // Ceiling
+                // Ceiling Removed to prevent clipping
+                /*
                 asset.Parts.Add(new ProceduralPart 
                 { 
                     Id = $"room_ceil_{room.X}_{room.Z}", Shape = "Box", 
-                    Position = new[] { room.CenterX, 10, room.CenterZ }, 
+                    Position = new[] { room.CenterX, 20, room.CenterZ }, 
                     Scale = new[] { (float)room.W, 1, (float)room.D }, 
                     ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial 
                 });
+                */
 
                 // Walls (North/South/East/West) - Simplified as blocks around
+                // Height 10 -> 20. Y-Pos 5 -> 10.
                 // North
-                asset.Parts.Add(new ProceduralPart { Id = $"wall_n_{room.X}", Shape = "Box", Position = new[] { room.CenterX, 5, room.Z + room.D/2f }, Scale = new[] { (float)room.W, 10, 1 }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+                asset.Parts.Add(new ProceduralPart { Id = $"wall_n_{room.X}", Shape = "Box", Position = new[] { room.CenterX, 10, room.Z + room.D/2f }, Scale = new[] { (float)room.W, 20, 1 }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
                 // South
-                asset.Parts.Add(new ProceduralPart { Id = $"wall_s_{room.X}", Shape = "Box", Position = new[] { room.CenterX, 5, room.Z - room.D/2f }, Scale = new[] { (float)room.W, 10, 1 }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+                asset.Parts.Add(new ProceduralPart { Id = $"wall_s_{room.X}", Shape = "Box", Position = new[] { room.CenterX, 10, room.Z - room.D/2f }, Scale = new[] { (float)room.W, 20, 1 }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
                 // East
-                asset.Parts.Add(new ProceduralPart { Id = $"wall_e_{room.X}", Shape = "Box", Position = new[] { room.X + room.W/2f, 5, room.CenterZ }, Scale = new[] { 1, 10, (float)room.D }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+                asset.Parts.Add(new ProceduralPart { Id = $"wall_e_{room.X}", Shape = "Box", Position = new[] { room.X + room.W/2f, 10, room.CenterZ }, Scale = new[] { 1, 20, (float)room.D }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
                 // West
-                asset.Parts.Add(new ProceduralPart { Id = $"wall_w_{room.X}", Shape = "Box", Position = new[] { room.X - room.W/2f, 5, room.CenterZ }, Scale = new[] { 1, 10, (float)room.D }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+                asset.Parts.Add(new ProceduralPart { Id = $"wall_w_{room.X}", Shape = "Box", Position = new[] { room.X - room.W/2f, 10, room.CenterZ }, Scale = new[] { 1, 20, (float)room.D }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
             }
 
             // 3. Connect Rooms (Corridors)
@@ -117,9 +120,39 @@ namespace StoneHammer.Systems
                 ConnectRooms(asset, rooms[i], rooms[i+1], recipe);
             }
 
-            // 4. Store spawn points for enemies (Centers of rooms)
-            // Hack: Attach to asset metadata? Or just assume spawns function will find floor.
-            // For now, let's keep it simple.
+            // 4. Spawn Enemies in Rooms (Skip start room 0)
+            if (recipe.Enemies.Any())
+            {
+                 for(int i=1; i<rooms.Count; i++) // Skip Start Room
+                 {
+                     var room = rooms[i];
+                     // Spawn 1-3 enemies per room
+                     int count = rng.Next(1, 4);
+                     for(int j=0; j<count; j++)
+                     {
+                         var enemy = recipe.Enemies[rng.Next(recipe.Enemies.Count)];
+                         
+                         // Random position within room (padding 2 units)
+                         float ex = room.CenterX + rng.Next(-(room.W/2)+2, (room.W/2)-2);
+                         float ez = room.CenterZ + rng.Next(-(room.D/2)+2, (room.D/2)-2);
+
+                         asset.Children.Add(new ChildAsset 
+                         { 
+                            Path = enemy.AssetPath, 
+                            Name = $"{enemy.NamePrefix}_{i}_{j}", 
+                            Transform = new { Position = new float[] { ex, 0, ez }, Rotation = new float[] { 0, rng.Next(0, 360), 0 } },
+                            Metadata = new Dictionary<string, object> 
+                            {
+                                { "isEnemy", true },
+                                { "hp", enemy.HP },
+                                { "xp", enemy.XP },
+                                { "returnScene", $"DungeonEntrance_{recipe.Id}" },
+                                { "assetPath", enemy.AssetPath }
+                            }
+                         });
+                     }
+                 }
+            }
         }
 
         private static void ConnectRooms(ProceduralAsset asset, RoomRect r1, RoomRect r2, DungeonRecipe recipe)
@@ -130,19 +163,20 @@ namespace StoneHammer.Systems
             float x2 = r2.CenterX; float z2 = r2.CenterZ;
 
             // X-Segment
-            float width = System.Math.Abs(x2 - x1) + 4; // +4 for overlap/width
+            float width = System.Math.Abs(x2 - x1) + 8; // +8 for overlap/width
             float centerX = (x1 + x2) / 2;
-            asset.Parts.Add(new ProceduralPart { Id = $"corr_h_{x1}", Shape = "Box", Position = new[] { centerX, -0.4f, z1 }, Scale = new[] { width, 1, 4 }, ColorHex = recipe.Theme.FloorColor, Material = recipe.Theme.FloorMaterial });
+            asset.Parts.Add(new ProceduralPart { Id = $"corr_h_{x1}", Shape = "Box", Position = new[] { centerX, -0.4f, z1 }, Scale = new[] { width, 1, 8 }, ColorHex = recipe.Theme.FloorColor, Material = recipe.Theme.FloorMaterial });
             // Ceiling
-             asset.Parts.Add(new ProceduralPart { Id = $"corr_h_ceil_{x1}", Shape = "Box", Position = new[] { centerX, 8, z1 }, Scale = new[] { width, 1, 4 }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+            // Ceiling Removed
+            // asset.Parts.Add(new ProceduralPart { Id = $"corr_h_ceil_{x1}", Shape = "Box", Position = new[] { centerX, 18, z1 }, Scale = new[] { width, 1, 8 }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
 
 
             // Z-Segment
-            float depth = System.Math.Abs(z2 - z1) + 4;
+            float depth = System.Math.Abs(z2 - z1) + 8;
             float centerZ = (z1 + z2) / 2;
-            asset.Parts.Add(new ProceduralPart { Id = $"corr_v_{z1}", Shape = "Box", Position = new[] { x2, -0.4f, centerZ }, Scale = new[] { 4, 1, depth }, ColorHex = recipe.Theme.FloorColor, Material = recipe.Theme.FloorMaterial });
-             // Ceiling
-             asset.Parts.Add(new ProceduralPart { Id = $"corr_v_ceil_{z1}", Shape = "Box", Position = new[] { x2, 8, centerZ }, Scale = new[] { 4, 1, depth }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+            asset.Parts.Add(new ProceduralPart { Id = $"corr_v_{z1}", Shape = "Box", Position = new[] { x2, -0.4f, centerZ }, Scale = new[] { 8, 1, depth }, ColorHex = recipe.Theme.FloorColor, Material = recipe.Theme.FloorMaterial });
+             // Ceiling Removed
+             // asset.Parts.Add(new ProceduralPart { Id = $"corr_v_ceil_{z1}", Shape = "Box", Position = new[] { x2, 18, centerZ }, Scale = new[] { 8, 1, depth }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
         }
 
         private class RoomRect
@@ -198,28 +232,12 @@ namespace StoneHammer.Systems
 
             var openCells = new List<(int, int)>();
 
-            // Walls (Extruded cells)
+            // Identify Open Cells and Prepare Wall Map for Optimization
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    if (map[x, y])
-                    {
-                        // Map 0,0 is -Width/2, -Height/2
-                        float worldX = (x - width / 2) * scale;
-                        float worldZ = (y - height / 2) * scale;
-
-                        asset.Parts.Add(new ProceduralPart 
-                        {
-                            Id = $"rock_{x}_{y}",
-                            Shape = "Box", 
-                            Position = new[] { worldX, 7.5f, worldZ }, // Higher position (15/2)
-                            Scale = new[] { (float)scale, 15f, (float)scale }, // Taller Walls
-                            ColorHex = recipe.Theme.WallColor,
-                            Material = recipe.Theme.WallMaterial
-                        });
-                    }
-                    else
+                    if (!map[x, y])
                     {
                         // Open cell, candidate for spawning
                         // Don't spawn too close to start (center)
@@ -230,6 +248,10 @@ namespace StoneHammer.Systems
                     }
                 }
             }
+            
+            // OPTIMIZATION: Greedy Meshing for Walls
+            // Instead of spawning 1x1 blocks, we merge adjacent wall cells into larger rectangles.
+            OptimizeCaveWalls(asset, map, width, height, scale, recipe.Theme.WallColor, recipe.Theme.WallMaterial);
 
             // Ceiling (Higher up)
             asset.Parts.Add(new ProceduralPart { Id = "cave_roof", Shape = "Box", Position = new[] { 0f, 15f, 0f }, Scale = new[] { (float)width*scale, 1f, (float)height*scale }, ColorHex = recipe.Theme.AtmosphereColor, Material = "Stone" });
@@ -263,6 +285,56 @@ namespace StoneHammer.Systems
                         }
                      });
                  }
+            }
+        }
+
+        private static void OptimizeCaveWalls(ProceduralAsset asset, bool[,] map, int width, int height, int scale, string color, string material)
+        {
+            // Simple RLE (Run-Length Encoding) along X-axis
+            // We iterate row by row. If we find a wall, we check the next cell.
+            // If it's also a wall, we extend the current block.
+            // If not, we finalize the block and start looking for the next one.
+            // Note: A full 2D greedy mesh (merging rects) is better but 1D RLE is often sufficient for 90% reduction.
+            
+            bool[,] visited = new bool[width, height];
+
+            for (int z = 0; z < height; z++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    if (map[x, z] && !visited[x, z])
+                    {
+                        // Start of a wall segment
+                        int startX = x;
+                        int length = 0;
+
+                        // Extend along X
+                        while (x < width && map[x, z] && !visited[x, z])
+                        {
+                            visited[x, z] = true;
+                            length++;
+                            x++;
+                        }
+
+                        // Create the merged wall part
+                        float centerX = (startX + (length - 1) / 2f - width / 2f) * scale;
+                        float centerZ = (z - height / 2f) * scale;
+                        
+                        // Scale.X expands by length
+                        float scaleX = length * scale;
+                        float scaleZ = scale;
+
+                        asset.Parts.Add(new ProceduralPart
+                        {
+                            Id = $"wall_opt_{z}_{startX}",
+                            Shape = "Box",
+                            Position = new[] { centerX, 7.5f, centerZ }, // Higher position (15/2)
+                            Scale = new[] { scaleX, 15f, scaleZ }, // Taller Walls
+                            ColorHex = color,
+                            Material = material
+                        });
+                    }
+                }
             }
         }
 

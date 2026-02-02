@@ -5,6 +5,36 @@
  */
 (function () {
     const sh = window.stoneHammer = window.stoneHammer || {};
+    sh.combat = {}; // Namespace for C# calls
+
+    sh.combat.init = function (enemyIds) {
+        console.log("[Combat] NUCLEAR CAMERA RESET.");
+
+        if (sh.camera) {
+            // 1. KILL ALL FOLLOW LOGIC
+            sh.camera.lockedTarget = null;
+            sh.camera.parent = null;
+            sh.player = null; // Disable WASD control override
+
+            // 2. Force "God View" (Top-Down, Centered)
+            // Ensure target is globally zeroed
+            sh.camera.setTarget(BABYLON.Vector3.Zero());
+
+            // 3. Set standard Arena angles
+            sh.camera.alpha = -Math.PI / 2; // Fixed Side View
+            sh.camera.beta = 0.6;           // Steep Top-Down Angle
+            sh.camera.radius = 20;          // Clean Zoom
+
+            sh.camera.lowerRadiusLimit = 5;
+            sh.camera.upperRadiusLimit = 50;
+
+            // 4. Force update
+            sh.camera.rebuildAnglesAndRadius();
+        }
+
+        // 2. Start UI
+        sh.startUITracking(enemyIds);
+    };
 
     sh.startUITracking = function (modelIds) {
         if (this._uiObserver) {

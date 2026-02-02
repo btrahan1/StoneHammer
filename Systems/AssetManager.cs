@@ -62,6 +62,10 @@ namespace StoneHammer.Systems
             var town = JsonSerializer.Deserialize<TownRecipe>(json, _options);
 
             if (town == null) return;
+            
+            // 1.5 Set Atmosphere
+            string atmos = town.Theme?.AtmosphereColor ?? "#80b3ff";
+            await _js.InvokeVoidAsync("stoneHammer.setAtmosphere", atmos);
 
             // 2. Town Floor
             await SpawnAsset("assets/town_floor.json", "TownFloor");
@@ -161,6 +165,12 @@ namespace StoneHammer.Systems
                         var dungeonAsset = UniversalDungeonGenerator.Generate(recipe, depth);
                         System.Console.WriteLine($"[AssetManager] Asset Generated. Parts: {dungeonAsset.Parts.Count}");
                         
+                        System.Console.WriteLine($"[AssetManager] Asset Generated. Parts: {dungeonAsset.Parts.Count}");
+                        
+                        // Set Atmosphere
+                        string atmos = recipe.Theme?.AtmosphereColor ?? "#000000";
+                        await _js.InvokeVoidAsync("stoneHammer.setAtmosphere", atmos);
+
                         await SpawnGeneratedAsset(dungeonAsset, dungeonAsset.Name);
                         await SpawnPlayer(0, 0);
                     }

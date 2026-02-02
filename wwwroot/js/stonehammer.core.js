@@ -126,6 +126,31 @@ window.stoneHammer = {
         if (this.ground) this.ground.setEnabled(true);
     },
 
+    // v27.2: Configurable Atmosphere
+    setAtmosphere: function (hexColor) {
+        if (!hexColor) hexColor = "#80b3ff"; // Default Blue
+        this.log("Setting Atmosphere: " + hexColor, "cyan");
+
+        const color = BABYLON.Color3.FromHexString(hexColor);
+
+        // 1. Scene Clear Color
+        if (this.scene) {
+            this.scene.clearColor = new BABYLON.Color4(color.r, color.g, color.b, 1.0);
+        }
+
+        // 2. Skybox
+        const skyBox = this.scene.getMeshByName("skyBox");
+        if (skyBox && skyBox.material) {
+            skyBox.material.diffuseColor = color;
+            skyBox.material.emissiveColor = color;
+        }
+
+        // 3. Fog (Optional polish)
+        if (this.scene.fogMode !== BABYLON.Scene.FOGMODE_NONE) {
+            this.scene.fogColor = color;
+        }
+    },
+
     storage: {
         getSaves: (prefix) => {
             const saves = [];

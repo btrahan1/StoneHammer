@@ -133,7 +133,14 @@
                     let mesh = pointerInfo.pickInfo.pickedMesh;
 
                     // Walk up hierarchy to find interactable root
-                    while (mesh.parent && !mesh.name.includes("CryptEntrance") && !mesh.name.includes("Stairs") && !mesh.name.includes("Skeleton") && !mesh.name.includes("Loot") && !mesh.name.includes("Exit")) {
+                    // v27.1: Loop checks for Metadata or known keys
+                    // valid keys: CryptEntrance, Stairs, Loot, Exit
+                    while (mesh.parent &&
+                        !mesh.name.includes("CryptEntrance") &&
+                        !mesh.name.includes("Stairs") &&
+                        !mesh.name.includes("Loot") &&
+                        !mesh.name.includes("Exit") &&
+                        !(mesh.metadata && mesh.metadata.isEnemy)) {
                         mesh = mesh.parent;
                     }
                     const name = mesh.name;

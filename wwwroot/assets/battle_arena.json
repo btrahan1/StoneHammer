@@ -11,12 +11,12 @@
                 0
             ],
             "Scale": [
-                60,
+                100,
                 1,
-                60
+                100
             ],
-            "ColorHex": "#1A202C",
-            "Material": "Stone"
+            "ColorHex": "#d2b48c",
+            "Material": "Sand"
         }
     ],
     "Children": []
