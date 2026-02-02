@@ -546,42 +546,34 @@ namespace StoneHammer.Systems
              string mobAsset = "assets/skeleton.json";
              int hp = 50; int xp = 25;
              
-             // Override based on Depth/Recipe ID
-             // Ideally this should be data-driven in the recipe, but for now hardcoded flavor logic
-             if (recipe.Id == "elemental") 
+             // Override based on Floor Config (Per-Depth)
+             // Check for specific floor config
+             var floorConfig = recipe.Floors?.FirstOrDefault(f => f.Depth == depth);
+             
+             List<DungeonEnemy> availableEnemies = recipe.Enemies;
+
+             if (floorConfig != null)
              {
-                 int elemType = (depth - 1) % 4; // 0, 1, 2, 3
-                 switch(elemType)
+                 if (floorConfig.Theme != null)
                  {
-                     case 0: // Earth
-                         floorColor = "#4e342e"; // Brown
-                         atmos = "#3e2723";
-                         mobPrefix = "EarthElemental";
-                         mobAsset = "assets/earth_elemental.json";
-                         hp = 100; xp = 50;
-                         break;
-                     case 1: // Wind
-                         floorColor = "#e0f7fa"; // Cyan Light
-                         atmos = "#b2ebf2";
-                         mobPrefix = "WindElemental";
-                         mobAsset = "assets/wind_elemental.json";
-                         hp = 80; xp = 50;
-                         break;
-                     case 2: // Fire
-                         floorColor = "#bf360c"; // Burnt Orange
-                         atmos = "#dd2c00";
-                         mobPrefix = "FireElemental";
-                         mobAsset = "assets/fire_elemental.json";
-                         hp = 90; xp = 50;
-                         break;
-                     case 3: // Water
-                         floorColor = "#01579b"; // Deep Blue
-                         atmos = "#0277bd";
-                         mobPrefix = "WaterElemental";
-                         mobAsset = "assets/water_elemental.json";
-                         hp = 120; xp = 50;
-                         break;
+                     if (!string.IsNullOrEmpty(floorConfig.Theme.FloorColor)) floorColor = floorConfig.Theme.FloorColor;
+                     if (!string.IsNullOrEmpty(floorConfig.Theme.AtmosphereColor)) atmos = floorConfig.Theme.AtmosphereColor;
                  }
+                 
+                 if (floorConfig.Enemies != null && floorConfig.Enemies.Count > 0)
+                 {
+                     availableEnemies = floorConfig.Enemies;
+                 }
+             }
+             
+             // Pick main mob for this floor
+             if (availableEnemies != null && availableEnemies.Count > 0)
+             {
+                 var enemyDef = availableEnemies[0]; // Simplification: Pick first defined enemy for this floor
+                 mobPrefix = enemyDef.NamePrefix;
+                 mobAsset = enemyDef.AssetPath;
+                 hp = enemyDef.HP;
+                 xp = enemyDef.XP;
              }
 
              // 1. Huge Room

@@ -1,38 +1,83 @@
 {
     "Id": "elemental",
     "Name": "Elemental Sanctum",
-    "LayoutType": "OpenFloor",
+    "LayoutType": 3,
     "Theme": {
-        "WallColor": "#444444",
+        "WallColor": "#222222",
         "WallMaterial": "Brick",
-        "FloorColor": "#222222",
+        "FloorColor": "#333333",
         "FloorMaterial": "Stone",
-        "AtmosphereColor": "#888888"
+        "AtmosphereColor": "#111111"
     },
+    "DefaultDepth": 1,
+    "Floors": [
+        {
+            "Depth": 1,
+            "Theme": {
+                "FloorColor": "#4e342e",
+                "AtmosphereColor": "#3e2723"
+            },
+            "Enemies": [
+                {
+                    "NamePrefix": "EarthElemental",
+                    "AssetPath": "assets/earth_elemental.json",
+                    "HP": 100,
+                    "XP": 50
+                }
+            ]
+        },
+        {
+            "Depth": 2,
+            "Theme": {
+                "FloorColor": "#e0f7fa",
+                "AtmosphereColor": "#b2ebf2"
+            },
+            "Enemies": [
+                {
+                    "NamePrefix": "WindElemental",
+                    "AssetPath": "assets/wind_elemental.json",
+                    "HP": 80,
+                    "XP": 50
+                }
+            ]
+        },
+        {
+            "Depth": 3,
+            "Theme": {
+                "FloorColor": "#bf360c",
+                "AtmosphereColor": "#dd2c00"
+            },
+            "Enemies": [
+                {
+                    "NamePrefix": "FireElemental",
+                    "AssetPath": "assets/fire_elemental.json",
+                    "HP": 90,
+                    "XP": 50
+                }
+            ]
+        },
+        {
+            "Depth": 4,
+            "Theme": {
+                "FloorColor": "#01579b",
+                "AtmosphereColor": "#0277bd"
+            },
+            "Enemies": [
+                {
+                    "NamePrefix": "WaterElemental",
+                    "AssetPath": "assets/water_elemental.json",
+                    "HP": 120,
+                    "XP": 50
+                }
+            ]
+        }
+    ],
     "Enemies": [
         {
-            "NamePrefix": "EarthElemental",
-            "AssetPath": "assets/earth_elemental.json",
-            "HP": 100,
-            "XP": 50
-        },
-        {
-            "NamePrefix": "WindElemental",
-            "AssetPath": "assets/wind_elemental.json",
-            "HP": 80,
-            "XP": 50
-        },
-        {
-            "NamePrefix": "FireElemental",
-            "AssetPath": "assets/fire_elemental.json",
-            "HP": 90,
-            "XP": 50
-        },
-        {
-            "NamePrefix": "WaterElemental",
-            "AssetPath": "assets/water_elemental.json",
-            "HP": 120,
-            "XP": 50
+            "NamePrefix": "Skeleton",
+            "AssetPath": "assets/skeleton.json",
+            "HP": 50,
+            "XP": 25
         }
     ]
 }

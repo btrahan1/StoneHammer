@@ -117,6 +117,7 @@ namespace StoneHammer.Systems
         public DungeonLayoutType LayoutType { get; set; } = DungeonLayoutType.Rooms;
         public DungeonTheme Theme { get; set; } = new();
         public List<DungeonEnemy> Enemies { get; set; } = new();
+        public List<DungeonFloorConfig> Floors { get; set; } = new();
         public int DefaultDepth { get; set; } = 1;
     }
 
@@ -144,5 +145,12 @@ namespace StoneHammer.Systems
         public int HP { get; set; } = 20;
         public int XP { get; set; } = 10;
         public float SpawnChance { get; set; } = 1.0f; // Relative weight
+    }
+
+    public class DungeonFloorConfig
+    {
+        public int Depth { get; set; } // Specific depth or StartDepth
+        public DungeonTheme? Theme { get; set; }
+        public List<DungeonEnemy> Enemies { get; set; } = new();
     }
 }
