@@ -223,10 +223,23 @@ namespace StoneHammer.Systems
             // A better way: Pass current scene from JS in StartCombat args? 
             // Or just default to restoring the logical location.
             // Temporary: Assume Crypt L1 if uncertain.
-            _returnToScene = "Crypt_Depth_1"; // Default
-            
             // Improve ID Parsing
             string baseName = targetActorName.Replace("voxel_", "");
+            
+            // v21.1: Context-Aware Return
+            // In the future, pass the scene name from JS. For now, infer from mob type.
+            if (baseName.Contains("Goblin") || baseName.Contains("Spider"))
+            {
+                _returnToScene = "GoblinCave";
+            }
+            else if (baseName.Contains("Slime") || baseName.Contains("Rat"))
+            {
+                _returnToScene = "Sewer";
+            }
+            else
+            {
+                _returnToScene = "Crypt_Depth_1"; // Default to Crypt for Skellies
+            }
 
             // Robust Cleaning: Remove all known body parts to find the Root Actor
             string[] knownParts = { 
@@ -318,17 +331,43 @@ namespace StoneHammer.Systems
                 var enemy = new CombatEntity 
                 { 
                     Name = $"Skeleton {suffix}", 
-                    HP = 40, 
-                    MaxHP = 40,
-                    IsHero = false,
-                    XPValue = 25,
-                    ModelId = enemyId
+                    HP = 40, MaxHP = 40, XPValue = 25,
+                    IsHero = false, ModelId = enemyId
                 };
+
+                if (_engagedGroup.Contains("Goblin")) 
+                {
+                    enemy.Name = $"Goblin {suffix}";
+                    enemy.HP = 25; enemy.MaxHP = 25; enemy.XPValue = 15;
+                }
+                else if (_engagedGroup.Contains("Spider"))
+                {
+                    enemy.Name = $"Spider {suffix}";
+                    enemy.HP = 15; enemy.MaxHP = 15; enemy.XPValue = 10;
+                }
+                else if (_engagedGroup.Contains("Slime"))
+                {
+                    enemy.Name = $"Slime {suffix}";
+                    enemy.HP = 35; enemy.MaxHP = 35; enemy.XPValue = 20;
+                }
+                else if (_engagedGroup.Contains("Rat"))
+                {
+                    enemy.Name = $"Giant Rat {suffix}";
+                    enemy.HP = 10; enemy.MaxHP = 10; enemy.XPValue = 5;
+                }
+
                 
                 Enemies.Add(enemy);
                 
+                
                 // Spawn Visual
-                await _assets.SpawnAsset("assets/skeleton.json", enemyId, false, new { Position = new float[] { 20, 0, (i * 8) - 4 }, Rotation = new float[] { 0, -90, 0 } });
+                string assetPath = "assets/skeleton.json";
+                if (_engagedGroup.Contains("Goblin")) assetPath = "assets/goblin.json";
+                else if (_engagedGroup.Contains("Spider")) assetPath = "assets/spider.json";
+                else if (_engagedGroup.Contains("Slime")) assetPath = "assets/slime.json";
+                else if (_engagedGroup.Contains("Rat")) assetPath = "assets/rat.json";
+                
+                await _assets.SpawnAsset(assetPath, enemyId, false, new { Position = new float[] { 20, 0, (i * 8) - 4 }, Rotation = new float[] { 0, -90, 0 } });
             }
 
             await JS.InvokeVoidAsync("stoneHammer.rotateCameraToBattle", "ArenaCenter"); // Adjust camera logic if needed

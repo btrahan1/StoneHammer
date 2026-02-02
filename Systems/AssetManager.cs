@@ -81,6 +81,12 @@ namespace StoneHammer.Systems
 
             // v14.0: The Desert Teleporter (East of Tavern)
             await SpawnAsset("assets/desert_entrance.json", "DesertEntrance", false, new { Position = new[] { 50, 0, 50 } });
+
+            // v21.0: Goblin Cave Entrance (West of Town)
+            await SpawnAsset("assets/mine_entrance.json", "GoblinCaveEntrance", false, new { Position = new[] { -60, 0, 0 }, Rotation = new[] { 0, 90, 0 }, isTrigger = true, triggerRadius = 5.0f });
+
+            // v22.0: Sewer Entrance (South-East of Town)
+            await SpawnAsset("assets/sewer_entrance.json", "SewerEntrance", false, new { Position = new[] { 40, 0, -40 }, Rotation = new[] { 0, 0, 0 }, isTrigger = true, triggerRadius = 5.0f });
         }
 
         private int _currentDepth = 0;
@@ -129,6 +135,24 @@ namespace StoneHammer.Systems
                 System.Console.WriteLine($"[AssetManager] Entering Crypt Level {_currentDepth}");
                 var levelAsset = CryptGenerator.Generate(_currentDepth);
                 await SpawnGeneratedAsset(levelAsset, levelAsset.Name);
+            }
+            else if (buildingName.Contains("GoblinCave"))
+            {
+                 // New Procedural Cave
+                 System.Console.WriteLine("[AssetManager] Entering Goblin Cave...");
+                 var levelAsset = CaveGenerator.Generate(1); // Default Level 1
+                 await SpawnGeneratedAsset(levelAsset, levelAsset.Name);
+                 await SpawnPlayer(0, 0); // Need to spawn player manually
+                 return; // SpawnGeneratedAsset spawns children, but we handled player explicitly
+            }
+            else if (buildingName.Contains("Sewer"))
+            {
+                 // New Procedural Sewers
+                 System.Console.WriteLine("[AssetManager] Entering Sewers...");
+                 var levelAsset = SewerGenerator.Generate(1); 
+                 await SpawnGeneratedAsset(levelAsset, levelAsset.Name);
+                 await SpawnPlayer(0, 0);
+                 return;
             }
             else if (buildingName == "BattleArena")
             {

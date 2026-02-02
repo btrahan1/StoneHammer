@@ -1,0 +1,208 @@
+{
+    "Type": "Voxel",
+    "Parts": [
+        {
+            "Id": "body",
+            "Offset": [
+                0,
+                1.0,
+                0
+            ],
+            "Dimensions": [
+                0.6,
+                0.8,
+                0.4
+            ],
+            "HexColor": "#4A7023"
+        },
+        {
+            "Id": "head",
+            "Offset": [
+                0,
+                1.65,
+                0
+            ],
+            "Dimensions": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "HexColor": "#4A7023"
+        },
+        {
+            "Id": "ear_l",
+            "Offset": [
+                -0.3,
+                1.75,
+                0
+            ],
+            "Dimensions": [
+                0.3,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#4A7023",
+            "Rotation": [
+                0,
+                0,
+                20
+            ]
+        },
+        {
+            "Id": "ear_r",
+            "Offset": [
+                0.3,
+                1.75,
+                0
+            ],
+            "Dimensions": [
+                0.3,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#4A7023",
+            "Rotation": [
+                0,
+                0,
+                -20
+            ]
+        },
+        {
+            "Id": "eye_l",
+            "Offset": [
+                -0.15,
+                1.75,
+                0.26
+            ],
+            "Dimensions": [
+                0.05,
+                0.05,
+                0.05
+            ],
+            "HexColor": "#FF0000"
+        },
+        {
+            "Id": "eye_r",
+            "Offset": [
+                0.15,
+                1.75,
+                0.26
+            ],
+            "Dimensions": [
+                0.05,
+                0.05,
+                0.05
+            ],
+            "HexColor": "#FF0000"
+        },
+        {
+            "Id": "arm_l",
+            "Offset": [
+                -0.4,
+                1.0,
+                0
+            ],
+            "Dimensions": [
+                0.15,
+                0.6,
+                0.15
+            ],
+            "HexColor": "#4A7023"
+        },
+        {
+            "Id": "arm_r",
+            "Offset": [
+                0.4,
+                1.0,
+                0
+            ],
+            "Dimensions": [
+                0.15,
+                0.6,
+                0.15
+            ],
+            "HexColor": "#4A7023"
+        },
+        {
+            "Id": "leg_l",
+            "Offset": [
+                -0.2,
+                0.3,
+                0
+            ],
+            "Dimensions": [
+                0.2,
+                0.6,
+                0.2
+            ],
+            "HexColor": "#3E2723"
+        },
+        {
+            "Id": "leg_r",
+            "Offset": [
+                0.2,
+                0.3,
+                0
+            ],
+            "Dimensions": [
+                0.2,
+                0.6,
+                0.2
+            ],
+            "HexColor": "#3E2723"
+        },
+        {
+            "Id": "loincloth",
+            "Offset": [
+                0,
+                0.5,
+                0
+            ],
+            "Dimensions": [
+                0.65,
+                0.3,
+                0.45
+            ],
+            "HexColor": "#5D4037"
+        },
+        {
+            "Id": "dagger_handle",
+            "Offset": [
+                0.4,
+                0.7,
+                0.2
+            ],
+            "Dimensions": [
+                0.05,
+                0.3,
+                0.05
+            ],
+            "HexColor": "#4E342E",
+            "Rotation": [
+                45,
+                0,
+                0
+            ]
+        },
+        {
+            "Id": "dagger_blade",
+            "Offset": [
+                0.4,
+                0.9,
+                0.3
+            ],
+            "Dimensions": [
+                0.08,
+                0.4,
+                0.02
+            ],
+            "HexColor": "#B0B0B0",
+            "Rotation": [
+                45,
+                0,
+                0
+            ]
+        }
+    ],
+    "Children": []
+}

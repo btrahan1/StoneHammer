@@ -1,86 +1,443 @@
 {
-    "Name": "Crypt Entrance",
+    "Name": "TheOssuaryCrypt",
     "Type": "Procedural",
     "Parts": [
         {
-            "Id": "base",
+            "Id": "ground_rubble",
+            "ParentId": null,
             "Shape": "Box",
             "Position": [
                 0,
-                0.5,
-                0
+                -0.2,
+                -1
             ],
-            "Scale": [
-                12,
-                1,
-                10
-            ],
-            "ColorHex": "#2d3748",
-            "Material": "Stone"
-        },
-        {
-            "Id": "wall_main",
-            "Shape": "Box",
-            "Position": [
+            "Rotation": [
                 0,
-                4,
+                0,
                 0
             ],
             "Scale": [
                 10,
-                6,
+                0.4,
                 8
             ],
-            "ColorHex": "#4a5568",
-            "Material": "Stone"
+            "ColorHex": "#0a0a0a",
+            "Material": "Rubber",
+            "Operation": "Union"
         },
         {
-            "Id": "roof_slab",
-            "Shape": "Box",
+            "Id": "pillar_left_femur",
+            "ParentId": null,
+            "Shape": "Cylinder",
             "Position": [
+                2.5,
+                3.0,
+                -2.5
+            ],
+            "Rotation": [
                 0,
-                7.5,
+                0,
+                5
+            ],
+            "Scale": [
+                0.7,
+                6.0,
+                0.7
+            ],
+            "ColorHex": "#e3dac9",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "pillar_left_joint_top",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                2.7,
+                6.0,
+                -2.5
+            ],
+            "Rotation": [
+                0,
+                0,
                 0
             ],
             "Scale": [
-                11,
-                1,
-                9
+                1.2,
+                1.0,
+                1.2
             ],
-            "ColorHex": "#2d3748",
-            "Material": "Stone"
+            "ColorHex": "#e3dac9",
+            "Material": "Plastic",
+            "Operation": "Union"
         },
         {
-            "Id": "door_frame",
+            "Id": "pillar_right_femur",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                -2.5,
+                3.0,
+                -2.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                -5
+            ],
+            "Scale": [
+                0.7,
+                6.0,
+                0.7
+            ],
+            "ColorHex": "#e3dac9",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "pillar_right_joint_top",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                -2.7,
+                6.0,
+                -2.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1.2,
+                1.0,
+                1.2
+            ],
+            "ColorHex": "#e3dac9",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "arch_spine_1",
+            "ParentId": null,
+            "Shape": "Capsule",
+            "Position": [
+                1.5,
+                6.8,
+                -2.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                60
+            ],
+            "Scale": [
+                0.6,
+                2.5,
+                0.6
+            ],
+            "ColorHex": "#d6cfc0",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "arch_spine_2",
+            "ParentId": null,
+            "Shape": "Capsule",
+            "Position": [
+                -1.5,
+                6.8,
+                -2.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                -60
+            ],
+            "Scale": [
+                0.6,
+                2.5,
+                0.6
+            ],
+            "ColorHex": "#d6cfc0",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "central_skull_dome",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                0,
+                7.5,
+                -2.2
+            ],
+            "Rotation": [
+                0,
+                180,
+                0
+            ],
+            "Scale": [
+                2.2,
+                1.8,
+                2.0
+            ],
+            "ColorHex": "#f0eae0",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "central_skull_jaw",
+            "ParentId": null,
             "Shape": "Box",
             "Position": [
                 0,
-                3,
-                4.1
+                6.3,
+                -1.8
+            ],
+            "Rotation": [
+                10,
+                0,
+                0
             ],
             "Scale": [
-                4,
-                5,
-                1
+                1.8,
+                1.0,
+                1.2
             ],
-            "ColorHex": "#1a202c",
-            "Material": "Stone"
+            "ColorHex": "#f0eae0",
+            "Material": "Plastic",
+            "Operation": "Union"
         },
         {
-            "Id": "door",
+            "Id": "eye_socket_l",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                0.5,
+                7.3,
+                -1.2
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.5,
+                0.5,
+                0.2
+            ],
+            "ColorHex": "#00ffaa",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "eye_socket_r",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                -0.5,
+                7.3,
+                -1.2
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.5,
+                0.5,
+                0.2
+            ],
+            "ColorHex": "#00ffaa",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "door_slab",
+            "ParentId": null,
             "Shape": "Box",
             "Position": [
                 0,
-                2.5,
-                4.2
+                3.0,
+                -3.2
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                3.8,
+                6.0,
+                0.4
+            ],
+            "ColorHex": "#1a130d",
+            "Material": "Leather",
+            "Operation": "Union"
+        },
+        {
+            "Id": "rib_cage_overlay_1",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                0,
+                4.5,
+                -3.0
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
             ],
             "Scale": [
                 2.5,
-                4,
+                2.5,
+                0.2
+            ],
+            "ColorHex": "#e3dac9",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "rib_cage_overlay_2",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                0,
+                3.0,
+                -3.0
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "Scale": [
+                2.8,
+                2.8,
+                0.2
+            ],
+            "ColorHex": "#e3dac9",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "rib_cage_overlay_3",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                0,
+                1.5,
+                -3.0
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "Scale": [
+                2.5,
+                2.5,
+                0.2
+            ],
+            "ColorHex": "#e3dac9",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "fossil_detail_left",
+            "ParentId": null,
+            "Shape": "Cone",
+            "Position": [
+                4.0,
+                1.0,
+                -1.5
+            ],
+            "Rotation": [
+                -20,
+                0,
+                45
+            ],
+            "Scale": [
+                0.4,
+                2.0,
+                0.4
+            ],
+            "ColorHex": "#c2b9a7",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "fossil_detail_right",
+            "ParentId": null,
+            "Shape": "Cone",
+            "Position": [
+                -4.0,
+                0.8,
+                -1.8
+            ],
+            "Rotation": [
+                -15,
+                0,
+                -40
+            ],
+            "Scale": [
+                0.5,
+                2.5,
                 0.5
             ],
-            "ColorHex": "#000000",
-            "Material": "Metal"
+            "ColorHex": "#c2b9a7",
+            "Material": "Plastic",
+            "Operation": "Union"
+        }
+    ],
+    "Timeline": [
+        {
+            "Time": 0.0,
+            "Action": "Scale",
+            "TargetId": "eye_socket_l",
+            "Value": [
+                0.5,
+                0.5,
+                0.2
+            ],
+            "Duration": 1.5
+        },
+        {
+            "Time": 1.5,
+            "Action": "Scale",
+            "TargetId": "eye_socket_l",
+            "Value": [
+                0.6,
+                0.6,
+                0.3
+            ],
+            "Duration": 1.5
+        },
+        {
+            "Time": 0.0,
+            "Action": "Color",
+            "TargetId": "eye_socket_r",
+            "Value": [
+                0.0,
+                1.0,
+                0.6
+            ],
+            "Duration": 2.0
+        },
+        {
+            "Time": 2.0,
+            "Action": "Color",
+            "TargetId": "eye_socket_r",
+            "Value": [
+                0.0,
+                0.4,
+                0.2
+            ],
+            "Duration": 2.0
         }
     ]
 }

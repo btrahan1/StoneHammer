@@ -1,0 +1,62 @@
+{
+    "Type": "Voxel",
+    "Parts": [
+        {
+            "Id": "core",
+            "Offset": [
+                0,
+                0.4,
+                0
+            ],
+            "Dimensions": [
+                0.6,
+                0.6,
+                0.6
+            ],
+            "HexColor": "#00FF00"
+        },
+        {
+            "Id": "outer_membrane",
+            "Offset": [
+                0,
+                0.4,
+                0
+            ],
+            "Dimensions": [
+                0.7,
+                0.7,
+                0.7
+            ],
+            "HexColor": "#33FF3388"
+        },
+        {
+            "Id": "eye_l",
+            "Offset": [
+                -0.15,
+                0.5,
+                0.3
+            ],
+            "Dimensions": [
+                0.1,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#000000"
+        },
+        {
+            "Id": "eye_r",
+            "Offset": [
+                0.15,
+                0.5,
+                0.3
+            ],
+            "Dimensions": [
+                0.1,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#000000"
+        }
+    ],
+    "Children": []
+}

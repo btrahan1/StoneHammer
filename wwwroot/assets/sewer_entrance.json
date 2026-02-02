@@ -1,0 +1,384 @@
+{
+    "Name": "TheSewerEntrance",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "sewer_floor_concrete",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                0,
+                -0.2,
+                -4
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                12,
+                0.4,
+                12
+            ],
+            "ColorHex": "#2b2b2b",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "toxic_sludge_river",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                0,
+                -0.1,
+                -4
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                4,
+                0.3,
+                12
+            ],
+            "ColorHex": "#1a3300",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "tunnel_mouth_outer",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                0,
+                2.5,
+                -1
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "Scale": [
+                5.5,
+                1,
+                5.5
+            ],
+            "ColorHex": "#1f1f1f",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "tunnel_interior_darkness",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                0,
+                2.5,
+                -6
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "Scale": [
+                5,
+                10,
+                5
+            ],
+            "ColorHex": "#050505",
+            "Material": "Rubber",
+            "Operation": "Union"
+        },
+        {
+            "Id": "rusty_pipe_left",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                3.8,
+                1.2,
+                -0.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.6,
+                3,
+                0.6
+            ],
+            "ColorHex": "#4d2600",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "rusty_pipe_bend",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                3.2,
+                2.7,
+                -0.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                90
+            ],
+            "Scale": [
+                0.6,
+                0.6,
+                0.3
+            ],
+            "ColorHex": "#4d2600",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "wall_left",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                6,
+                3,
+                -1
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                6,
+                6,
+                1
+            ],
+            "ColorHex": "#1a1a1a",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "wall_right",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                -6,
+                3,
+                -1
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                6,
+                6,
+                1
+            ],
+            "ColorHex": "#1a1a1a",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "broken_grate_bar_1",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                1.2,
+                2.5,
+                -1.2
+            ],
+            "Rotation": [
+                0,
+                0,
+                5
+            ],
+            "Scale": [
+                0.15,
+                5,
+                0.15
+            ],
+            "ColorHex": "#0a0a0a",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "broken_grate_bar_2",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                -1.2,
+                1.8,
+                -1.2
+            ],
+            "Rotation": [
+                15,
+                0,
+                -20
+            ],
+            "Scale": [
+                0.15,
+                3.5,
+                0.15
+            ],
+            "ColorHex": "#0a0a0a",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "slime_drip_vial",
+            "ParentId": null,
+            "Shape": "Capsule",
+            "Position": [
+                3.2,
+                2.2,
+                -0.2
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.15,
+                0.8,
+                0.15
+            ],
+            "ColorHex": "#44ff00",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "toxic_haze",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                0,
+                0.5,
+                -3
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                6,
+                1.5,
+                4
+            ],
+            "ColorHex": "#224400",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "discarded_can",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                -2.5,
+                0.1,
+                -2
+            ],
+            "Rotation": [
+                0,
+                45,
+                90
+            ],
+            "Scale": [
+                0.2,
+                0.4,
+                0.2
+            ],
+            "ColorHex": "#777777",
+            "Material": "Metal",
+            "Operation": "Union"
+        }
+    ],
+    "Timeline": [
+        {
+            "Time": 0.0,
+            "Action": "Color",
+            "TargetId": "toxic_sludge_river",
+            "Value": [
+                0.1,
+                0.2,
+                0.0
+            ],
+            "Duration": 2.0
+        },
+        {
+            "Time": 2.0,
+            "Action": "Color",
+            "TargetId": "toxic_sludge_river",
+            "Value": [
+                0.2,
+                0.5,
+                0.1
+            ],
+            "Duration": 2.0
+        },
+        {
+            "Time": 0.0,
+            "Action": "Move",
+            "TargetId": "slime_drip_vial",
+            "Value": [
+                3.2,
+                2.0,
+                -0.2
+            ],
+            "Duration": 1.5
+        },
+        {
+            "Time": 1.5,
+            "Action": "Move",
+            "TargetId": "slime_drip_vial",
+            "Value": [
+                3.2,
+                0.2,
+                -0.2
+            ],
+            "Duration": 0.3
+        },
+        {
+            "Time": 1.8,
+            "Action": "Scale",
+            "TargetId": "slime_drip_vial",
+            "Value": [
+                0.01,
+                0.01,
+                0.01
+            ],
+            "Duration": 0.1
+        },
+        {
+            "Time": 0.0,
+            "Action": "Scale",
+            "TargetId": "toxic_haze",
+            "Value": [
+                6.2,
+                1.6,
+                4.2
+            ],
+            "Duration": 3.0
+        },
+        {
+            "Time": 3.0,
+            "Action": "Scale",
+            "TargetId": "toxic_haze",
+            "Value": [
+                5.8,
+                1.4,
+                3.8
+            ],
+            "Duration": 3.0
+        }
+    ]
+}

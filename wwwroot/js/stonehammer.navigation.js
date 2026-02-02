@@ -84,10 +84,18 @@
                     }
                     const name = mesh.name;
 
-                    if (name.includes("CryptEntrance") || name.startsWith("Stairs")) {
-                        this.log("Descending into The Crypt...", "red");
-                        // Pass the building name, which might include depth for dungeons
-                        this.enterBuilding(name.includes("Depth") ? name : `Crypt_Depth_${name.endsWith("Down") ? 1 : 0}`);
+                    if (name.includes("CryptEntrance") || name.startsWith("Stairs") || name.includes("GoblinCaveEntrance") || name.includes("SewerEntrance")) {
+                        if (name.includes("GoblinCaveEntrance")) {
+                            this.log("Entering the Goblin Cave...", "green");
+                            this.enterBuilding("GoblinCave");
+                        } else if (name.includes("SewerEntrance")) {
+                            this.log("Entering the Sewers...", "lime");
+                            this.enterBuilding("Sewer");
+                        } else {
+                            this.log("Descending into The Crypt...", "red");
+                            // Pass the building name, which might include depth for dungeons
+                            this.enterBuilding(name.includes("Depth") ? name : `Crypt_Depth_${name.endsWith("Down") ? 1 : 0}`);
+                        }
                     }
 
                     // v14.0: Desert Entrance
@@ -96,8 +104,9 @@
                         this.enterBuilding("Desert");
                     }
 
-                    // v15.0: Combat Trigger (Skeleton Clicks)
-                    if (name.includes("Skeleton")) {
+                    // v15.0: Combat Trigger (Enemy Clicks)
+                    // Ensure we don't trigger combat on Entrances
+                    if ((name.includes("Skeleton") || name.includes("Goblin") || name.includes("Spider") || name.includes("Slime") || name.includes("Rat")) && !name.includes("Entrance")) {
                         // Find the root actor name
                         // Already walked up? Maybe not if Voxel structure is complex.
                         // Let's ensure we strip voxel_ prefix if present.

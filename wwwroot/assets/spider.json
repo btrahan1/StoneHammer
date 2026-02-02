@@ -1,0 +1,257 @@
+{
+    "Type": "Voxel",
+    "Scale": 1.0,
+    "Parts": [
+        {
+            "Id": "abdomen",
+            "Offset": [
+                0,
+                1.0,
+                -0.5
+            ],
+            "Dimensions": [
+                0.8,
+                0.6,
+                1.0
+            ],
+            "HexColor": "#1a1a1a"
+        },
+        {
+            "Id": "thorax",
+            "Offset": [
+                0,
+                0.9,
+                0.3
+            ],
+            "Dimensions": [
+                0.5,
+                0.4,
+                0.5
+            ],
+            "HexColor": "#0d0d0d"
+        },
+        {
+            "Id": "head",
+            "Offset": [
+                0,
+                0.9,
+                0.7
+            ],
+            "Dimensions": [
+                0.3,
+                0.3,
+                0.3
+            ],
+            "HexColor": "#0d0d0d"
+        },
+        {
+            "Id": "eye_1",
+            "Offset": [
+                -0.08,
+                1.0,
+                0.86
+            ],
+            "Dimensions": [
+                0.05,
+                0.05,
+                0.05
+            ],
+            "HexColor": "#FF0000"
+        },
+        {
+            "Id": "eye_2",
+            "Offset": [
+                0.08,
+                1.0,
+                0.86
+            ],
+            "Dimensions": [
+                0.05,
+                0.05,
+                0.05
+            ],
+            "HexColor": "#FF0000"
+        },
+        {
+            "Id": "eye_3",
+            "Offset": [
+                -0.05,
+                0.9,
+                0.86
+            ],
+            "Dimensions": [
+                0.03,
+                0.03,
+                0.03
+            ],
+            "HexColor": "#FF0000"
+        },
+        {
+            "Id": "eye_4",
+            "Offset": [
+                0.05,
+                0.9,
+                0.86
+            ],
+            "Dimensions": [
+                0.03,
+                0.03,
+                0.03
+            ],
+            "HexColor": "#FF0000"
+        },
+        {
+            "Id": "leg_l1",
+            "Offset": [
+                -0.6,
+                0.7,
+                0.6
+            ],
+            "Dimensions": [
+                0.8,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#222",
+            "Rotation": [
+                0,
+                30,
+                -30
+            ]
+        },
+        {
+            "Id": "leg_r1",
+            "Offset": [
+                0.6,
+                0.7,
+                0.6
+            ],
+            "Dimensions": [
+                0.8,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#222",
+            "Rotation": [
+                0,
+                -30,
+                30
+            ]
+        },
+        {
+            "Id": "leg_l2",
+            "Offset": [
+                -0.7,
+                0.7,
+                0.3
+            ],
+            "Dimensions": [
+                0.9,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#222",
+            "Rotation": [
+                0,
+                10,
+                -30
+            ]
+        },
+        {
+            "Id": "leg_r2",
+            "Offset": [
+                0.7,
+                0.7,
+                0.3
+            ],
+            "Dimensions": [
+                0.9,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#222",
+            "Rotation": [
+                0,
+                -10,
+                30
+            ]
+        },
+        {
+            "Id": "leg_l3",
+            "Offset": [
+                -0.7,
+                0.7,
+                0.0
+            ],
+            "Dimensions": [
+                0.9,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#222",
+            "Rotation": [
+                0,
+                -10,
+                -30
+            ]
+        },
+        {
+            "Id": "leg_r3",
+            "Offset": [
+                0.7,
+                0.7,
+                0.0
+            ],
+            "Dimensions": [
+                0.9,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#222",
+            "Rotation": [
+                0,
+                10,
+                30
+            ]
+        },
+        {
+            "Id": "leg_l4",
+            "Offset": [
+                -0.6,
+                0.7,
+                -0.3
+            ],
+            "Dimensions": [
+                0.8,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#222",
+            "Rotation": [
+                0,
+                -30,
+                -30
+            ]
+        },
+        {
+            "Id": "leg_r4",
+            "Offset": [
+                0.6,
+                0.7,
+                -0.3
+            ],
+            "Dimensions": [
+                0.8,
+                0.1,
+                0.1
+            ],
+            "HexColor": "#222",
+            "Rotation": [
+                0,
+                30,
+                30
+            ]
+        }
+    ],
+    "Children": []
+}
