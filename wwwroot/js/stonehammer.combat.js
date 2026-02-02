@@ -42,7 +42,7 @@
         }
 
         this._uiObserver = this.scene.onBeforeRenderObservable.add(() => {
-            if (!modelIds) return;
+            if (!modelIds || !Array.isArray(modelIds)) return;
 
             modelIds.forEach(id => {
                 // Find Mesh

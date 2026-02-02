@@ -287,9 +287,6 @@ namespace StoneHammer.Systems
 
             // v27.2: Custom Combat Atmosphere
             await JS.InvokeVoidAsync("stoneHammer.setAtmosphere", "#e6ccb3"); // Sandy Brown
-            
-            // v27.3: Normalize Camera
-            await JS.InvokeVoidAsync("stoneHammer.combat.init", Enemies.Select(e => e.ModelId).ToArray());
 
             // 3. Spawn Heroes (Party) - Left Side
             Heroes.Clear();
@@ -410,6 +407,8 @@ namespace StoneHammer.Systems
                 await _assets.SpawnAsset(assetPath, enemyId, false, new { Position = new float[] { 20, 0, (i * 8) - 4 }, Rotation = new float[] { 0, -90, 0 } });
             }
 
+            // v27.3: Normalize Camera & UI (Moved After Spawning)
+            await JS.InvokeVoidAsync("stoneHammer.combat.init", Enemies.Select(e => e.ModelId).ToArray());
             await JS.InvokeVoidAsync("stoneHammer.rotateCameraToBattle", "ArenaCenter"); // Adjust camera logic if needed
             
             // Ready to fight!

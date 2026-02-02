@@ -125,94 +125,43 @@
         this.log("Teleport Hub Spawned (3 Pillars)", "lime");
     };
 
-    // v12.3: Double Click for Crypt
+    // v12.3: Interaction Config
     sh.setupClickInteraction = function () {
-        this.scene.onPointerObservable.add((pointerInfo) => {
-            if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOUBLETAP) {
-                if (pointerInfo.pickInfo.hit && pointerInfo.pickInfo.pickedMesh) {
-                    let mesh = pointerInfo.pickInfo.pickedMesh;
-
-                    // Walk up hierarchy to find interactable root
-                    // v27.1: Loop checks for Metadata or known keys
-                    // valid keys: CryptEntrance, Stairs, Loot, Exit
-                    while (mesh.parent &&
-                        !mesh.name.includes("CryptEntrance") &&
-                        !mesh.name.includes("Stairs") &&
-                        !mesh.name.includes("Loot") &&
-                        !mesh.name.includes("Exit") &&
-                        !(mesh.metadata && mesh.metadata.isEnemy)) {
-                        mesh = mesh.parent;
-                    }
-                    const name = mesh.name;
-
-                    if (name.includes("CryptEntrance") || name.startsWith("Stairs") || name.includes("GoblinCaveEntrance") || name.includes("SewerEntrance")) {
-                        if (name.includes("GoblinCaveEntrance")) {
-                            this.log("Entering the Goblin Cave...", "green");
-                            this.enterBuilding("GoblinCave");
-                        } else if (name.includes("SewerEntrance")) {
-                            this.log("Entering the Sewers...", "lime");
-                            this.enterBuilding("Sewer");
-                        } else {
-                            this.log("Descending into The Crypt...", "red");
-                            // Pass the building name, which might include depth for dungeons
-                            this.enterBuilding(name.includes("Depth") ? name : `Crypt_Depth_${name.endsWith("Down") ? 1 : 0}`);
-                        }
-                    }
-
-                    // v14.0: Desert Entrance
-                    if (name.includes("DesertEntrance")) {
-                        this.log("Warping to the Wasteland...", "orange");
-                        this.enterBuilding("Desert");
-                    }
-
-                    // v27.0: Data-Driven Combat Trigger
-                    // Check if the clicked mesh (or its root) has enemy metadata
-                    if (mesh.metadata && mesh.metadata.isEnemy) {
-                        // Clean name for display/ID
-                        let actorName = name.replace("voxel_", "").replace("recipe_", "");
-
-                        this.log("Engaging " + actorName + "!", "red");
-                        if (this.dotNetHelper) {
-                            // Pass metadata back to C#
-                            this.dotNetHelper.invokeMethodAsync('StartCombat', actorName, mesh.metadata);
-                        }
-                    }
-
-                    // v15.1: Loot Chest Interaction
-                    if (name.includes("Loot Chest") || name.includes("LootChest")) {
-                        this.log("Looting...", "yellow");
-                        const chest = mesh; // Use likely root
-
-                        if (chest.parent) chest.parent.dispose();
-                        else chest.dispose();
-
-                        if (this.dotNetHelper) {
-                            this.dotNetHelper.invokeMethodAsync('OpenLoot');
-                        }
-                    }
-                }
-            }
-        });
-
-        // SINGLE CLICK HANDLER UPDATE
+        // SINGLE CLICK & SMART DOUBLE CLICK HANDLER
         this.scene.onPointerDown = (evt, pickResult) => {
             if (!pickResult.hit || !pickResult.pickedMesh) return;
 
             let mesh = pickResult.pickedMesh;
+            let originalPartName = mesh.name;
 
-            // Walk up for basic interactions
-            // Fix: Check lowercase for case-insensitive matching
+            // 1. Walk up hierarchy to find interactable root
             while (mesh.parent &&
                 !mesh.name.startsWith("pillar_") &&
                 !mesh.name.includes("Exit") &&
                 !mesh.name.includes("LodgeExit") &&
                 !mesh.name.includes("Loot") &&
-                !mesh.name.toLowerCase().includes("stairs")) {
+                !mesh.name.includes("CryptEntrance") &&
+                !mesh.name.toLowerCase().includes("stairs") &&
+                !(mesh.metadata && mesh.metadata.isEnemy)) {
                 mesh = mesh.parent;
             }
             const name = mesh.name;
+            const now = Date.now();
 
-            // v9.20: Teleport Hub Pillars
+            // 2. SMART DOUBLE CLICK LOGIC
+            if (this.lastClickTarget === mesh.uniqueId && (now - this.lastClickTime < 500)) {
+                this.log(`Double Click Detected on: ${name} (Part: ${originalPartName})`, "gray");
+                this.handleDoubleClick(mesh, name);
+                this.lastClickTarget = null;
+                this.lastClickTime = 0;
+                return;
+            }
+
+            // Update Click History
+            this.lastClickTarget = mesh.uniqueId;
+            this.lastClickTime = now;
+
+            // 3. SINGLE CLICK LOGIC (Existing)
             if (name.startsWith("pillar_")) {
                 const target = mesh.metadata?.target;
                 if (target) {
@@ -221,8 +170,7 @@
                 }
             }
 
-            // v10.1: Exit Crystal (Single Click) - Supports "ExitCrystal", "LodgeExit", "CryptExit"
-            if (name.includes("Exit") || name.includes("LodgeExit")) { // "Exit" covers ExitCrystal, CryptExit, DesertExit
+            if (name.includes("Exit") || name.includes("LodgeExit")) {
                 if (name.includes("DesertExit")) {
                     this.log("Escaping the Wasteland...", "cyan");
                     this.exitDesert();
@@ -234,7 +182,6 @@
                 }
             }
 
-            // v13.0: Dungeon Navigation
             if (name.toLowerCase().includes("stairsdown") || name.toLowerCase().includes("stairs_down")) {
                 let currentDepth = 1;
                 if (this.currentBuilding && this.currentBuilding.includes("Depth")) {
@@ -260,22 +207,15 @@
                 }
             }
 
-            // v19.1: Loot Chest (Single Click)
             if (name.includes("Loot Chest") || name.includes("LootChest")) {
                 this.log("Looting...", "yellow");
-
-                // Dispose visual chest
                 if (mesh.parent) mesh.parent.dispose();
                 else mesh.dispose();
-
-                // Trigger UI
                 if (this.dotNetHelper) {
                     this.dotNetHelper.invokeMethodAsync('OpenLoot');
                 }
             }
 
-            // v21.0: Store Interaction
-            // Check for any part of the store (e.g. wall, door, sign)
             if (name.includes("Hammer & Sickle Store") || name.includes("general_store") || name.toLowerCase().includes("store")) {
                 this.log("Opening Shop...", "gold");
                 if (this.dotNetHelper) {
@@ -283,6 +223,35 @@
                 }
             }
         };
+    };
+
+    // Helper to extract double click actions
+    sh.handleDoubleClick = function (mesh, name) {
+        if (name.includes("CryptEntrance") || name.startsWith("Stairs") || name.includes("GoblinCaveEntrance") || name.includes("SewerEntrance")) {
+            if (name.includes("GoblinCaveEntrance")) {
+                this.log("Entering the Goblin Cave...", "green");
+                this.enterBuilding("GoblinCave");
+            } else if (name.includes("SewerEntrance")) {
+                this.log("Entering the Sewers...", "lime");
+                this.enterBuilding("Sewer");
+            } else {
+                this.log("Descending into The Crypt...", "red");
+                this.enterBuilding(name.includes("Depth") ? name : `Crypt_Depth_${name.endsWith("Down") ? 1 : 0}`);
+            }
+        }
+
+        if (name.includes("DesertEntrance")) {
+            this.log("Warping to the Wasteland...", "orange");
+            this.enterBuilding("Desert");
+        }
+
+        if (mesh.metadata && mesh.metadata.isEnemy) {
+            let actorName = name.replace("voxel_", "").replace("recipe_", "");
+            this.log("Engaging " + actorName + "!", "red");
+            if (this.dotNetHelper) {
+                this.dotNetHelper.invokeMethodAsync('StartCombat', actorName, mesh.metadata);
+            }
+        }
     };
 
     sh.clearAll = function () {
@@ -295,17 +264,13 @@
         }
 
         // v26.1: Deep Clean for Performance
-        // Dispose Materials (except Skybox/Default)
-        // We iterate backwards because disposing removes from reference array sometimes?
-        // Safest to cache list first?
         const mats = [...this.scene.materials];
         mats.forEach(m => {
             if (m.name !== "skyBox" && m.name !== "default material") {
-                m.dispose(true, true); // Force dispose textures too
+                m.dispose(true, true);
             }
         });
 
-        // Reset Cache
         if (this.materialCache) this.materialCache = {};
 
         this.scene.transformNodes.forEach(t => t.dispose());
