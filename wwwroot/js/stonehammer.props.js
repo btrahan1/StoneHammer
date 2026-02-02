@@ -34,7 +34,21 @@
             existingNode.dispose();
         }
 
-        const group = new BABYLON.TransformNode("voxel_" + name, this.scene);
+        let group;
+        if (isPlayer) {
+            // Player requires a Mesh root for .moveWithCollisions()
+            // Create a collider box (approx human size)
+            group = BABYLON.MeshBuilder.CreateBox("voxel_" + name, { width: 1, height: 2, depth: 1 }, this.scene);
+            group.visibility = 0; // Invisible collider
+            group.checkCollisions = true;
+            group.ellipsoid = new BABYLON.Vector3(0.5, 1.0, 0.5); // Collision ellipsoid
+            group.ellipsoidOffset = new BABYLON.Vector3(0, 1.0, 0); // Center of body
+
+            this.log("Player Root created as Mesh (Collider)", "lime");
+        } else {
+            group = new BABYLON.TransformNode("voxel_" + name, this.scene);
+        }
+
         if (metadata) group.metadata = metadata;
 
         // Handle rotation if provided
@@ -174,6 +188,7 @@
             } else {
                 mesh = BABYLON.MeshBuilder.CreateBox(name + "_" + id, { width: w, height: h, depth: d }, this.scene);
             }
+            mesh.checkCollisions = true;
 
             mesh.position = this.parseVec3(this.getProp(p, "Position"));
             const rot = this.getProp(p, "Rotation") || [0, 0, 0];
@@ -215,6 +230,7 @@
                         merged.name = "merged_" + matId;
                         merged.parent = group;
                         merged.material = mat;
+                        merged.checkCollisions = true; // Fix: Enable collisions on merged result
                         this.log("Merged " + list.length + " meshes for mat " + matId, "gray");
                     }
                 }

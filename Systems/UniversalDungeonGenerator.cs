@@ -58,6 +58,18 @@ namespace StoneHammer.Systems
             int mapDepth = 400;
             int roomCount = rng.Next(8, 15);
 
+            // 0. Global Foundation (Bedrock)
+            // Added to prevent falling into void and provide visual "ground" outside rooms
+            asset.Parts.Add(new ProceduralPart 
+            { 
+                Id = "dungeon_foundation", 
+                Shape = "Box", 
+                Position = new[] { 0f, -2.0f, 0f }, 
+                Scale = new[] { (float)mapWidth, 1f, (float)mapDepth }, 
+                ColorHex = "#3E2723", // Dark Brown/Dirt
+                Material = "Stone" // Basic Stone
+            });
+
             // 1. Place Rooms
             for (int i = 0; i < roomCount; i++)
             {
@@ -79,7 +91,14 @@ namespace StoneHammer.Systems
             // Ensure we have at least one room (Start)
             if (!rooms.Any()) rooms.Add(new RoomRect { X = -10, Z = -10, W = 20, D = 20 });
 
-            // 2. Build Rooms
+            // 2. Identify Connections (Doors)
+            // We connect strictly sequentially for now
+            for (int i = 0; i < rooms.Count - 1; i++)
+            {
+                ConnectRooms(asset, rooms[i], rooms[i+1], recipe);
+            }
+
+            // 3. Build Rooms (With Walls respecting Doors)
             foreach (var room in rooms)
             {
                 // Floor
@@ -91,33 +110,11 @@ namespace StoneHammer.Systems
                     ColorHex = recipe.Theme.FloorColor, Material = recipe.Theme.FloorMaterial 
                 });
 
-                // Ceiling Removed to prevent clipping
-                /*
-                asset.Parts.Add(new ProceduralPart 
-                { 
-                    Id = $"room_ceil_{room.X}_{room.Z}", Shape = "Box", 
-                    Position = new[] { room.CenterX, 20, room.CenterZ }, 
-                    Scale = new[] { (float)room.W, 1, (float)room.D }, 
-                    ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial 
-                });
-                */
-
-                // Walls (North/South/East/West) - Simplified as blocks around
-                // Height 10 -> 20. Y-Pos 5 -> 10.
-                // North
-                asset.Parts.Add(new ProceduralPart { Id = $"wall_n_{room.X}", Shape = "Box", Position = new[] { room.CenterX, 10, room.Z + room.D/2f }, Scale = new[] { (float)room.W, 20, 1 }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
-                // South
-                asset.Parts.Add(new ProceduralPart { Id = $"wall_s_{room.X}", Shape = "Box", Position = new[] { room.CenterX, 10, room.Z - room.D/2f }, Scale = new[] { (float)room.W, 20, 1 }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
-                // East
-                asset.Parts.Add(new ProceduralPart { Id = $"wall_e_{room.X}", Shape = "Box", Position = new[] { room.X + room.W/2f, 10, room.CenterZ }, Scale = new[] { 1, 20, (float)room.D }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
-                // West
-                asset.Parts.Add(new ProceduralPart { Id = $"wall_w_{room.X}", Shape = "Box", Position = new[] { room.X - room.W/2f, 10, room.CenterZ }, Scale = new[] { 1, 20, (float)room.D }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
-            }
-
-            // 3. Connect Rooms (Corridors)
-            for (int i = 0; i < rooms.Count - 1; i++)
-            {
-                ConnectRooms(asset, rooms[i], rooms[i+1], recipe);
+                // Walls
+                GenerateSmartWall(asset, room.X, room.Z + room.D/2f, room.W, "North", room, recipe); // North
+                GenerateSmartWall(asset, room.X, room.Z - room.D/2f, room.W, "South", room, recipe); // South
+                GenerateSmartWall(asset, room.X + room.W/2f, room.Z, room.D, "East", room, recipe); // East
+                GenerateSmartWall(asset, room.X - room.W/2f, room.Z, room.D, "West", room, recipe); // West
             }
 
             // 4. Spawn Enemies in Rooms (Skip start room 0)
@@ -157,26 +154,99 @@ namespace StoneHammer.Systems
 
         private static void ConnectRooms(ProceduralAsset asset, RoomRect r1, RoomRect r2, DungeonRecipe recipe)
         {
-            // L-Shaped Corridor
-            // Horizontal then Vertical
+            // L-Shaped Corridor logic
             float x1 = r1.CenterX; float z1 = r1.CenterZ;
             float x2 = r2.CenterX; float z2 = r2.CenterZ;
+            float corrWidth = 8f;
 
+            // Determine Door Requests
+            // 1. Exit r1 (Horizontal segment starts here)
+            // It punches through either East or West wall of r1.
+            if (x2 > x1) r1.AddDoor("East", z1, corrWidth);
+            else r1.AddDoor("West", z1, corrWidth);
+
+            // 2. Enter r2 (Vertical segment ends here)
+            // It punches through either North or South wall of r2.
+            if (z2 > z1) r2.AddDoor("South", x2, corrWidth);
+            else r2.AddDoor("North", x2, corrWidth);
+
+            // Draw Corridor Floor
             // X-Segment
-            float width = System.Math.Abs(x2 - x1) + 8; // +8 for overlap/width
+            float width = System.Math.Abs(x2 - x1) + corrWidth; 
             float centerX = (x1 + x2) / 2;
-            asset.Parts.Add(new ProceduralPart { Id = $"corr_h_{x1}", Shape = "Box", Position = new[] { centerX, -0.4f, z1 }, Scale = new[] { width, 1, 8 }, ColorHex = recipe.Theme.FloorColor, Material = recipe.Theme.FloorMaterial });
-            // Ceiling
-            // Ceiling Removed
-            // asset.Parts.Add(new ProceduralPart { Id = $"corr_h_ceil_{x1}", Shape = "Box", Position = new[] { centerX, 18, z1 }, Scale = new[] { width, 1, 8 }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
-
+            asset.Parts.Add(new ProceduralPart { Id = $"corr_h_{x1}", Shape = "Box", Position = new[] { centerX, -0.4f, z1 }, Scale = new[] { width, 1, corrWidth }, ColorHex = recipe.Theme.FloorColor, Material = recipe.Theme.FloorMaterial });
 
             // Z-Segment
-            float depth = System.Math.Abs(z2 - z1) + 8;
+            float depth = System.Math.Abs(z2 - z1) + corrWidth;
             float centerZ = (z1 + z2) / 2;
-            asset.Parts.Add(new ProceduralPart { Id = $"corr_v_{z1}", Shape = "Box", Position = new[] { x2, -0.4f, centerZ }, Scale = new[] { 8, 1, depth }, ColorHex = recipe.Theme.FloorColor, Material = recipe.Theme.FloorMaterial });
-             // Ceiling Removed
-             // asset.Parts.Add(new ProceduralPart { Id = $"corr_v_ceil_{z1}", Shape = "Box", Position = new[] { x2, 18, centerZ }, Scale = new[] { 8, 1, depth }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+            // Note: The vertical segment technically overlaps the horizontal one at the corner. This is fine.
+            asset.Parts.Add(new ProceduralPart { Id = $"corr_v_{z1}", Shape = "Box", Position = new[] { x2, -0.4f, centerZ }, Scale = new[] { corrWidth, 1, depth }, ColorHex = recipe.Theme.FloorColor, Material = recipe.Theme.FloorMaterial });
+        }
+
+        private static void GenerateSmartWall(ProceduralAsset asset, float wallX, float wallZ, int length, string side, RoomRect room, DungeonRecipe recipe)
+        {
+            // Filter doors relevant to this side
+            var doors = room.Doors.Where(d => d.Side == side).OrderBy(d => d.Pos).ToList();
+            
+            float wallHeight = 20f;
+            float wallY = 10f;
+            float thick = 1f;
+
+            // Wall geometry variables depend on orientation
+            bool isHoriz = (side == "North" || side == "South");
+            
+            // "Start" and "End" of the wall in world coords along the wall's axis
+            // For North/South, axis is X. Range: [CenterX - W/2, CenterX + W/2]
+            // For East/West, axis is Z. Range: [CenterZ - D/2, CenterZ + D/2]
+            float start = isHoriz ? (room.CenterX - room.W/2f) : (room.CenterZ - room.D/2f);
+            float end = isHoriz ? (room.CenterX + room.W/2f) : (room.CenterZ + room.D/2f);
+
+            float currentPos = start;
+
+            foreach(var door in doors)
+            {
+                // Gap Start/End
+                float gapStart = door.Pos - (door.Size / 2f);
+                float gapEnd = door.Pos + (door.Size / 2f);
+
+                // Build Wall Segment from currentPos to gapStart
+                if (gapStart > currentPos)
+                {
+                    float segLen = gapStart - currentPos;
+                    float segCenter = currentPos + (segLen / 2f);
+                    
+                    if (isHoriz)
+                        asset.Parts.Add(new ProceduralPart { Id = $"wall_{side}_{segCenter}", Shape = "Box", Position = new[] { segCenter, wallY, wallZ }, Scale = new[] { segLen, wallHeight, thick }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+                    else
+                        asset.Parts.Add(new ProceduralPart { Id = $"wall_{side}_{segCenter}", Shape = "Box", Position = new[] { wallX, wallY, segCenter }, Scale = new[] { thick, wallHeight, segLen }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+                }
+
+                // Create Lintel (Above Door)
+                // Height: 4 units? Door is usually 5-6 units high. Wall is 20.
+                // Let's say Door Height is 8. Lintel starts at 8 + (20-8)/2 = 14?
+                // Size: 20 - 8 = 12.
+                float lintelHeight = 12f;
+                float lintelY = 8f + (lintelHeight/2f); // 8 + 6 = 14
+                
+                 if (isHoriz)
+                        asset.Parts.Add(new ProceduralPart { Id = $"lintel_{side}_{door.Pos}", Shape = "Box", Position = new[] { door.Pos, lintelY, wallZ }, Scale = new[] { door.Size, lintelHeight, thick }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+                    else
+                        asset.Parts.Add(new ProceduralPart { Id = $"lintel_{side}_{door.Pos}", Shape = "Box", Position = new[] { wallX, lintelY, door.Pos }, Scale = new[] { thick, lintelHeight, door.Size }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+
+
+                currentPos = gapEnd;
+            }
+
+            // Final Segment
+            if (currentPos < end)
+            {
+                float segLen = end - currentPos;
+                float segCenter = currentPos + (segLen / 2f);
+                 if (isHoriz)
+                        asset.Parts.Add(new ProceduralPart { Id = $"wall_{side}_{segCenter}", Shape = "Box", Position = new[] { segCenter, wallY, wallZ }, Scale = new[] { segLen, wallHeight, thick }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+                    else
+                        asset.Parts.Add(new ProceduralPart { Id = $"wall_{side}_{segCenter}", Shape = "Box", Position = new[] { wallX, wallY, segCenter }, Scale = new[] { thick, wallHeight, segLen }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+            }
         }
 
         private class RoomRect
@@ -184,12 +254,25 @@ namespace StoneHammer.Systems
             public int X, Z, W, D;
             public float CenterX => X; 
             public float CenterZ => Z;
+            public List<DoorDef> Doors { get; set; } = new List<DoorDef>();
+
+            public void AddDoor(string side, float pos, float size)
+            {
+                Doors.Add(new DoorDef { Side = side, Pos = pos, Size = size });
+            }
 
             public bool Intersects(RoomRect other, int buffer)
             {
                 return (System.Math.Abs(X - other.X) * 2 < (W + other.W) + buffer) &&
                        (System.Math.Abs(Z - other.Z) * 2 < (D + other.D) + buffer);
             }
+        }
+
+        private class DoorDef
+        {
+            public string Side; // North, South, East, West
+            public float Pos;   // Coordinate along the wall
+            public float Size;
         }
 
         private static void GenerateCaveLayout(ProceduralAsset asset, DungeonRecipe recipe)

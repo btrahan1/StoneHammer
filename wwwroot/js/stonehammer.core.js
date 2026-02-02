@@ -56,6 +56,12 @@ window.stoneHammer = {
             this.camera.minZ = 0.5;
             this.camera.maxZ = 10000;
 
+            // v10.6: Collisions
+            this.scene.collisionsEnabled = true;
+            this.camera.checkCollisions = true;
+            this.camera.ellipsoid = new BABYLON.Vector3(1, 2, 1); // 2m high player
+            this.camera.collisionRadius = new BABYLON.Vector3(0.5, 0.5, 0.5);
+
             // Stable Lighting
             var hemi = new BABYLON.HemisphericLight("hemi", new BABYLON.Vector3(0, 1, 0), this.scene);
             hemi.intensity = 1.5;
