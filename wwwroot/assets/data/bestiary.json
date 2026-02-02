@@ -1,0 +1,90 @@
+{
+    "Skeleton": {
+        "Name": "Skeleton",
+        "HP": 40,
+        "XP": 25,
+        "AssetPath": "assets/skeleton.json",
+        "Faction": "Undead",
+        "DefaultReturnScene": "Crypt_Depth_1"
+    },
+    "EarthElemental": {
+        "Name": "Earth Elemental",
+        "HP": 100,
+        "XP": 50,
+        "AssetPath": "assets/earth_elemental.json",
+        "Faction": "Elemental",
+        "DefaultReturnScene": "DungeonEntrance_elemental"
+    },
+    "WindElemental": {
+        "Name": "Wind Elemental",
+        "HP": 80,
+        "XP": 50,
+        "AssetPath": "assets/wind_elemental.json",
+        "Faction": "Elemental",
+        "DefaultReturnScene": "DungeonEntrance_elemental"
+    },
+    "FireElemental": {
+        "Name": "Fire Elemental",
+        "HP": 90,
+        "XP": 50,
+        "AssetPath": "assets/fire_elemental.json",
+        "Faction": "Elemental",
+        "DefaultReturnScene": "DungeonEntrance_elemental"
+    },
+    "WaterElemental": {
+        "Name": "Water Elemental",
+        "HP": 120,
+        "XP": 50,
+        "AssetPath": "assets/water_elemental.json",
+        "Faction": "Elemental",
+        "DefaultReturnScene": "DungeonEntrance_elemental"
+    },
+    "Goblin": {
+        "Name": "Goblin",
+        "HP": 25,
+        "XP": 15,
+        "AssetPath": "assets/goblin.json",
+        "Faction": "Monster",
+        "DefaultReturnScene": "GoblinCave"
+    },
+    "Spider": {
+        "Name": "Spider",
+        "HP": 15,
+        "XP": 10,
+        "AssetPath": "assets/spider.json",
+        "Faction": "Monster",
+        "DefaultReturnScene": "GoblinCave"
+    },
+    "Slime": {
+        "Name": "Slime",
+        "HP": 35,
+        "XP": 20,
+        "AssetPath": "assets/slime.json",
+        "Faction": "Monster",
+        "DefaultReturnScene": "Sewer"
+    },
+    "Rat": {
+        "Name": "Giant Rat",
+        "HP": 10,
+        "XP": 5,
+        "AssetPath": "assets/rat.json",
+        "Faction": "Monster",
+        "DefaultReturnScene": "Sewer"
+    },
+    "Snake": {
+        "Name": "Giant Snake",
+        "HP": 50,
+        "XP": 40,
+        "AssetPath": "assets/snake.json",
+        "Faction": "Beast",
+        "DefaultReturnScene": "DungeonEntrance_thehole"
+    },
+    "Beetle": {
+        "Name": "Giant Beetle",
+        "HP": 80,
+        "XP": 60,
+        "AssetPath": "assets/beetle.json",
+        "Faction": "Beast",
+        "DefaultReturnScene": "DungeonEntrance_thehole"
+    }
+}

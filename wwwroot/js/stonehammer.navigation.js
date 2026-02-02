@@ -252,6 +252,14 @@
                 this.dotNetHelper.invokeMethodAsync('StartCombat', actorName, mesh.metadata);
             }
         }
+
+        // v28.0: Generic Metadata Actions
+        if (mesh.metadata && mesh.metadata.action) {
+            if (mesh.metadata.action === "EnterDungeon") {
+                this.log("Entering Portal: " + mesh.metadata.target, "magenta");
+                this.enterBuilding(mesh.metadata.target);
+            }
+        }
     };
 
     sh.clearAll = function () {

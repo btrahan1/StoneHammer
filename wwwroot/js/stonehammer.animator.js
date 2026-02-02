@@ -99,8 +99,23 @@
 
                 // Fallback Logic
                 if (!targetNode) {
-                    const targets = this.scene.getNodes().filter(n => (isHero ? n.name.includes("Skeleton") : n.name.includes("Mason")) && n.isEnabled() !== false);
-                    targetNode = targets.length > 0 ? targets[0] : null;
+                    // v27.4: Metadata-Driven Targeting
+                    const targetFaction = isHero ? "Enemy" : "Hero";
+
+                    const targets = this.scene.getNodes().filter(n => {
+                        if (!n.metadata || n.metadata.faction !== targetFaction) return false;
+                        if (n.isEnabled() === false) return false;
+                        return true;
+                    });
+
+                    // Legacy Fallback (temporary safety net)
+                    if (targets.length === 0) {
+                        const legacyName = isHero ? "Skeleton" : "Mason";
+                        const legacyTargets = this.scene.getNodes().filter(n => n.name.includes(legacyName) && n.isEnabled() !== false);
+                        if (legacyTargets.length > 0) targetNode = legacyTargets[0];
+                    } else {
+                        targetNode = targets[0];
+                    }
                 }
 
                 const targetPos = targetNode ? targetNode.position.clone() : new BABYLON.Vector3(startX + (15 * direction), 2, 0);

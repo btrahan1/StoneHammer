@@ -124,7 +124,8 @@ namespace StoneHammer.Systems
     {
         Rooms,
         Cave,
-        Tunnel
+        Tunnel,
+        OpenFloor
     }
 
     public class DungeonTheme

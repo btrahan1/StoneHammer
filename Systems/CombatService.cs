@@ -190,12 +190,27 @@ namespace StoneHammer.Systems
             CurrentLootItems.Clear();
         }
 
-        public CombatService(CityBridge bridge, IJSRuntime js, AssetManager assets, CharacterService charService)
+        public CombatService(CityBridge bridge, IJSRuntime js, AssetManager assets, CharacterService charService, HttpClient http)
         {
             _bridge = bridge;
             JS = js;
             _assets = assets;
             _charService = charService;
+            
+            _ = LoadBestiaryData(http);
+        }
+
+
+        
+        public async Task LoadBestiaryData(HttpClient http)
+        {
+             try {
+                var json = await http.GetStringAsync("assets/data/bestiary.json?v=" + DateTime.Now.Ticks);
+                _bestiary = JsonSerializer.Deserialize<Dictionary<string, MobDefinition>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                Console.WriteLine($"[Combat] Bestiary Loaded: {_bestiary.Count} entries.");
+             } catch (Exception ex) {
+                 Console.WriteLine($"[Combat] Bestiary Error: {ex.Message}");
+             }
         }
 
         // Instanced Combat State
@@ -203,6 +218,9 @@ namespace StoneHammer.Systems
         private float _returnX = 0;
         private float _returnZ = 0;
         private string _engagedGroup = "";
+        
+        // Bestiary Data
+        private Dictionary<string, MobDefinition> _bestiary = new Dictionary<string, MobDefinition>();
         
         // Persistent Dead List (Ideally moved to a separate service later)
         private HashSet<string> _defeatedGroups = new HashSet<string>();
@@ -233,22 +251,8 @@ namespace StoneHammer.Systems
             {
                  _returnToScene = rs.ToString();
             }
-            else if (baseName.Contains("Goblin") || baseName.Contains("Spider"))
-            {
-                _returnToScene = "GoblinCave";
-            }
-            else if (baseName.Contains("Slime") || baseName.Contains("Rat"))
-            {
-                _returnToScene = "Sewer";
-            }
-            else if (baseName.Contains("Snake") || baseName.Contains("Beetle"))
-            {
-                _returnToScene = "DungeonEntrance_thehole";
-            }
-            else
-            {
-                _returnToScene = "Crypt_Depth_1"; // Default to Crypt for Skellies
-            }
+            // Logic moved to Lookup
+            // else if (baseName.Contains("Goblin") || baseName.Contains("Spider")) ...
 
             // Robust Cleaning: Remove all known body parts to find the Root Actor
             string[] knownParts = { 
@@ -331,10 +335,39 @@ namespace StoneHammer.Systems
                 hIndex++;
             }
 
-            // 4. Spawn Enemies (Group) - Right Side
+                // 4. Spawn Enemies (Group) - Right Side
             Enemies.Clear();
             string[] suffixes = { "A", "B", "C" }; // Assume 3 per group
             
+            // Find Bestiary Entry
+            MobDefinition def = null;
+            if (_bestiary.ContainsKey(_engagedGroup)) def = _bestiary[_engagedGroup];
+            else 
+            {
+                // Try fuzzy match? (e.g. "Goblin_Lvl1" -> "Goblin")
+                foreach(var key in _bestiary.Keys)
+                {
+                    if (_engagedGroup.Contains(key)) 
+                    {
+                        def = _bestiary[key];
+                        break;
+                    }
+                }
+            }
+            
+            if (def == null)
+            {
+                // Fallback Default
+                def = new MobDefinition { Name = _engagedGroup, HP = 20, XP = 10, AssetPath = "assets/skeleton.json" };
+                Console.WriteLine($"[Combat] Warning: '{_engagedGroup}' not in Bestiary. Using default.");
+            }
+
+            // Set Return Scene from Bestiary if not already set by metadata
+            if (string.IsNullOrEmpty(_returnToScene) && !string.IsNullOrEmpty(def.DefaultReturnScene))
+            {
+                _returnToScene = def.DefaultReturnScene;
+            }
+
             for(int i=0; i<3; i++)
             {
                 string suffix = suffixes[i];
@@ -342,69 +375,31 @@ namespace StoneHammer.Systems
                 
                 var enemy = new CombatEntity 
                 { 
-                    Name = $"Skeleton {suffix}", 
-                    HP = 40, MaxHP = 40, XPValue = 25,
-                    IsHero = false, ModelId = enemyId
+                    Name = $"{def.Name} {suffix}", 
+                    HP = def.HP, 
+                    MaxHP = def.HP, 
+                    XPValue = def.XP,
+                    IsHero = false, 
+                    ModelId = enemyId
                 };
 
+                // Metadata Override
                 if (metadata.HasValue)
                 {
-                    // Data-Driven Stats
-                    enemy.Name = $"{_engagedGroup} {suffix}"; // Generic name
                     if (metadata.Value.TryGetProperty("hp", out var h)) enemy.HP = enemy.MaxHP = h.GetInt32();
                     if (metadata.Value.TryGetProperty("xp", out var x)) enemy.XPValue = x.GetInt32();
                 }
-                else if (_engagedGroup.Contains("Goblin")) 
-                {
-                    enemy.Name = $"Goblin {suffix}";
-                    enemy.HP = 25; enemy.MaxHP = 25; enemy.XPValue = 15;
-                }
-                else if (_engagedGroup.Contains("Spider"))
-                {
-                    enemy.Name = $"Spider {suffix}";
-                    enemy.HP = 15; enemy.MaxHP = 15; enemy.XPValue = 10;
-                }
-                else if (_engagedGroup.Contains("Slime"))
-                {
-                    enemy.Name = $"Slime {suffix}";
-                    enemy.HP = 35; enemy.MaxHP = 35; enemy.XPValue = 20;
-                }
-                else if (_engagedGroup.Contains("Rat"))
-                {
-                    enemy.Name = $"Giant Rat {suffix}";
-                    enemy.HP = 10; enemy.MaxHP = 10; enemy.XPValue = 5;
-                }
-                else if (_engagedGroup.Contains("Snake"))
-                {
-                    enemy.Name = $"Giant Snake {suffix}";
-                    enemy.HP = 50; enemy.MaxHP = 50; enemy.XPValue = 40;
-                }
-                else if (_engagedGroup.Contains("Beetle"))
-                {
-                    enemy.Name = $"Giant Beetle {suffix}";
-                    enemy.HP = 80; enemy.MaxHP = 80; enemy.XPValue = 60;
-                }
-
                 
                 Enemies.Add(enemy);
                 
-                
                 // Spawn Visual
-                string assetPath = "assets/skeleton.json";
-
-                if (metadata.HasValue && metadata.Value.TryGetProperty("assetPath", out var ap))
+                string assetPath = def.AssetPath;
+                if (!string.IsNullOrEmpty(assetPath))
                 {
-                    assetPath = ap.ToString();
+                    // Pass faction info via metadata for Animation targeting
+                    var spawnMeta = new Dictionary<string, object> { { "faction", "Enemy" } };
+                    await _assets.SpawnAsset(assetPath, enemyId, false, new { Position = new float[] { 20, 0, (i * 8) - 4 }, Rotation = new float[] { 0, -90, 0 } }, spawnMeta);
                 }
-                else if (_engagedGroup.Contains("Goblin")) assetPath = "assets/goblin.json";
-                else if (_engagedGroup.Contains("Spider")) assetPath = "assets/spider.json";
-                else if (_engagedGroup.Contains("Slime")) assetPath = "assets/slime.json";
-                else if (_engagedGroup.Contains("Slime")) assetPath = "assets/slime.json"; // Dupe implicit logic
-                else if (_engagedGroup.Contains("Rat")) assetPath = "assets/rat.json";
-                else if (_engagedGroup.Contains("Snake")) assetPath = "assets/snake.json";
-                else if (_engagedGroup.Contains("Beetle")) assetPath = "assets/beetle.json";
-                
-                await _assets.SpawnAsset(assetPath, enemyId, false, new { Position = new float[] { 20, 0, (i * 8) - 4 }, Rotation = new float[] { 0, -90, 0 } });
             }
 
             // v27.3: Normalize Camera & UI (Moved After Spawning)
@@ -778,6 +773,15 @@ namespace StoneHammer.Systems
        if (o is long l) return (int)l;
        if (o is JsonElement je && je.ValueKind == JsonValueKind.Number) return je.GetInt32();
        return 0; // fallback
+    }
+    public class MobDefinition
+    {
+        public string Name { get; set; }
+        public int HP { get; set; }
+        public int XP { get; set; }
+        public string AssetPath { get; set; }
+        public string Faction { get; set; }
+        public string DefaultReturnScene { get; set; }
     }
 }
 

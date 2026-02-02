@@ -1,0 +1,38 @@
+{
+    "Id": "elemental",
+    "Name": "Elemental Sanctum",
+    "LayoutType": "OpenFloor",
+    "Theme": {
+        "WallColor": "#444444",
+        "WallMaterial": "Brick",
+        "FloorColor": "#222222",
+        "FloorMaterial": "Stone",
+        "AtmosphereColor": "#888888"
+    },
+    "Enemies": [
+        {
+            "NamePrefix": "EarthElemental",
+            "AssetPath": "assets/earth_elemental.json",
+            "HP": 100,
+            "XP": 50
+        },
+        {
+            "NamePrefix": "WindElemental",
+            "AssetPath": "assets/wind_elemental.json",
+            "HP": 80,
+            "XP": 50
+        },
+        {
+            "NamePrefix": "FireElemental",
+            "AssetPath": "assets/fire_elemental.json",
+            "HP": 90,
+            "XP": 50
+        },
+        {
+            "NamePrefix": "WaterElemental",
+            "AssetPath": "assets/water_elemental.json",
+            "HP": 120,
+            "XP": 50
+        }
+    ]
+}

@@ -115,6 +115,20 @@
                 0,
                 0
             ]
+        },
+        {
+            "DungeonId": "elemental",
+            "EntranceAssetPath": "assets/elemental_entrance.json",
+            "Position": [
+                -50,
+                0,
+                -50
+            ],
+            "Rotation": [
+                0,
+                45,
+                0
+            ]
         }
     ]
 }

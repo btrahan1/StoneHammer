@@ -134,10 +134,17 @@ namespace StoneHammer.Systems
                 {
                     dungeonId = buildingName.Replace("DungeonEntrance_", "");
                 }
-                // Legacy Fallbacks (for Interaction names like "CryptEntrance")
-                else if (buildingName.Contains("Crypt")) dungeonId = "crypt";
-                else if (buildingName.Contains("GoblinCave")) dungeonId = "goblin_cave";
-                else if (buildingName.Contains("Sewer")) dungeonId = "sewer";
+                else 
+                {
+                    // Fallback: Use the name itself as the ID (e.g. "Crypt", "GoblinCave")
+                    dungeonId = buildingName;
+                }
+
+                // Strip Depth from ID if present (e.g. "elemental_Depth_2" -> "elemental")
+                if (dungeonId.Contains("_Depth_"))
+                {
+                    dungeonId = dungeonId.Split(new[] { "_Depth_" }, StringSplitOptions.None)[0];
+                }
 
                 // Parse Depth (e.g. "crypt_Depth_2")
                 if (buildingName.Contains("_Depth_"))

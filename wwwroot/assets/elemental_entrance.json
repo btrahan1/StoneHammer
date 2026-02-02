@@ -1,0 +1,418 @@
+{
+    "Name": "ElementalDungeonEntrance",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "stone_platform",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                0,
+                -0.1,
+                -4
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                12,
+                0.2,
+                10
+            ],
+            "ColorHex": "#2e2e2e",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "main_arch_left",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                3.5,
+                3.5,
+                -3
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1.5,
+                7,
+                1.5
+            ],
+            "ColorHex": "#3d3d3d",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "main_arch_right",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                -3.5,
+                3.5,
+                -3
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1.5,
+                7,
+                1.5
+            ],
+            "ColorHex": "#3d3d3d",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "main_arch_top",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                0,
+                7,
+                -3
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                8.5,
+                1.5,
+                1.5
+            ],
+            "ColorHex": "#3d3d3d",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "portal_inner_void",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                0,
+                3.5,
+                -3.2
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                5,
+                6,
+                0.5
+            ],
+            "ColorHex": "#0a0a0a",
+            "Material": "Rubber",
+            "Operation": "Union"
+        },
+        {
+            "Id": "fire_orb",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                2.8,
+                1.2,
+                -2.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1,
+                1,
+                1
+            ],
+            "ColorHex": "#ff4500",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "fire_flame_1",
+            "ParentId": null,
+            "Shape": "Cone",
+            "Position": [
+                2.8,
+                2.0,
+                -2.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.6,
+                1.2,
+                0.6
+            ],
+            "ColorHex": "#ff8c00",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "water_basin",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                -2.8,
+                0.5,
+                -2.5
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "Scale": [
+                1.5,
+                1.5,
+                0.4
+            ],
+            "ColorHex": "#1e90ff",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "water_sphere",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                -2.8,
+                1.2,
+                -2.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.8,
+                0.8,
+                0.8
+            ],
+            "ColorHex": "#00ffff",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "earth_crag",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                2.8,
+                5.8,
+                -2.5
+            ],
+            "Rotation": [
+                45,
+                45,
+                0
+            ],
+            "Scale": [
+                1.2,
+                1.2,
+                1.2
+            ],
+            "ColorHex": "#5c4033",
+            "Material": "Rubber",
+            "Operation": "Union"
+        },
+        {
+            "Id": "earth_crystal",
+            "ParentId": null,
+            "Shape": "Cone",
+            "Position": [
+                2.8,
+                6.5,
+                -2.3
+            ],
+            "Rotation": [
+                180,
+                0,
+                0
+            ],
+            "Scale": [
+                0.4,
+                1.0,
+                0.4
+            ],
+            "ColorHex": "#32cd32",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "wind_vortex_ring",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                -2.8,
+                5.8,
+                -2.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1.2,
+                1.2,
+                0.2
+            ],
+            "ColorHex": "#f0ffff",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "wind_wisps",
+            "ParentId": null,
+            "Shape": "Capsule",
+            "Position": [
+                -2.8,
+                5.8,
+                -2.5
+            ],
+            "Rotation": [
+                0,
+                45,
+                45
+            ],
+            "Scale": [
+                0.2,
+                1.5,
+                0.2
+            ],
+            "ColorHex": "#ffffff",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "center_convergence",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                0,
+                3.5,
+                -3.1
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "Scale": [
+                3.5,
+                3.5,
+                0.1
+            ],
+            "ColorHex": "#ffffff",
+            "Material": "Glow",
+            "Operation": "Union"
+        }
+    ],
+    "Timeline": [
+        {
+            "Time": 0.0,
+            "Action": "Color",
+            "TargetId": "fire_orb",
+            "Value": [
+                1.0,
+                0.2,
+                0.0
+            ],
+            "Duration": 1.0
+        },
+        {
+            "Time": 1.0,
+            "Action": "Color",
+            "TargetId": "fire_orb",
+            "Value": [
+                1.0,
+                0.6,
+                0.0
+            ],
+            "Duration": 1.0
+        },
+        {
+            "Time": 0.0,
+            "Action": "Scale",
+            "TargetId": "water_sphere",
+            "Value": [
+                0.9,
+                0.9,
+                0.9
+            ],
+            "Duration": 2.0
+        },
+        {
+            "Time": 2.0,
+            "Action": "Scale",
+            "TargetId": "water_sphere",
+            "Value": [
+                0.7,
+                0.7,
+                0.7
+            ],
+            "Duration": 2.0
+        },
+        {
+            "Time": 0.0,
+            "Action": "Rotate",
+            "TargetId": "wind_vortex_ring",
+            "Value": [
+                0,
+                360,
+                0
+            ],
+            "Duration": 4.0
+        },
+        {
+            "Time": 0.0,
+            "Action": "Rotate",
+            "TargetId": "wind_wisps",
+            "Value": [
+                360,
+                360,
+                0
+            ],
+            "Duration": 3.0
+        },
+        {
+            "Time": 0.0,
+            "Action": "Scale",
+            "TargetId": "center_convergence",
+            "Value": [
+                4.0,
+                4.0,
+                0.15
+            ],
+            "Duration": 2.5
+        },
+        {
+            "Time": 2.5,
+            "Action": "Scale",
+            "TargetId": "center_convergence",
+            "Value": [
+                3.0,
+                3.0,
+                0.05
+            ],
+            "Duration": 2.5
+        }
+    ]
+}

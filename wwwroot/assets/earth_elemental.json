@@ -1,0 +1,104 @@
+{
+    "Type": "Voxel",
+    "Parts": [
+        {
+            "Id": "body",
+            "Offset": [
+                0,
+                1.0,
+                0
+            ],
+            "Dimensions": [
+                0.8,
+                1.0,
+                0.6
+            ],
+            "HexColor": "#5c4033"
+        },
+        {
+            "Id": "head",
+            "Offset": [
+                0,
+                2.2,
+                0
+            ],
+            "Dimensions": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "HexColor": "#3e2723"
+        },
+        {
+            "Id": "arm_l",
+            "Offset": [
+                -0.6,
+                1.2,
+                0
+            ],
+            "Dimensions": [
+                0.3,
+                0.8,
+                0.3
+            ],
+            "HexColor": "#5c4033"
+        },
+        {
+            "Id": "arm_r",
+            "Offset": [
+                0.6,
+                1.2,
+                0
+            ],
+            "Dimensions": [
+                0.3,
+                0.8,
+                0.3
+            ],
+            "HexColor": "#5c4033"
+        },
+        {
+            "Id": "leg_l",
+            "Offset": [
+                -0.3,
+                0,
+                0
+            ],
+            "Dimensions": [
+                0.3,
+                0.8,
+                0.3
+            ],
+            "HexColor": "#3e2723"
+        },
+        {
+            "Id": "leg_r",
+            "Offset": [
+                0.3,
+                0,
+                0
+            ],
+            "Dimensions": [
+                0.3,
+                0.8,
+                0.3
+            ],
+            "HexColor": "#3e2723"
+        },
+        {
+            "Id": "crystal_spikes",
+            "Offset": [
+                0,
+                2.0,
+                -0.3
+            ],
+            "Dimensions": [
+                0.8,
+                0.8,
+                0.1
+            ],
+            "HexColor": "#32cd32"
+        }
+    ],
+    "Children": []
+}

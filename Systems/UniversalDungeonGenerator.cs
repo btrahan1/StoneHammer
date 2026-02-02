@@ -33,6 +33,9 @@ namespace StoneHammer.Systems
                 case DungeonLayoutType.Tunnel:
                     GenerateTunnelLayout(asset, recipe);
                     break;
+                case DungeonLayoutType.OpenFloor:
+                    GenerateOpenFloorLayout(asset, recipe, depth);
+                    break;
             }
 
             // Populate Enemies
@@ -531,6 +534,143 @@ namespace StoneHammer.Systems
                      });
                  }
             }
+        }
+        private static void GenerateOpenFloorLayout(ProceduralAsset asset, DungeonRecipe recipe, int depth)
+        {
+             // Specialized Logic for Elemental Sanctum
+             // Depth 1: Earth, 2: Wind, 3: Fire, 4: Water
+             
+             string floorColor = recipe.Theme.FloorColor;
+             string atmos = recipe.Theme.AtmosphereColor;
+             string mobPrefix = "Skeleton";
+             string mobAsset = "assets/skeleton.json";
+             int hp = 50; int xp = 25;
+             
+             // Override based on Depth/Recipe ID
+             // Ideally this should be data-driven in the recipe, but for now hardcoded flavor logic
+             if (recipe.Id == "elemental") 
+             {
+                 int elemType = (depth - 1) % 4; // 0, 1, 2, 3
+                 switch(elemType)
+                 {
+                     case 0: // Earth
+                         floorColor = "#4e342e"; // Brown
+                         atmos = "#3e2723";
+                         mobPrefix = "EarthElemental";
+                         mobAsset = "assets/earth_elemental.json";
+                         hp = 100; xp = 50;
+                         break;
+                     case 1: // Wind
+                         floorColor = "#e0f7fa"; // Cyan Light
+                         atmos = "#b2ebf2";
+                         mobPrefix = "WindElemental";
+                         mobAsset = "assets/wind_elemental.json";
+                         hp = 80; xp = 50;
+                         break;
+                     case 2: // Fire
+                         floorColor = "#bf360c"; // Burnt Orange
+                         atmos = "#dd2c00";
+                         mobPrefix = "FireElemental";
+                         mobAsset = "assets/fire_elemental.json";
+                         hp = 90; xp = 50;
+                         break;
+                     case 3: // Water
+                         floorColor = "#01579b"; // Deep Blue
+                         atmos = "#0277bd";
+                         mobPrefix = "WaterElemental";
+                         mobAsset = "assets/water_elemental.json";
+                         hp = 120; xp = 50;
+                         break;
+                 }
+             }
+
+             // 1. Huge Room
+             int width = 200;
+             int depthD = 200;
+             
+             // Floor (Bedrock + Floor)
+             asset.Parts.Add(new ProceduralPart { Id = "huge_bedrock", Shape = "Box", Position = new[] { 0f, -4f, 0f }, Scale = new[] { 220f, 2f, 220f }, ColorHex = "#1a1a1a", Material = "Stone" });
+             
+             asset.Parts.Add(new ProceduralPart 
+             { 
+                 Id = "open_floor_main", Shape = "Box", 
+                 Position = new[] { 0f, -2f, 0f }, 
+                 Scale = new[] { (float)width, 2f, (float)depthD }, 
+                 ColorHex = floorColor, 
+                 Material = "Stone" 
+             });
+
+             // Walls (Perimeter)
+             float wallH = 40f;
+             // N
+             asset.Parts.Add(new ProceduralPart { Id = "wall_N", Shape = "Box", Position = new[] { 0f, 10f, depthD/2f }, Scale = new[] { (float)width, wallH, 4f }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+             // S
+             asset.Parts.Add(new ProceduralPart { Id = "wall_S", Shape = "Box", Position = new[] { 0f, 10f, -depthD/2f }, Scale = new[] { (float)width, wallH, 4f }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+             // E
+             asset.Parts.Add(new ProceduralPart { Id = "wall_E", Shape = "Box", Position = new[] { width/2f, 10f, 0f }, Scale = new[] { 4f, wallH, (float)depthD }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+             // W
+             asset.Parts.Add(new ProceduralPart { Id = "wall_W", Shape = "Box", Position = new[] { -width/2f, 10f, 0f }, Scale = new[] { 4f, wallH, (float)depthD }, ColorHex = recipe.Theme.WallColor, Material = recipe.Theme.WallMaterial });
+
+             // 2. Pillars
+             for(int x = -40; x <= 40; x+=40)
+             {
+                 for(int z = -40; z <= 40; z+=40)
+                 {
+                     if (x == 0 && z == 0) continue; // Skip center spawn
+                     asset.Parts.Add(new ProceduralPart { Id = $"pillar_{x}_{z}", Shape = "Cylinder", Position = new[] { (float)x, 10f, (float)z }, Scale = new[] { 4f, 30f, 4f }, ColorHex = recipe.Theme.WallColor, Material = "Brick" });
+                 }
+             }
+
+             // 3. Spawns (One huge Boss Element? Or multiple?)
+             // User said "Huge room, with that elemental type as the mob".
+             // Let's spawn 3 of them.
+             var rng = new System.Random();
+             for(int i=0; i<3; i++)
+             {
+                 asset.Children.Add(new ChildAsset 
+                 { 
+                    Path = mobAsset, 
+                    Name = $"{mobPrefix}_{i}", 
+                    Transform = new { Position = new float[] { rng.Next(-30,30), 0, rng.Next(-30,30) } },
+                    Metadata = new Dictionary<string, object> 
+                    {
+                        { "isEnemy", true },
+                        { "hp", hp },
+                        { "xp", xp },
+                        { "returnScene", $"DungeonEntrance_{recipe.Id}_Depth_{depth}" }, // Return to this depth? Or entrance? Bestiary default is entrance.
+                        { "assetPath", mobAsset },
+                        { "faction", "Elemental" }
+                    }
+                 });
+             }
+
+
+             // 4. Portal Logic
+             if (depth < 4)
+             {
+                 // Next Level Portal
+                 asset.Children.Add(new ChildAsset 
+                 { 
+                     Path = "assets/exit_crystal.json", 
+                     Name = "LevelPortal", 
+                     Transform = new { Position = new float[] { 0, 5, -(depthD/2f) + 20 } },
+                     Metadata = new Dictionary<string, object> 
+                     { 
+                         { "action", "EnterDungeon" },
+                         { "target", $"DungeonEntrance_{recipe.Id}_Depth_{depth+1}" }
+                     }
+                 });
+             }
+             else
+             {
+                 // Final Exit
+                 asset.Children.Add(new ChildAsset 
+                 { 
+                     Path = "assets/exit_crystal.json", 
+                     Name = "DungeonExit", 
+                     Transform = new { Position = new float[] { 0, 5, -(depthD/2f) + 20 } } 
+                 });
+             }
         }
     }
 }

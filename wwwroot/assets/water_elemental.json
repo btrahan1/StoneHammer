@@ -1,0 +1,118 @@
+{
+    "Type": "Voxel",
+    "Parts": [
+        {
+            "Id": "body",
+            "Offset": [
+                0,
+                1.0,
+                0
+            ],
+            "Dimensions": [
+                0.6,
+                1.0,
+                0.6
+            ],
+            "HexColor": "#1e90ff"
+        },
+        {
+            "Id": "head",
+            "Offset": [
+                0,
+                2.2,
+                0
+            ],
+            "Dimensions": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "HexColor": "#00bfff"
+        },
+        {
+            "Id": "arm_l",
+            "Offset": [
+                -0.6,
+                1.2,
+                0
+            ],
+            "Dimensions": [
+                0.3,
+                0.8,
+                0.3
+            ],
+            "HexColor": "#1e90ff"
+        },
+        {
+            "Id": "arm_r",
+            "Offset": [
+                0.6,
+                1.2,
+                0
+            ],
+            "Dimensions": [
+                0.3,
+                0.8,
+                0.3
+            ],
+            "HexColor": "#1e90ff"
+        },
+        {
+            "Id": "leg_l",
+            "Offset": [
+                -0.3,
+                0,
+                0
+            ],
+            "Dimensions": [
+                0.3,
+                0.8,
+                0.3
+            ],
+            "HexColor": "#00008b"
+        },
+        {
+            "Id": "leg_r",
+            "Offset": [
+                0.3,
+                0,
+                0
+            ],
+            "Dimensions": [
+                0.3,
+                0.8,
+                0.3
+            ],
+            "HexColor": "#00008b"
+        },
+        {
+            "Id": "bubble_1",
+            "Offset": [
+                0.5,
+                2.5,
+                0
+            ],
+            "Dimensions": [
+                0.2,
+                0.2,
+                0.2
+            ],
+            "HexColor": "#00ffff"
+        },
+        {
+            "Id": "bubble_2",
+            "Offset": [
+                -0.5,
+                2.3,
+                0.2
+            ],
+            "Dimensions": [
+                0.15,
+                0.15,
+                0.15
+            ],
+            "HexColor": "#00ffff"
+        }
+    ],
+    "Children": []
+}

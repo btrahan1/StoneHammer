@@ -1,0 +1,104 @@
+{
+    "Type": "Voxel",
+    "Parts": [
+        {
+            "Id": "body",
+            "Offset": [
+                0,
+                1.0,
+                0
+            ],
+            "Dimensions": [
+                0.5,
+                1.0,
+                0.5
+            ],
+            "HexColor": "#ff4500"
+        },
+        {
+            "Id": "head",
+            "Offset": [
+                0,
+                2.1,
+                0
+            ],
+            "Dimensions": [
+                0.4,
+                0.6,
+                0.4
+            ],
+            "HexColor": "#ff8c00"
+        },
+        {
+            "Id": "arm_l",
+            "Offset": [
+                -0.5,
+                1.2,
+                0
+            ],
+            "Dimensions": [
+                0.2,
+                0.8,
+                0.2
+            ],
+            "HexColor": "#ff4500"
+        },
+        {
+            "Id": "arm_r",
+            "Offset": [
+                0.5,
+                1.2,
+                0
+            ],
+            "Dimensions": [
+                0.2,
+                0.8,
+                0.2
+            ],
+            "HexColor": "#ff4500"
+        },
+        {
+            "Id": "leg_l",
+            "Offset": [
+                -0.25,
+                0,
+                0
+            ],
+            "Dimensions": [
+                0.25,
+                0.8,
+                0.25
+            ],
+            "HexColor": "#8b0000"
+        },
+        {
+            "Id": "leg_r",
+            "Offset": [
+                0.25,
+                0,
+                0
+            ],
+            "Dimensions": [
+                0.25,
+                0.8,
+                0.25
+            ],
+            "HexColor": "#8b0000"
+        },
+        {
+            "Id": "flame_crest",
+            "Offset": [
+                0,
+                2.5,
+                0
+            ],
+            "Dimensions": [
+                0.6,
+                0.4,
+                0.1
+            ],
+            "HexColor": "#ffff00"
+        }
+    ],
+    "Children": []
+}
