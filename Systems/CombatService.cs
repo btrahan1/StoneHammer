@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using System.Text.Json;
+using static StoneHammer.Systems.CharacterModels;
 
 namespace StoneHammer.Systems
 {
@@ -207,9 +208,8 @@ namespace StoneHammer.Systems
              try {
                 var json = await http.GetStringAsync("assets/data/bestiary.json?v=" + DateTime.Now.Ticks);
                 _bestiary = JsonSerializer.Deserialize<Dictionary<string, MobDefinition>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                Console.WriteLine($"[Combat] Bestiary Loaded: {_bestiary.Count} entries.");
              } catch (Exception ex) {
-                 Console.WriteLine($"[Combat] Bestiary Error: {ex.Message}");
+                 // Console.WriteLine($"[Combat] Bestiary Error: {ex.Message}");
              }
         }
 
@@ -532,24 +532,28 @@ namespace StoneHammer.Systems
 
         private async Task PerformAction(CombatEntity actor, CombatAction action)
         {
-            // 1. Deduct Cost (if Hero)
-            if (actor.IsHero && actor.SourceCharacter != null)
+            // 1. Check if it's a Skill
+            Skill skill = null;
+            if (actor.SourceCharacter != null)
             {
-                var skill = actor.SourceCharacter.Skills.FirstOrDefault(s => s.Name == action.Type);
-                if (skill != null)
-                {
-                    if (actor.SourceCharacter.CurrentMana < skill.ManaCost)
-                    {
-                        CombatLog = $"{actor.Name} fizzles! Not enough resource.";
-                        OnStateChanged?.Invoke();
-                        await Task.Delay(500);
-                        return;
-                    }
-                    actor.SourceCharacter.CurrentMana -= skill.ManaCost;
-                }
+                 skill = actor.SourceCharacter.Skills.FirstOrDefault(s => s.Name == action.Type);
             }
 
-            if (action.Type == "Attack" && action.Target != null)
+            if (skill != null)
+            {
+                // Mana Cost
+                if (actor.SourceCharacter.CurrentMana < skill.ManaCost)
+                {
+                    CombatLog = $"{actor.Name} fizzles! Not enough mana.";
+                    OnStateChanged?.Invoke();
+                    await Task.Delay(500);
+                    return;
+                }
+                actor.SourceCharacter.CurrentMana -= skill.ManaCost;
+                
+                await PerformSkill(actor, skill, action.Target);
+            }
+            else if (action.Type == "Attack" && action.Target != null)
             {
                 await PerformAttack(actor, action.Target, 1.0f);
             }
@@ -557,48 +561,99 @@ namespace StoneHammer.Systems
             {
                 CombatLog = $"{actor.Name} is guarding.";
                 OnStateChanged?.Invoke();
-                // Logic for reducing damage next turn? (Not implemented yet)
-            }
-            // --- FIGHTER SKILLS ---
-            else if (action.Type == "Power Strike" && action.Target != null)
-            {
-                CombatLog = $"{actor.Name} uses Power Strike!";
-                await PerformAttack(actor, action.Target, 1.5f, "Attack");
-            }
-            else if (action.Type == "Block")
-            {
-                 CombatLog = $"{actor.Name} hunkers down!";
-                 OnStateChanged?.Invoke();
-            }
-            // --- ROGUE SKILLS ---
-            else if (action.Type == "Backstab" && action.Target != null)
-            {
-                CombatLog = $"{actor.Name} Backstabs!";
-                await PerformAttack(actor, action.Target, 2.0f, "Attack");
-            }
-            // --- MAGE SKILLS ---
-            else if (action.Type == "Fireball" && action.Target != null)
-            {
-                CombatLog = $"{actor.Name} casts Fireball!";
-                await PerformMagic(actor, action.Target, 2.5f, "Cast_Fire", "🔥");
-            }
-            else if (action.Type == "Ice Bolt" && action.Target != null)
-            {
-                CombatLog = $"{actor.Name} casts Ice Bolt!";
-                await PerformMagic(actor, action.Target, 1.5f, "Cast_Ice", "❄️");
-            }
-            // --- HEALER SKILLS ---
-            else if (action.Type == "Heal" && action.Target != null)
-            {
-                 await PerformHeal(actor, action.Target);
-            }
-            else if (action.Type == "Smite" && action.Target != null)
-            {
-                CombatLog = $"{actor.Name} Smites the enemy!";
-                await PerformMagic(actor, action.Target, 1.8f, "Cast_Smite", "⚡");
             }
             
             await Task.Delay(500); 
+        }
+
+        private async Task PerformSkill(CombatEntity actor, Skill skill, CombatEntity? primaryTarget)
+        {
+             // 1. Identify Targets
+             List<CombatEntity> targets = new List<CombatEntity>();
+             
+             if (skill.TargetType == SkillTargetType.Self)
+             {
+                 targets.Add(actor);
+             }
+             else if (skill.TargetType == SkillTargetType.SingleEnemy)
+             {
+                 if (primaryTarget != null) targets.Add(primaryTarget);
+             }
+             else if (skill.TargetType == SkillTargetType.SingleAlly)
+             {
+                 if (primaryTarget != null) targets.Add(primaryTarget);
+             }
+             else if (skill.TargetType == SkillTargetType.AllEnemies)
+             {
+                 // Depending on who cast it
+                 if (actor.IsHero) targets.AddRange(Enemies.Where(e => e.HP > 0));
+                 else targets.AddRange(Heroes.Where(h => h.HP > 0));
+                 
+                 CombatLog = $"{actor.Name} uses {skill.Name} on ALL enemies!";
+             }
+             else if (skill.TargetType == SkillTargetType.AllAllies)
+             {
+                 if (actor.IsHero) targets.AddRange(Heroes.Where(h => h.HP > 0));
+                 else targets.AddRange(Enemies.Where(e => e.HP > 0));
+
+                 CombatLog = $"{actor.Name} uses {skill.Name} on the party!";
+             }
+             
+             OnStateChanged?.Invoke();
+
+             // 2. Play Animation (on Actor)
+             await PlayAnim(actor, skill.Animation, primaryTarget);
+             
+             // SFX
+             if (!string.IsNullOrEmpty(skill.Sfx))
+             {
+                  await JS.InvokeVoidAsync("stoneHammer.audio.playSound", skill.Sfx);
+             }
+
+             // 3. Apply Effect to All Targets
+             foreach(var target in targets)
+             {
+                 if (skill.EffectType == SkillEffectType.Damage)
+                 {
+                     int damage = (int)(CalculateDamage(actor) * skill.Multiplier);
+                     
+                     await PlayAnim(target, "Hit");
+                     await JS.InvokeVoidAsync("stoneHammer.flashTarget", target.ModelId, skill.VfxColor, 300);
+                     if (skill.Multiplier > 1.5f) await JS.InvokeVoidAsync("stoneHammer.shakeCamera", 0.3, 200);
+
+                     target.HP -= damage;
+                     if (target.IsHero && target.SourceCharacter != null) target.SourceCharacter.CurrentHP = target.HP;
+                     
+                     target.LastDamageAmount = damage;
+                     target.LastDamageType = "Skill";
+                     CombatLog = $"{skill.Icon} {target.Name} hit for {damage}!";
+                 }
+                 else if (skill.EffectType == SkillEffectType.Heal)
+                 {
+                     int heal = (int)((20 + (actor.SourceCharacter?.Stats.Wisdom ?? 0)) * skill.Multiplier);
+                     target.HP = Math.Min(target.HP + heal, target.MaxHP);
+                     if (target.IsHero && target.SourceCharacter != null) target.SourceCharacter.CurrentHP = target.HP;
+
+                     target.LastDamageAmount = heal;
+                     target.LastDamageType = "Heal";
+                     CombatLog = $"{target.Name} healed for {heal}.";
+                     
+                     await JS.InvokeVoidAsync("stoneHammer.flashTarget", target.ModelId, "#00FF00", 300);
+                 }
+                 else if (skill.EffectType == SkillEffectType.Buff)
+                 {
+                     CombatLog = $"{target.Name} is buffed!";
+                     // Placeholder for buff logic
+                 }
+                 
+                 target.LastDamageTime = DateTime.Now;
+                 OnStateChanged?.Invoke();
+                 
+                 if (target.HP <= 0) await HandleDeath(target);
+                 
+                 // Small delay between generic AOE hits for visual clarity?
+                 if (targets.Count > 1) await Task.Delay(100);
+             }
         }
 
         private async Task PerformAttack(CombatEntity actor, CombatEntity target, float multiplier, string anim = "Attack")
@@ -726,7 +781,16 @@ namespace StoneHammer.Systems
         {
             if (!entity.IsHero || entity.SourceCharacter == null) return 5; // Base mob damage
 
-            return Math.Max(1, entity.SourceCharacter.GetTotalAttack());
+            float multiplier = 1.0f;
+            switch(entity.SourceCharacter.Class)
+            {
+                case CharacterClass.Rogue: multiplier = 0.75f; break;
+                case CharacterClass.Healer: multiplier = 0.50f; break;
+                case CharacterClass.Mage: multiplier = 0.25f; break;
+                // Fighter stays 1.0
+            }
+
+            return Math.Max(1, (int)(entity.SourceCharacter.GetTotalAttack() * multiplier));
         }
 
         private async Task HandleVictory()

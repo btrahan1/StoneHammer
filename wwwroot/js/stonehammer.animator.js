@@ -269,6 +269,170 @@
 
         this.scene.beginDirectAnimation(bolt, [anim, animZ], 0, 25, false, 1.0, () => bolt.dispose());
     };
+
+    /**
+     * Executes a timeline of animations on a prop hierarchy.
+     * @param {Array} timeline - List of event objects { Time, Action, TargetId, Value, Duration }
+     * @param {BABYLON.TransformNode} rootNode - The root node of the prop
+     */
+    sh.playTimeline = function (timeline, rootNode) {
+        if (!timeline || timeline.length === 0) return;
+
+        console.log(`[Animator] Playing Timeline for ${rootNode.name} (${timeline.length} total events)`);
+        const fps = 60;
+
+        // 1. Group events by Target -> Property
+        // Key: "TargetId|Action" -> [Event, Event...]
+        const tracks = {};
+
+        timeline.forEach(event => {
+            const targetId = sh.getProp(event, "TargetId");
+            const action = sh.getProp(event, "Action");
+
+            // Map Action to Babylon Property
+            let property = "";
+            let animType = BABYLON.Animation.ANIMATIONTYPE_FLOAT;
+
+            if (action === "Scale") {
+                property = "scaling";
+                animType = BABYLON.Animation.ANIMATIONTYPE_VECTOR3;
+            }
+            else if (action === "Move") {
+                property = "position";
+                animType = BABYLON.Animation.ANIMATIONTYPE_VECTOR3;
+            }
+            else if (action === "Rotate") {
+                property = "rotation";
+                animType = BABYLON.Animation.ANIMATIONTYPE_VECTOR3;
+            }
+            else if (action === "Color") {
+                // Defer property check until we find mesh, but use generic key for grouping
+                property = "material.color";
+                animType = BABYLON.Animation.ANIMATIONTYPE_COLOR3;
+            }
+
+            const key = targetId + "|" + property;
+            if (!tracks[key]) tracks[key] = { targetId, action, property, animType, events: [] };
+            tracks[key].events.push(event);
+        });
+
+        // 2. Process each track
+        for (const key in tracks) {
+            const track = tracks[key];
+            const targetId = track.targetId;
+
+            // Find Mesh
+            let targetMesh = null;
+            rootNode.getChildren(null, true).forEach(child => {
+                if (child.name.endsWith("_" + targetId)) targetMesh = child;
+            });
+            if (!targetMesh && rootNode.name.endsWith(targetId)) targetMesh = rootNode;
+
+            if (!targetMesh) {
+                console.warn(`[Animator] Target '${targetId}' not found for track ${key}`);
+                continue;
+            }
+
+            // Resolve Color Property (Standard vs PBR)
+            if (track.action === "Color") {
+                if (targetMesh.material) {
+                    if (targetMesh.material.diffuseColor) track.property = "material.diffuseColor";
+                    else if (targetMesh.material.albedoColor) track.property = "material.albedoColor";
+                    else if (targetMesh.material.emissiveColor) track.property = "material.emissiveColor";
+                }
+            }
+
+            // Sort events by time
+            track.events.sort((a, b) => (sh.getProp(a, "Time") || 0) - (sh.getProp(b, "Time") || 0));
+
+            // Create Animation
+            const animName = "anim_" + key.replace("|", "_");
+            const anim = new BABYLON.Animation(animName, track.property, fps, track.animType, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+
+            const keys = [];
+
+            // Initial State (Frame 0)
+            // We must have a Value at Frame 0, OR we assume current state.
+            // If the first event starts > 0, we insert a key at 0 with current value.
+
+            let currentVal = null;
+            if (track.property === "scaling") currentVal = targetMesh.scaling.clone();
+            else if (track.property === "position") currentVal = targetMesh.position.clone();
+            else if (track.property === "rotation") currentVal = targetMesh.rotation.clone();
+            else if (track.property.includes("Color")) {
+                // Fetch generic color
+                if (track.property.includes("diffuse")) currentVal = targetMesh.material.diffuseColor.clone();
+                else if (track.property.includes("albedo")) currentVal = targetMesh.material.albedoColor.clone();
+                else if (track.property.includes("emissive")) currentVal = targetMesh.material.emissiveColor.clone();
+                else currentVal = BABYLON.Color3.White();
+            }
+
+            // Add Frame 0 key if needed?
+            // Actually, let's just process events into keys.
+            // Logic: Event (Time T, Duration D, Value V).
+            // Means: From T to T+D, interpolate to V.
+            // Start Value? Implied to be "Previous Value".
+
+            // We verify if we need an explicit start key at T=0
+            const firstTime = sh.getProp(track.events[0], "Time") || 0;
+            if (firstTime > 0) {
+                keys.push({ frame: 0, value: currentVal });
+            }
+
+            let lastFrame = 0;
+
+            track.events.forEach(e => {
+                const duration = sh.getProp(e, "Duration") || 0;
+                const time = sh.getProp(e, "Time") || 0;
+                const rawVal = sh.getProp(e, "Value");
+
+                let val = null;
+                if (track.animType === BABYLON.Animation.ANIMATIONTYPE_VECTOR3) {
+                    val = new BABYLON.Vector3(rawVal[0], rawVal[1], rawVal[2]);
+                    if (track.action === "Rotate") {
+                        val = new BABYLON.Vector3(
+                            BABYLON.Tools.ToRadians(rawVal[0]),
+                            BABYLON.Tools.ToRadians(rawVal[1]),
+                            BABYLON.Tools.ToRadians(rawVal[2])
+                        );
+                    }
+                } else if (track.animType === BABYLON.Animation.ANIMATIONTYPE_COLOR3) {
+                    val = new BABYLON.Color3(rawVal[0], rawVal[1], rawVal[2]);
+                }
+
+                const startFrame = time * fps;
+                const endFrame = (time + duration) * fps;
+
+                // If gap between lastFrame and startFrame? Hold value.
+                // But Babylon handles gaps by interpolation if keys exist.
+                // We want to "Hold" previous value until startFrame?
+                // If I have key at 0, and next event starts at 30... 0->30 interpolates.
+                // If I want 0->30 to be STATIC, I need a key at 30 (Start) with SAME value as 0.
+                // But we don't know the value at 30 unless we calculated it.
+
+                // SIMPLIFIED APPROACH:
+                // Just use the End target.
+                // Key at Time+Duration = Value.
+                // If there is ANY previous key, Babylon interpolates.
+                // This matches the "Tween" definition of "Go to X".
+
+                // Special case: Instant Set (Duration 0)
+                // We set a key at Frame T with Value.
+
+                keys.push({ frame: endFrame, value: val });
+
+                if (endFrame > lastFrame) lastFrame = endFrame;
+            });
+
+            // Check loop closure?
+            // If we want a perfect loop, the last key must match first key?
+            // The JSON data should define this (e.g. last event returns to 0).
+
+            anim.setKeys(keys);
+            targetMesh.animations.push(anim);
+            this.scene.beginAnimation(targetMesh, 0, lastFrame, true);
+        }
+    };
     // HELPER: Flash Target
     sh.flashTarget = function (targetId, colorHex, duration) {
         const targetNode = this.scene.getTransformNodeByName("voxel_" + targetId) || this.scene.getMeshByName("voxel_" + targetId) || this.scene.getTransformNodeByName(targetId);

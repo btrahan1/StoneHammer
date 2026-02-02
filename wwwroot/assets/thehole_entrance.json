@@ -3,29 +3,6 @@
     "Type": "Procedural",
     "Parts": [
         {
-            "Id": "ground_rim",
-            "ParentId": null,
-            "Shape": "Box",
-            "Position": [
-                0,
-                -0.5,
-                -5
-            ],
-            "Rotation": [
-                0,
-                0,
-                0
-            ],
-            "Scale": [
-                15,
-                1,
-                15
-            ],
-            "ColorHex": "#1c1c1a",
-            "Material": "Rubber",
-            "Operation": "Union"
-        },
-        {
             "Id": "the_void",
             "ParentId": null,
             "Shape": "Cylinder",

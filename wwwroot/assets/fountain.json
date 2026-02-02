@@ -1,0 +1,354 @@
+{
+    "Name": "MedievalTownSquareFountain",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "basin_bottom",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                0,
+                0.1,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                6,
+                0.3,
+                6
+            ],
+            "ColorHex": "#7a7a7a",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "basin_rim",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                0,
+                0.4,
+                0
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "Scale": [
+                6,
+                6,
+                0.6
+            ],
+            "ColorHex": "#666666",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "main_pool_water",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                0,
+                0.3,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                5.6,
+                0.1,
+                5.6
+            ],
+            "ColorHex": "#4fa3ff",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "central_pedestal_base",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                0,
+                1.2,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1.2,
+                2.5,
+                1.2
+            ],
+            "ColorHex": "#808080",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "mid_tier_basin",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                0,
+                2.5,
+                0
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "Scale": [
+                3,
+                3,
+                0.4
+            ],
+            "ColorHex": "#666666",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "mid_tier_water",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                0,
+                2.5,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                2.8,
+                0.1,
+                2.8
+            ],
+            "ColorHex": "#6bb9ff",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "top_pillar",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                0,
+                3.5,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.6,
+                1.5,
+                0.6
+            ],
+            "ColorHex": "#808080",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "top_ornament",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                0,
+                4.3,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.8,
+                1.0,
+                0.8
+            ],
+            "ColorHex": "#a0a0a0",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "spout_north",
+            "ParentId": null,
+            "Shape": "Capsule",
+            "Position": [
+                0,
+                4.0,
+                0.6
+            ],
+            "Rotation": [
+                45,
+                0,
+                0
+            ],
+            "Scale": [
+                0.15,
+                0.8,
+                0.15
+            ],
+            "ColorHex": "#bde0ff",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "spout_south",
+            "ParentId": null,
+            "Shape": "Capsule",
+            "Position": [
+                0,
+                4.0,
+                -0.6
+            ],
+            "Rotation": [
+                -45,
+                0,
+                0
+            ],
+            "Scale": [
+                0.15,
+                0.8,
+                0.15
+            ],
+            "ColorHex": "#bde0ff",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "spout_left",
+            "ParentId": null,
+            "Shape": "Capsule",
+            "Position": [
+                0.6,
+                4.0,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                -45
+            ],
+            "Scale": [
+                0.15,
+                0.8,
+                0.15
+            ],
+            "ColorHex": "#bde0ff",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "spout_right",
+            "ParentId": null,
+            "Shape": "Capsule",
+            "Position": [
+                -0.6,
+                4.0,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                45
+            ],
+            "Scale": [
+                0.15,
+                0.8,
+                0.15
+            ],
+            "ColorHex": "#bde0ff",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "falling_stream_n",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                0,
+                1.8,
+                2.5
+            ],
+            "Rotation": [
+                5,
+                0,
+                0
+            ],
+            "Scale": [
+                0.1,
+                2.8,
+                0.1
+            ],
+            "ColorHex": "#ffffff",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "falling_stream_s",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                0,
+                1.8,
+                -2.5
+            ],
+            "Rotation": [
+                -5,
+                0,
+                0
+            ],
+            "Scale": [
+                0.1,
+                2.8,
+                0.1
+            ],
+            "ColorHex": "#ffffff",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "water_ripple_1",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                0,
+                0.35,
+                0
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "Scale": [
+                1,
+                1,
+                0.05
+            ],
+            "ColorHex": "#ffffff",
+            "Material": "Glow",
+            "Operation": "Union"
+        }
+    ],
+    "Timeline": [
+ 
+    ]
+}

@@ -8,6 +8,7 @@
 @inject IJSRuntime JSRuntime
 @inject CombatService CombatService
 @inject ShopService ShopService
+@inject CharacterService CharacterService
 @inject SaveService SaveService
 
 <PageTitle>StoneHammer</PageTitle>
@@ -36,6 +37,7 @@
             <button class="btn btn-info" @onclick="SpawnGuildMaster">Spawn Guild Master</button>
             <button class="btn btn-dark" style="border:1px solid gold; color:gold" @onclick="OpenInn">🍺 Visit Inn</button>
             <button class="btn btn-danger" @onclick="ClearScene">Clear Scene</button>
+            <button class="btn btn-warning" style="background:red; color:white;" @onclick="WipeSaves">⚠️ Wipe Saves</button>
         </div>
     </div>
 </div>
@@ -65,13 +67,19 @@
         _gameStarted = true;
         StateHasChanged();
         
+        // Ensure Characters are loaded
+        if (CharacterService.Party.Count == 0)
+        {
+            await CharacterService.InitializeAsync();
+        }
+
         await GenerateTown();
 
         // Auto-Load logic
         var latestSave = await SaveService.GetLatestSave();
         if (!string.IsNullOrEmpty(latestSave))
         {
-            Console.WriteLine($"Auto-Loading Latest Save: {latestSave}");
+            // Console.WriteLine($"Auto-Loading Latest Save: {latestSave}");
             await SaveService.LoadGame(latestSave);
         }
     }
@@ -122,6 +130,15 @@
     private async Task SpawnGuildMaster() => await AssetManager.SpawnGuildMaster(0, 5);
     private async Task ClearScene() => await AssetManager.ClearAll();
     private async Task SpawnSandboxPillar() => await JSRuntime.InvokeVoidAsync("stoneHammer.spawnSandboxPillar");
+    private async Task WipeSaves()
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure? This deletes ALL progress.");
+        if (confirmed)
+        {
+            await SaveService.ClearAllSaves();
+            await CharacterService.ResetGame(); // Also reset current state
+        }
+    }
 
     private CharacterSheet? _charSheet;
     private void ToggleCharacter() => _charSheet?.Toggle();

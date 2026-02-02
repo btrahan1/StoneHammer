@@ -3,29 +3,6 @@
     "Type": "Procedural",
     "Parts": [
         {
-            "Id": "ground_plane",
-            "ParentId": null,
-            "Shape": "Box",
-            "Position": [
-                0,
-                -0.1,
-                -5
-            ],
-            "Rotation": [
-                0,
-                0,
-                0
-            ],
-            "Scale": [
-                15,
-                0.2,
-                15
-            ],
-            "ColorHex": "#1a1a14",
-            "Material": "Rubber",
-            "Operation": "Union"
-        },
-        {
             "Id": "main_arch_left",
             "ParentId": null,
             "Shape": "Box",

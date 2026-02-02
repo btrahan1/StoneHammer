@@ -92,8 +92,8 @@ namespace StoneHammer.Systems
 
             // 5. Player & Decor (Hardcoded for now / could be in recipe too)
             await SpawnPlayer(x, z);
-            await SpawnAsset("assets/table.json", "Street Table 1", false, new { Position = new[] { 5, 0, 5 } });
-            await SpawnAsset("assets/table.json", "Street Table 2", false, new { Position = new[] { -5, 0, 5 } });
+            //await SpawnAsset("assets/table.json", "Street Table 1", false, new { Position = new[] { 5, 0, 5 } });
+            //await SpawnAsset("assets/table.json", "Street Table 2", false, new { Position = new[] { -5, 0, 5 } });
 
             // v14.0: The Desert Teleporter (Legacy Hybrid)
             await SpawnAsset("assets/desert_entrance.json", "DesertEntrance", false, new { Position = new[] { 50, 0, 50 } });
@@ -119,10 +119,10 @@ namespace StoneHammer.Systems
             }
             else if (buildingName == "Desert")
             {
-                System.Console.WriteLine("[AssetManager] Entering Procedural Desert...");
                 await _bridge.EnterDesert();
                 await SpawnAsset("assets/exit_crystal.json", "DesertExit", false, new { Position = new float[] { 0, 10, 0 } });
             }
+
             // 2. Dungeons
             // 2. Dungeons (Generic Fallback)
             else
@@ -158,22 +158,16 @@ namespace StoneHammer.Systems
 
                 // Load Recipe
                 string recipePath = $"assets/data/dungeons/dungeon_{dungeonId}.json";
-                System.Console.WriteLine($"[AssetManager] Loading Dungeon Recipe: {recipePath} (Depth {depth})");
 
                 try 
                 {
                     string json = await _http.GetStringAsync(recipePath + "?v=" + System.DateTime.Now.Ticks);
-                    System.Console.WriteLine($"[AssetManager] JSON Loaded. Length: {json.Length}");
                     
                     var recipe = JsonSerializer.Deserialize<DungeonRecipe>(json, _options);
 
                     if (recipe != null)
                     {
-                        System.Console.WriteLine($"[AssetManager] Recipe Parsed. Layout: {recipe.LayoutType}");
                         var dungeonAsset = UniversalDungeonGenerator.Generate(recipe, depth);
-                        System.Console.WriteLine($"[AssetManager] Asset Generated. Parts: {dungeonAsset.Parts.Count}");
-                        
-                        System.Console.WriteLine($"[AssetManager] Asset Generated. Parts: {dungeonAsset.Parts.Count}");
                         
                         // Set Atmosphere
                         string atmos = recipe.Theme?.AtmosphereColor ?? "#000000";
@@ -227,7 +221,6 @@ namespace StoneHammer.Systems
             if (!_deadActors.Contains(actorId))
             {
                 _deadActors.Add(actorId);
-                System.Console.WriteLine($"[AssetManager] MarkAsDead: {actorId} (Total Dead: {_deadActors.Count})");
             }
         }
 
@@ -238,11 +231,8 @@ namespace StoneHammer.Systems
                 // Check Blacklist
                 if (_deadActors.Contains(name))
                 {
-                    System.Console.WriteLine($"[AssetManager] BLOCKED: {name} is on the dead list.");
                     return;
                 }
-
-                System.Console.WriteLine($"[AssetManager] Spawning: {name}");
 
                 string json;
                 if (!string.IsNullOrEmpty(path))
@@ -263,7 +253,6 @@ namespace StoneHammer.Systems
 
                 if (isVoxel)
                 {
-                    System.Console.WriteLine($"[AssetManager] Identifed {name} as VOXEL (SpawnVoxel).");
                     var asset = JsonSerializer.Deserialize<VoxelAsset>(json, _options);
                     if (asset != null) 
                     {
@@ -274,9 +263,9 @@ namespace StoneHammer.Systems
                         }
                     }
                 }
+
                 else
                 {
-                    System.Console.WriteLine($"[AssetManager] Identifed {name} as PROCEDURAL (SpawnRecipe).");
                     var asset = JsonSerializer.Deserialize<ProceduralAsset>(json, _options);
                     if (asset != null) 
                     {

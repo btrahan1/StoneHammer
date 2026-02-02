@@ -79,9 +79,9 @@
             }, this.scene);
 
             // Debug: Log naming pattern
-            if (name === "Player") {
-                console.log(`[Props] Created Player Part: ${mesh.name} (Id: ${id})`);
-            }
+            //if (name === "Player") {
+            //    console.log(`[Props] Created Player Part: ${mesh.name} (Id: ${id})`);
+            //}
 
             mesh.position = new BABYLON.Vector3(pos[0], pos[1], pos[2]);
 
@@ -103,9 +103,9 @@
             }
 
             // Debug Parent
-            if (name === "Player") {
-                console.log(`[Props] ${mesh.name} parent set to: ${mesh.parent ? mesh.parent.name : "NULL"}`);
-            }
+            //if (name === "Player") {
+            //    console.log(`[Props] ${mesh.name} parent set to: ${mesh.parent ? mesh.parent.name : "NULL"}`);
+            //}
 
             if (id.includes("arm") || id.includes("leg")) {
                 mesh.setPivotPoint(new BABYLON.Vector3(0, scale[1] / 2, 0));
@@ -203,16 +203,33 @@
             const mat = this.createMaterial(name + "_" + id, p);
             mesh.material = mat;
 
-            // Merging Logic: Only merge if NO parent specified (root level parts usually)
+            // v27.5: Animation Safety
+            // If this part is targeted by an animation, DO NOT merge it.
+            // We need to know if 'id' is in the Timeline.
+            // Let's pre-calculate this set outside the loop for performance?
+            // Actually, let's just do it inline here for safety if we access asset.Timeline efficiently.
+
+            const timeline = this.getProp(asset, "Timeline");
+            let isAnimated = false;
+            if (timeline) {
+                isAnimated = timeline.some(t => this.getProp(t, "TargetId") === id);
+            }
+
+            // Merging Logic: Only merge if NO parent specified AND not animated
             const parentId = this.getProp(p, "ParentId");
-            if (!parentId) {
+            if (!parentId && !isAnimated) {
                 if (!meshesByMat[mat.uniqueId]) meshesByMat[mat.uniqueId] = [];
                 meshesByMat[mat.uniqueId].push(mesh);
             } else {
-                // Keep hierarchy for complex props
-                const parent = this.scene.getNodeByName(name + "_" + parentId);
-                if (parent) mesh.parent = parent;
-                else mesh.parent = group;
+                // Keep hierarchy for complex props OR animated parts
+                if (parentId) {
+                    const parent = this.scene.getNodeByName(name + "_" + parentId);
+                    if (parent) mesh.parent = parent;
+                    else mesh.parent = group;
+                } else {
+                    // Root level but animated (kept separate)
+                    mesh.parent = group;
+                }
             }
         });
 
@@ -231,7 +248,7 @@
                         merged.parent = group;
                         merged.material = mat;
                         merged.checkCollisions = true; // Fix: Enable collisions on merged result
-                        this.log("Merged " + list.length + " meshes for mat " + matId, "gray");
+                        //this.log("Merged " + list.length + " meshes for mat " + matId, "gray");
                     }
                 }
             }
@@ -254,6 +271,13 @@
         if (transform && transform.isTrigger) {
             this.buildingTriggers.push({ name: name, pos: pos, radius: transform.triggerRadius || 3 });
         }
+
+        // v20.9: New Animation Support
+        const timeline = this.getProp(asset, "Timeline");
+        if (timeline && timeline.length > 0 && typeof sh.playTimeline === 'function') {
+            sh.playTimeline(timeline, group);
+        }
+
         this.log("Spawned Prop: " + name, "lime");
     };
 

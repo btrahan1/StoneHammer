@@ -1,0 +1,38 @@
+[
+    {
+        "Name": "Backstab",
+        "Description": "Critical hit from behind.",
+        "Icon": "🗡️",
+        "ManaCost": 10,
+        "TargetType": "SingleEnemy",
+        "EffectType": "Damage",
+        "Multiplier": 2.2,
+        "Animation": "Attack",
+        "VfxColor": "#FF0000",
+        "Sfx": "stab"
+    },
+    {
+        "Name": "Fan of Knives",
+        "Description": "Throw daggers at everyone.",
+        "Icon": "🔪",
+        "ManaCost": 12,
+        "TargetType": "AllEnemies",
+        "EffectType": "Damage",
+        "Multiplier": 1.1,
+        "Animation": "Spin",
+        "VfxColor": "#555555",
+        "Sfx": "knife_throw"
+    },
+    {
+        "Name": "Stealth",
+        "Description": "Become invisible.",
+        "Icon": "👻",
+        "ManaCost": 5,
+        "TargetType": "Self",
+        "EffectType": "Buff",
+        "Multiplier": 0.0,
+        "Animation": "Crouch",
+        "VfxColor": "#111111",
+        "Sfx": "stealth"
+    }
+]

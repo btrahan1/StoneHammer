@@ -1,0 +1,38 @@
+[
+    {
+        "Name": "Power Strike",
+        "Description": "A heavy blow.",
+        "Icon": "⚔️",
+        "ManaCost": 5,
+        "TargetType": "SingleEnemy",
+        "EffectType": "Damage",
+        "Multiplier": 1.5,
+        "Animation": "Attack",
+        "VfxColor": "#FFFFFF",
+        "Sfx": "attack_melee"
+    },
+    {
+        "Name": "Whirlwind",
+        "Description": "Spin to win against all foes.",
+        "Icon": "🌪️",
+        "ManaCost": 15,
+        "TargetType": "AllEnemies",
+        "EffectType": "Damage",
+        "Multiplier": 1.2,
+        "Animation": "Spin",
+        "VfxColor": "#CCCCCC",
+        "Sfx": "whoosh"
+    },
+    {
+        "Name": "Block",
+        "Description": "Reduce incoming damage.",
+        "Icon": "🛡️",
+        "ManaCost": 0,
+        "TargetType": "Self",
+        "EffectType": "Buff",
+        "Multiplier": 0.5,
+        "Animation": "Block",
+        "VfxColor": "#444444",
+        "Sfx": "shield_bash"
+    }
+]

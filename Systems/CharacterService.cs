@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static StoneHammer.Systems.CharacterModels;
+using System.Text.Json;
 
 namespace StoneHammer.Systems
 {
@@ -9,6 +10,8 @@ namespace StoneHammer.Systems
     {
         public CharacterData Player => Party[0]; // Main Character
         public List<CharacterData> Party { get; private set; } = new List<CharacterData>();
+        
+        private HttpClient _http;
         
         // Event to notify UI of changes
         public event Action? OnCharacterUpdated;
@@ -19,18 +22,19 @@ namespace StoneHammer.Systems
             OnCharacterUpdated?.Invoke();
         }
 
-        public CharacterService()
+        public CharacterService(HttpClient http)
         {
-            Initialize();
+            _http = http;
+            // InitializeAsync must be called manually or fire-and-forget (not ideal but ok for client-side Blazor if careful)
         }
 
-        public void ResetGame()
+        public async Task ResetGame()
         {
-            Initialize();
+            await InitializeAsync();
             OnCharacterUpdated?.Invoke();
         }
 
-        private void Initialize()
+        public async Task InitializeAsync()
         {
             Party.Clear();
             
@@ -73,10 +77,10 @@ namespace StoneHammer.Systems
             Equip(mainChar, mainChar.Inventory.FirstOrDefault(i => i.Name == "Work Helmet"));
             
             // Set default class
-            SetClass(mainChar, CharacterClass.Fighter);
+            await SetClassAsync(mainChar, CharacterClass.Fighter);
         }
 
-        public void RecruitMember()
+        public async Task RecruitMember()
         {
             if (Party.Count >= 4) return;
             
@@ -91,7 +95,7 @@ namespace StoneHammer.Systems
             };
             
             Party.Add(recruit);
-            SetClass(recruit, newClass); // Init stats
+            await SetClassAsync(recruit, newClass); // Init stats
             OnCharacterUpdated?.Invoke();
         }
 
@@ -153,7 +157,7 @@ namespace StoneHammer.Systems
             OnCharacterUpdated?.Invoke();
         }
 
-        public void SetClass(CharacterData target, CharacterClass newClass)
+        public async Task SetClassAsync(CharacterData target, CharacterClass newClass)
         {
             target.Class = newClass;
             
@@ -166,27 +170,35 @@ namespace StoneHammer.Systems
                 case CharacterClass.Fighter:
                     target.Stats.Strength = 16;
                     target.Stats.Constitution = 14;
-                    AddSkill(target, new Skill { Name = "Power Strike", Description = "A heavy blow.", ManaCost = 5, Icon = "⚔️" });
-                    AddSkill(target, new Skill { Name = "Block", Description = "Reduce damage.", ManaCost = 0, Icon = "🛡️" });
                     break;
                 case CharacterClass.Rogue:
                     target.Stats.Dexterity = 16;
                     target.Stats.Charisma = 14;
-                    AddSkill(target, new Skill { Name = "Backstab", Description = "Critical hit from behind.", ManaCost = 10, Icon = "🗡️" });
-                    AddSkill(target, new Skill { Name = "Stealth", Description = "Become invisible.", ManaCost = 5, Icon = "👻" });
                     break;
                 case CharacterClass.Healer:
                     target.Stats.Wisdom = 16;
                     target.Stats.Constitution = 12;
-                    AddSkill(target, new Skill { Name = "Heal", Description = "Restore HP.", ManaCost = 8, Icon = "💖" });
-                    AddSkill(target, new Skill { Name = "Smite", Description = "Holy damage.", ManaCost = 6, Icon = "⚡" });
                     break;
                 case CharacterClass.Mage:
                     target.Stats.Intelligence = 16;
                     target.Stats.Wisdom = 14;
-                    AddSkill(target, new Skill { Name = "Fireball", Description = "Explosive damage.", ManaCost = 12, Icon = "🔥" });
-                    AddSkill(target, new Skill { Name = "Ice Bolt", Description = "Freeze enemy.", ManaCost = 8, Icon = "❄️" });
                     break;
+            }
+
+            // Load Skills from JSON
+            try 
+            {
+                string jsonPath = $"assets/data/skills/skills_{newClass.ToString().ToLower()}.json";
+                var json = await _http.GetStringAsync(jsonPath + "?v=" + DateTime.Now.Ticks);
+                var skills = JsonSerializer.Deserialize<List<Skill>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (skills != null) 
+                {
+                    target.Skills.AddRange(skills);
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"[CharacterService] Failed to load skills for {newClass}: {ex.Message}");
             }
             
             // Recalc Max Resource

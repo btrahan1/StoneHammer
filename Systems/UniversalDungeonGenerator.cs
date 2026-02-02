@@ -442,6 +442,20 @@ namespace StoneHammer.Systems
         {
             // Drunkard's Walk Tunnel
             var rng = new System.Random();
+            
+            // 0. Safety Foundation (Bedrock to prevent falling)
+            // Fix for Falling Through World in Sewers
+            int mapSize = 400;
+            asset.Parts.Add(new ProceduralPart 
+            { 
+                Id = "tunnel_foundation", 
+                Shape = "Box", 
+                Position = new[] { 0f, -4.0f, 0f }, // Slightly lower to clear sludge channels
+                Scale = new[] { (float)mapSize, 1f, (float)mapSize }, 
+                ColorHex = "#1a0f0a", // Darker Mud/Dirt
+                Material = "Stone" 
+            });
+
             int walkerX = 0; int walkerY = 0;
             int steps = 60;
             var path = new HashSet<(int, int)>();

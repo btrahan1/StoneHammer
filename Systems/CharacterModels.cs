@@ -27,6 +27,23 @@ namespace StoneHammer.Systems
             Mage
         }
 
+        public enum SkillTargetType
+        {
+            SingleEnemy,
+            AllEnemies,
+            SingleAlly,
+            AllAllies,
+            Self
+        }
+
+        public enum SkillEffectType
+        {
+            Damage,
+            Heal,
+            Buff,
+            Debuff
+        }
+
         public class Skill
         {
             public string Id { get; set; } = System.Guid.NewGuid().ToString();
@@ -36,6 +53,14 @@ namespace StoneHammer.Systems
             public int ManaCost { get; set; } = 0;
             public int Cooldown { get; set; } = 0;
             public bool IsPassive { get; set; } = false;
+            
+            // Data-Driven Properties
+            public SkillTargetType TargetType { get; set; } = SkillTargetType.SingleEnemy;
+            public SkillEffectType EffectType { get; set; } = SkillEffectType.Damage;
+            public float Multiplier { get; set; } = 1.0f;
+            public string Animation { get; set; } = "Attack";
+            public string VfxColor { get; set; } = "#FFFFFF";
+            public string Sfx { get; set; } = "attack_melee";
         }
 
         public enum EquipmentSlot

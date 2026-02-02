@@ -344,7 +344,7 @@
         if (_selected != null && Enum.TryParse(typeof(CharacterClass), e.Value?.ToString(), out var result))
         {
             var newClass = (CharacterClass)result;
-            CharService.SetClass(_selected, newClass);
+            await CharService.SetClassAsync(_selected, newClass);
             
             // Only update visuals if it's the main player (for now)
             if (_selected == CharService.Player) {

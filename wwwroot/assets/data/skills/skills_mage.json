@@ -1,0 +1,38 @@
+[
+    {
+        "Name": "Fireball",
+        "Description": "Explodes on all enemies.",
+        "Icon": "🔥",
+        "ManaCost": 15,
+        "TargetType": "AllEnemies",
+        "EffectType": "Damage",
+        "Multiplier": 1.5,
+        "Animation": "Cast_Fire",
+        "VfxColor": "#FF5500",
+        "Sfx": "spell_fire"
+    },
+    {
+        "Name": "Ice Bolt",
+        "Description": "Freeze single enemy.",
+        "Icon": "❄️",
+        "ManaCost": 8,
+        "TargetType": "SingleEnemy",
+        "EffectType": "Damage",
+        "Multiplier": 1.5,
+        "Animation": "Cast_Ice",
+        "VfxColor": "#00FFFF",
+        "Sfx": "spell_ice"
+    },
+    {
+        "Name": "Meteor",
+        "Description": "Massive AOE damage.",
+        "Icon": "☄️",
+        "ManaCost": 25,
+        "TargetType": "AllEnemies",
+        "EffectType": "Damage",
+        "Multiplier": 2.5,
+        "Animation": "Cast_Fire",
+        "VfxColor": "#FF2200",
+        "Sfx": "explosion"
+    }
+]

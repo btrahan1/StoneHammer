@@ -1,0 +1,38 @@
+[
+    {
+        "Name": "Heal",
+        "Description": "Restore HP to one ally.",
+        "Icon": "💖",
+        "ManaCost": 8,
+        "TargetType": "SingleAlly",
+        "EffectType": "Heal",
+        "Multiplier": 2.0,
+        "Animation": "Cast_Heal",
+        "VfxColor": "#00FF00",
+        "Sfx": "spell_heal"
+    },
+    {
+        "Name": "Party Heal",
+        "Description": "Restore HP to everyone.",
+        "Icon": "✨",
+        "ManaCost": 20,
+        "TargetType": "AllAllies",
+        "EffectType": "Heal",
+        "Multiplier": 1.5,
+        "Animation": "Cast_Heal",
+        "VfxColor": "#AA00FF",
+        "Sfx": "spell_heal"
+    },
+    {
+        "Name": "Smite",
+        "Description": "Holy damage.",
+        "Icon": "⚡",
+        "ManaCost": 6,
+        "TargetType": "SingleEnemy",
+        "EffectType": "Damage",
+        "Multiplier": 1.8,
+        "Animation": "Cast_Smite",
+        "VfxColor": "#FFFF00",
+        "Sfx": "spell_thunder"
+    }
+]

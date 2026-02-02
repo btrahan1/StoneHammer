@@ -55,12 +55,20 @@ namespace StoneHammer.Systems
             }
         }
 
+        public async Task ClearAllSaves()
+        {
+             var keys = await _js.InvokeAsync<List<string>>("stoneHammer.storage.getSaves", KeyPrefix);
+             foreach(var key in keys)
+             {
+                 await _js.InvokeVoidAsync("localStorage.removeItem", key);
+             }
+        }
+
         public async Task<string?> GetLatestSave()
         {
             var keys = await _js.InvokeAsync<List<string>>("stoneHammer.storage.getSaves", KeyPrefix);
             if (keys == null || keys.Count == 0) 
             {
-                Console.WriteLine("[SaveService] No saves found.");
                 return null;
             }
 
@@ -76,20 +84,20 @@ namespace StoneHammer.Systems
                     var save = JsonSerializer.Deserialize<SaveGame>(json);
                     if (save != null)
                     {
-                        Console.WriteLine($"[SaveService] Found '{save.Name}' Created: {save.Created}");
+                        // Console.WriteLine($"[SaveService] Found '{save.Name}' Created: {save.Created}");
                         if (latest == null || save.Created > latest.Created)
                         {
                             latest = save;
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 { 
-                    Console.WriteLine($"[SaveService] Error reading {key}: {ex.Message}");
+                     // Console.WriteLine($"[SaveService] Error reading {key}: {ex.Message}");
                 }
             }
 
-            if (latest != null) Console.WriteLine($"[SaveService] Selected Latest: {latest.Name}");
+            if (latest != null) {} // Console.WriteLine($"[SaveService] Selected Latest: {latest.Name}");
             return latest?.Name;
         }
     }
