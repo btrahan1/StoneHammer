@@ -57,6 +57,20 @@
                 180,
                 0
             ]
+        },
+        {
+            "AssetPath": "assets/class_trainer_hub.json",
+            "Name": "ClassTrainerHub",
+            "Position": [
+                10,
+                0,
+                -10
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ]
         }
     ],
     "DungeonEntrances": [

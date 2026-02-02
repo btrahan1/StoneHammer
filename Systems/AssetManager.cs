@@ -47,6 +47,13 @@ namespace StoneHammer.Systems
         public async Task SpawnStore(float x = 0, float z = 0) => await SpawnAsset("assets/general_store.json", "General Store", false, new { Position = new[] { x, 0, z } });
         public async Task SpawnGuildMaster(float x = 0, float z = 0) => await SpawnAsset("assets/guild_master.json", "Guild Master Debug", false, new { Position = new[] { x, 0, z } }); // Debug helper
 
+        public async Task SpawnProp(string assetFile, string name, float x, float z)
+        {
+            // Auto-prepend assets/ if not present
+            string path = assetFile.StartsWith("assets/") ? assetFile : $"assets/{assetFile}";
+            await SpawnAsset(path, name, false, new { Position = new[] { x, 0, z } });
+        }
+
         public async Task ExitBuilding(float x, float z)
         {
             await GenerateTown(x, z);

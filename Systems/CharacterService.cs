@@ -157,6 +157,37 @@ namespace StoneHammer.Systems
             OnCharacterUpdated?.Invoke();
         }
 
+        private Dictionary<CharacterClass, List<Skill>> _skillCache = new Dictionary<CharacterClass, List<Skill>>();
+
+        public async Task<List<Skill>> GetClassSkillsAsync(CharacterClass cClass)
+        {
+            if (_skillCache.ContainsKey(cClass)) return _skillCache[cClass];
+
+            try 
+            {
+                string jsonPath = $"assets/data/skills/skills_{cClass.ToString().ToLower()}.json";
+                var json = await _http.GetStringAsync(jsonPath + "?v=" + DateTime.Now.Ticks);
+                
+                var options = new JsonSerializerOptions 
+                { 
+                    PropertyNameCaseInsensitive = true 
+                };
+                options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+
+                var skills = JsonSerializer.Deserialize<List<Skill>>(json, options);
+                if (skills != null) 
+                {
+                    _skillCache[cClass] = skills;
+                    return skills;
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"[CharacterService] Failed to load skills for {cClass}: {ex.Message}");
+            }
+            return new List<Skill>();
+        }
+
         public async Task SetClassAsync(CharacterData target, CharacterClass newClass)
         {
             target.Class = newClass;
@@ -185,27 +216,35 @@ namespace StoneHammer.Systems
                     break;
             }
 
-            // Load Skills from JSON
-            try 
-            {
-                string jsonPath = $"assets/data/skills/skills_{newClass.ToString().ToLower()}.json";
-                var json = await _http.GetStringAsync(jsonPath + "?v=" + DateTime.Now.Ticks);
-                var skills = JsonSerializer.Deserialize<List<Skill>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (skills != null) 
-                {
-                    target.Skills.AddRange(skills);
-                }
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"[CharacterService] Failed to load skills for {newClass}: {ex.Message}");
-            }
+            // Load Skills and Grant Starters
+            var allSkills = await GetClassSkillsAsync(newClass);
+            var starters = allSkills.Where(s => s.LevelRequirement <= 1 && s.GoldCost == 0).ToList();
+            target.Skills.AddRange(starters);
             
             // Recalc Max Resource
             target.MaxMana = target.GetMaxResource();
             target.CurrentMana = target.MaxMana;
             target.CurrentHP = target.Stats.MaxHP;
             
+            OnCharacterUpdated?.Invoke();
+        }
+
+        public bool CanLearnSkill(CharacterData character, Skill skill)
+        {
+            if (character.Skills.Any(s => s.Name == skill.Name)) return false; // Already known
+            if (character.Level < skill.LevelRequirement) return false;
+            // v30.1: Pooled Gold (Player pays for everyone)
+            if (Player.Gold < skill.GoldCost) return false;
+            return true;
+        }
+
+        public void LearnSkill(CharacterData character, Skill skill)
+        {
+            if (!CanLearnSkill(character, skill)) return;
+
+            // v30.1: Pooled Gold
+            Player.Gold -= skill.GoldCost;
+            character.Skills.Add(skill);
             OnCharacterUpdated?.Invoke();
         }
 

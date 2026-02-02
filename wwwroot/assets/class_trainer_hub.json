@@ -1,0 +1,329 @@
+{
+    "Name": "ClassTrainerHub",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "floor_base",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                0,
+                0,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                10,
+                0.2,
+                10
+            ],
+            "ColorHex": "#444444",
+            "Material": "Stone",
+            "Operation": "Union"
+        },
+        {
+            "Id": "wall_back",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                0,
+                2,
+                -4.9
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                10,
+                4,
+                0.2
+            ],
+            "ColorHex": "#555555",
+            "Material": "Stone",
+            "Operation": "Union"
+        },
+        {
+            "Id": "wall_left",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                4.9,
+                2,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.2,
+                4,
+                10
+            ],
+            "ColorHex": "#555555",
+            "Material": "Stone",
+            "Operation": "Union"
+        },
+        {
+            "Id": "wall_right",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                -4.9,
+                2,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.2,
+                4,
+                10
+            ],
+            "ColorHex": "#555555",
+            "Material": "Stone",
+            "Operation": "Union"
+        },
+        {
+            "Id": "mage_pedestal",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                3.5,
+                0.6,
+                -3.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.8,
+                1.2,
+                0.8
+            ],
+            "ColorHex": "#4B0082",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "mage_orb",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                3.5,
+                1.5,
+                -3.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "ColorHex": "#00FFFF",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "rogue_target_post",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                -3.5,
+                1.0,
+                -3.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.2,
+                2.0,
+                0.2
+            ],
+            "ColorHex": "#3D2B1F",
+            "Material": "Wood",
+            "Operation": "Union"
+        },
+        {
+            "Id": "rogue_target_board",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                -3.5,
+                1.5,
+                -3.3
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "Scale": [
+                0.8,
+                0.1,
+                0.8
+            ],
+            "ColorHex": "#8B0000",
+            "Material": "Leather",
+            "Operation": "Union"
+        },
+        {
+            "Id": "healer_altar",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                3.8,
+                0.5,
+                2.0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                1.5,
+                1.0,
+                3.0
+            ],
+            "ColorHex": "#FFFFFF",
+            "Material": "Glass",
+            "Operation": "Union"
+        },
+        {
+            "Id": "healer_basin",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                3.8,
+                1.1,
+                2.0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.6,
+                0.2,
+                0.6
+            ],
+            "ColorHex": "#FFD700",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "fighter_rack_back",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                -4.5,
+                1.0,
+                2.0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.2,
+                2.0,
+                3.0
+            ],
+            "ColorHex": "#4A3728",
+            "Material": "Wood",
+            "Operation": "Union"
+        },
+        {
+            "Id": "fighter_sword_blade",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                -4.3,
+                1.2,
+                2.0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.05,
+                1.5,
+                0.2
+            ],
+            "ColorHex": "#C0C0C0",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "main_counter",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                0,
+                0.5,
+                -1.0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                4.0,
+                1.0,
+                1.0
+            ],
+            "ColorHex": "#5D4037",
+            "Material": "Wood",
+            "Operation": "Union"
+        }
+    ],
+    "Timeline": [
+        {
+            "Time": 0.0,
+            "Action": "Rotate",
+            "TargetId": "mage_orb",
+            "Value": [
+                0,
+                360,
+                0
+            ],
+            "Duration": 4.0
+        },
+        {
+            "Time": 0.0,
+            "Action": "Color",
+            "TargetId": "mage_orb",
+            "Value": [
+                0,
+                1,
+                1
+            ],
+            "Duration": 2.0
+        }
+    ]
+}

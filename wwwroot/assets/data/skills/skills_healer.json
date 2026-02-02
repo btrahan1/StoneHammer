@@ -1,38 +1,72 @@
 [
     {
-        "Name": "Heal",
-        "Description": "Restore HP to one ally.",
+        "Name": "Basic Heal",
+        "Description": "Restores a small amount of HP.",
         "Icon": "💖",
-        "ManaCost": 8,
+        "ManaCost": 5,
         "TargetType": "SingleAlly",
-        "EffectType": "Heal",
-        "Multiplier": 2.0,
-        "Animation": "Cast_Heal",
-        "VfxColor": "#00FF00",
-        "Sfx": "spell_heal"
-    },
-    {
-        "Name": "Party Heal",
-        "Description": "Restore HP to everyone.",
-        "Icon": "✨",
-        "ManaCost": 20,
-        "TargetType": "AllAllies",
         "EffectType": "Heal",
         "Multiplier": 1.5,
         "Animation": "Cast_Heal",
-        "VfxColor": "#AA00FF",
-        "Sfx": "spell_heal"
+        "VfxColor": "#00FF00",
+        "Sfx": "spell_heal_small",
+        "LevelRequirement": 1,
+        "GoldCost": 0
     },
     {
         "Name": "Smite",
-        "Description": "Holy damage.",
+        "Description": "Call down holy fire on an enemy.",
         "Icon": "⚡",
-        "ManaCost": 6,
+        "ManaCost": 10,
         "TargetType": "SingleEnemy",
         "EffectType": "Damage",
-        "Multiplier": 1.8,
+        "Multiplier": 1.6,
         "Animation": "Cast_Smite",
         "VfxColor": "#FFFF00",
-        "Sfx": "spell_thunder"
+        "Sfx": "spell_thunder",
+        "LevelRequirement": 5,
+        "GoldCost": 100
+    },
+    {
+        "Name": "Divine Shield",
+        "Description": "Protect self from harm.",
+        "Icon": "🛡️",
+        "ManaCost": 15,
+        "TargetType": "Self",
+        "EffectType": "Buff",
+        "Multiplier": 0.5,
+        "Animation": "Cast_Buff",
+        "VfxColor": "#FFFFCC",
+        "Sfx": "spell_shield",
+        "LevelRequirement": 10,
+        "GoldCost": 500
+    },
+    {
+        "Name": "Greater Heal",
+        "Description": "Restores a large amount of HP.",
+        "Icon": "💗",
+        "ManaCost": 25,
+        "TargetType": "SingleAlly",
+        "EffectType": "Heal",
+        "Multiplier": 3.0,
+        "Animation": "Cast_Heal_Big",
+        "VfxColor": "#00FF66",
+        "Sfx": "spell_heal_big",
+        "LevelRequirement": 15,
+        "GoldCost": 1500
+    },
+    {
+        "Name": "Party Heal",
+        "Description": "Heals all allies dramatically.",
+        "Icon": "✨",
+        "ManaCost": 40,
+        "TargetType": "AllAllies",
+        "EffectType": "Heal",
+        "Multiplier": 2.5,
+        "Animation": "Cast_Ultimate",
+        "VfxColor": "#AA00FF",
+        "Sfx": "spell_heal_party",
+        "LevelRequirement": 20,
+        "GoldCost": 5000
     }
 ]

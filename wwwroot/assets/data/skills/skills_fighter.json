@@ -1,38 +1,72 @@
 [
     {
         "Name": "Power Strike",
-        "Description": "A heavy blow.",
+        "Description": "A heavy blow with your weapon.",
         "Icon": "⚔️",
-        "ManaCost": 5,
+        "ManaCost": 0,
         "TargetType": "SingleEnemy",
         "EffectType": "Damage",
         "Multiplier": 1.5,
-        "Animation": "Attack",
+        "Animation": "Attack_Heavy",
         "VfxColor": "#FFFFFF",
-        "Sfx": "attack_melee"
-    },
-    {
-        "Name": "Whirlwind",
-        "Description": "Spin to win against all foes.",
-        "Icon": "🌪️",
-        "ManaCost": 15,
-        "TargetType": "AllEnemies",
-        "EffectType": "Damage",
-        "Multiplier": 1.2,
-        "Animation": "Spin",
-        "VfxColor": "#CCCCCC",
-        "Sfx": "whoosh"
+        "Sfx": "attack_heavy",
+        "LevelRequirement": 1,
+        "GoldCost": 0
     },
     {
         "Name": "Block",
-        "Description": "Reduce incoming damage.",
+        "Description": "Raise your guard to reduce damage.",
         "Icon": "🛡️",
         "ManaCost": 0,
         "TargetType": "Self",
         "EffectType": "Buff",
         "Multiplier": 0.5,
         "Animation": "Block",
-        "VfxColor": "#444444",
-        "Sfx": "shield_bash"
+        "VfxColor": "#888888",
+        "Sfx": "shield_bash",
+        "LevelRequirement": 5,
+        "GoldCost": 100
+    },
+    {
+        "Name": "Cleave",
+        "Description": "Swing wide to hit multiple enemies.",
+        "Icon": "🪓",
+        "ManaCost": 15,
+        "TargetType": "AllEnemies",
+        "EffectType": "Damage",
+        "Multiplier": 1.2,
+        "Animation": "Attack_Cleave",
+        "VfxColor": "#FFDD00",
+        "Sfx": "whoosh",
+        "LevelRequirement": 10,
+        "GoldCost": 500
+    },
+    {
+        "Name": "Battle Cry",
+        "Description": "Inspire allies, increasing damage.",
+        "Icon": "📢",
+        "ManaCost": 10,
+        "TargetType": "AllAllies",
+        "EffectType": "Buff",
+        "Multiplier": 1.2,
+        "Animation": "Shout",
+        "VfxColor": "#FF0000",
+        "Sfx": "shout",
+        "LevelRequirement": 15,
+        "GoldCost": 1500
+    },
+    {
+        "Name": "Whirlwind",
+        "Description": "Spin rapidly, devastating all foes.",
+        "Icon": "🌪️",
+        "ManaCost": 30,
+        "TargetType": "AllEnemies",
+        "EffectType": "Damage",
+        "Multiplier": 2.5,
+        "Animation": "Spin",
+        "VfxColor": "#CCCCCC",
+        "Sfx": "whirlwind",
+        "LevelRequirement": 20,
+        "GoldCost": 5000
     }
 ]

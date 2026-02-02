@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using StoneHammer.Components
 @using StoneHammer.Systems
+@using static StoneHammer.Systems.CharacterModels
 @implements IDisposable
 @using System.Text.Json
 @inject AssetManager AssetManager
@@ -35,6 +36,7 @@
             <button class="btn btn-secondary" @onclick="SpawnSandboxPillar">Spawn Sandbox Pillar</button>
             <button class="btn btn-secondary" @onclick="SpawnSandboxPillar">Spawn Sandbox Pillar</button>
             <button class="btn btn-info" @onclick="SpawnGuildMaster">Spawn Guild Master</button>
+            <button class="btn btn-primary" @onclick="@(async () => await AssetManager.SpawnProp("class_trainer_hub.json", "ClassTrainerHub", 5, 0))">Spawn Skills Hub</button>
             <button class="btn btn-dark" style="border:1px solid gold; color:gold" @onclick="OpenInn">🍺 Visit Inn</button>
             <button class="btn btn-danger" @onclick="ClearScene">Clear Scene</button>
             <button class="btn btn-warning" style="background:red; color:white;" @onclick="WipeSaves">⚠️ Wipe Saves</button>
@@ -47,6 +49,7 @@
 <LootDialog />
 <CharacterSheet @ref="_charSheet" />
 <InnDialog @ref="_innDialog" />
+<SkillTrainer @ref="_skillTrainer" />
 <ConfirmationDialog @ref="_confirmDialog" />
 
 @code {
@@ -150,6 +153,15 @@
     public void OpenShop()
     {
         ShopService.OpenShop();
+    }
+
+    private SkillTrainer? _skillTrainer;
+
+    [JSInvokable]
+    public void OpenSkillTrainer(string partName)
+    {
+        _skillTrainer?.Show();
+        StateHasChanged();
     }
     
     private ConfirmationDialog? _confirmDialog; // Added Reference

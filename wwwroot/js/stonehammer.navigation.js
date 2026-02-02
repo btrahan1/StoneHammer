@@ -222,6 +222,14 @@
                     this.dotNetHelper.invokeMethodAsync('OpenShop');
                 }
             }
+
+            // v30.0: Class Trainer Hub Interaction
+            if (name.includes("ClassTrainerHub")) {
+                this.log("Opening Skill Trainer...", "gold");
+                if (this.dotNetHelper) {
+                    this.dotNetHelper.invokeMethodAsync('OpenSkillTrainer', originalPartName);
+                }
+            }
         };
     };
 

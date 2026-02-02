@@ -52,6 +52,8 @@ namespace StoneHammer.Systems
             public string Icon { get; set; } = "✨";
             public int ManaCost { get; set; } = 0;
             public int Cooldown { get; set; } = 0;
+            public int LevelRequirement { get; set; } = 1; // New
+            public int GoldCost { get; set; } = 0;         // New
             public bool IsPassive { get; set; } = false;
             
             // Data-Driven Properties

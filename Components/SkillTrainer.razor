@@ -1,0 +1,251 @@
+@using StoneHammer.Systems
+@using static StoneHammer.Systems.CharacterModels
+@inject CharacterService CharacterService
+
+@if (IsVisible)
+{
+    <div class="skill-trainer-modal">
+        <div class="trainer-header">
+            <h3>Class Trainer Hub</h3>
+            <div class="header-gold">Party Gold: <span>@CharacterService.Player.Gold 🪙</span></div>
+            <button class="close-btn" @onclick="Close">X</button>
+        </div>
+
+        <div class="trainer-content party-grid">
+            @foreach (var member in CharacterService.Party)
+            {
+                <div class="party-tile">
+                    <div class="tile-header @member.Class.ToString().ToLower()">
+                        <div class="char-name">@member.Name</div>
+                        <div class="char-meta">
+                            <span class="char-class">@member.Class</span>
+                            <span class="char-level">Lvl @member.Level</span>
+                        </div>
+                    </div>
+
+                    <div class="tile-skills">
+                        @if (_partySkills.TryGetValue(member, out var skills))
+                        {
+                            @if (!skills.Any())
+                            {
+                                <p class="no-skills">No skills available.</p>
+                            }
+                            else
+                            {
+                                var learnedSkills = skills.Where(s => member.Skills.Any(k => k.Name == s.Name)).ToList();
+                                var availableSkills = skills.Where(s => !member.Skills.Any(k => k.Name == s.Name)).ToList();
+
+                                @if (availableSkills.Any())
+                                {
+                                    <div class="section-title">Available Training</div>
+                                    @foreach (var skill in availableSkills)
+                                    {
+                                        var canAfford = CharacterService.Player.Gold >= skill.GoldCost;
+                                        var levelMet = member.Level >= skill.LevelRequirement;
+                                        var canLearn = canAfford && levelMet;
+
+                                        <div class="skill-row @(canLearn ? "learnable" : "locked")">
+                                            <div class="skill-icon" title="@skill.Description">@skill.Icon</div>
+                                            <div class="skill-details">
+                                                <div class="skill-name">@skill.Name</div>
+                                                <div class="skill-reqs">
+                                                    <span class="@(levelMet ? "met" : "unmet")">Lvl @skill.LevelRequirement</span> • 
+                                                    <span class="@(canAfford ? "met" : "unmet")">@skill.GoldCost 🪙</span>
+                                                </div>
+                                            </div>
+                                            <div class="skill-btn">
+                                                <button class="btn-train" disabled="@(!canLearn)" @onclick="() => Learn(member, skill)">+</button>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="section-title">All Skills Learned!</div>
+                                }
+
+                                @if (learnedSkills.Any())
+                                {
+                                    <div class="section-title learned">Mastered Abilities</div>
+                                    @foreach (var skill in learnedSkills)
+                                    {
+                                        <div class="skill-row learned">
+                                            <div class="skill-icon" title="@skill.Description">@skill.Icon</div>
+                                            <div class="skill-details">
+                                                <div class="skill-name">@skill.Name</div>
+                                                <div class="learned-status">Mastered</div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <p class="loading">Loading...</p>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <style>
+        .skill-trainer-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90vw;
+            max-width: 1200px;
+            height: 80vh;
+            background: #1a1a1a;
+            border: 2px solid #5d4037;
+            border-radius: 8px;
+            color: white;
+            z-index: 2000;
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .trainer-header {
+            background: #3e2723;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #5d4037;
+        }
+        
+        .header-gold { font-size: 1.2em; color: #ffaa00; font-weight: bold; }
+        .header-gold span { color: white; background: #333; padding: 2px 8px; border-radius: 4px; border: 1px solid #ffaa00; }
+
+        .trainer-content {
+            padding: 20px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            background: #222;
+        }
+
+        .party-tile {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .tile-header {
+            padding: 10px;
+            background: #333;
+            border-bottom: 1px solid #444;
+        }
+        
+        .tile-header.mage { border-top: 3px solid #0088ff; }
+        .tile-header.fighter { border-top: 3px solid #ffaa00; }
+        .tile-header.rogue { border-top: 3px solid #ffff00; }
+        .tile-header.healer { border-top: 3px solid #aa00ff; }
+
+        .char-name { font-weight: bold; font-size: 1.1em; }
+        .char-meta { font-size: 0.85em; color: #aaa; display: flex; justify-content: space-between; }
+
+        .tile-skills {
+            padding: 10px;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 400px; /* Internal scroll for very long lists */
+        }
+
+        .section-title {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            color: #888;
+            margin: 10px 0 5px 0;
+            border-bottom: 1px solid #444;
+            padding-bottom: 2px;
+        }
+        .section-title.learned { color: #008800; margin-top: 15px; }
+
+        .skill-row {
+            display: flex;
+            align-items: center;
+            background: #333;
+            margin-bottom: 6px;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #3a3a3a;
+        }
+
+        .skill-row.learnable { border-color: #ffaa00; background: #3a2e22; }
+        .skill-row.learned { opacity: 0.6; }
+        .skill-row.locked { opacity: 0.5; }
+
+        .skill-icon { font-size: 1.5em; margin-right: 10px; width: 30px; text-align: center; }
+        
+        .skill-details { flex-grow: 1; }
+        .skill-name { font-weight: bold; font-size: 0.9em; }
+        .skill-reqs { font-size: 0.75em; }
+        .met { color: #88ff88; }
+        .unmet { color: #ff4444; }
+        .learned-status { font-size: 0.75em; color: #00ff00; }
+
+        .btn-train {
+            background: #ffaa00;
+            color: black;
+            border: none;
+            font-weight: bold;
+            width: 25px;
+            height: 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-train:disabled { background: #555; color: #888; cursor: not-allowed; }
+        
+        .close-btn { background: none; border: none; color: white; font-size: 1.2em; cursor: pointer; }
+    </style>
+}
+
+@code {
+    public bool IsVisible { get; private set; }
+    
+    private Dictionary<CharacterData, List<Skill>> _partySkills = new Dictionary<CharacterData, List<Skill>>();
+
+    public void Show(CharacterData? ignored = null, CharacterClass? ignoredClass = null)
+    {
+        IsVisible = true;
+        LoadSkills();
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+    private async void LoadSkills()
+    {
+        _partySkills.Clear();
+        foreach (var member in CharacterService.Party)
+        {
+            var skills = await CharacterService.GetClassSkillsAsync(member.Class);
+            _partySkills[member] = skills.OrderBy(s => s.LevelRequirement).ThenBy(s => s.GoldCost).ToList();
+        }
+        StateHasChanged();
+    }
+
+    private void Learn(CharacterData member, Skill skill)
+    {
+        CharacterService.LearnSkill(member, skill);
+        StateHasChanged(); // Refresh UI to update gold/learned status
+    }
+}
