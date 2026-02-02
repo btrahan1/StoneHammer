@@ -80,15 +80,8 @@
     public async Task ConfirmEnterBuilding(string buildingName)
     {
          string properName = buildingName.Replace("DungeonEntrance_", "").Replace("_", " ");
-         string lower = properName.ToLower();
-
-         if (lower.Contains("crypt")) properName = "The Ancient Crypt";
-         else if (lower.Contains("goblincave") || lower.Contains("goblin")) properName = "The Goblin Cave";
-         else if (lower.Contains("sewer")) properName = "The Sewers";
-         else if (lower.Contains("desert")) properName = "The Wastelands";
-         
-         // Use TItle Case if not matched
-         if (properName == lower) properName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(properName);
+         // Generic Title Casing for all Dungeons
+         properName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(properName);
 
          bool confirmed = await _confirmDialog.Show("Enter Dungeon?", $"Are you brave enough to enter {properName}?");
          

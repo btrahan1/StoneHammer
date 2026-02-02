@@ -124,7 +124,8 @@ namespace StoneHammer.Systems
                 await SpawnAsset("assets/exit_crystal.json", "DesertExit", false, new { Position = new float[] { 0, 10, 0 } });
             }
             // 2. Dungeons
-            else if (buildingName.StartsWith("DungeonEntrance_") || buildingName.Contains("Crypt") || buildingName.Contains("GoblinCave") || buildingName.Contains("Sewer"))
+            // 2. Dungeons (Generic Fallback)
+            else
             {
                 string dungeonId = "";
                 int depth = 1;
@@ -196,11 +197,7 @@ namespace StoneHammer.Systems
                 }
                 return;
             }
-            else
-            {
-                 // Default interior
-                 await SpawnAsset("assets/sandbox_interior.json", "Sandbox Interior");
-            }
+
             
             await SpawnPlayer(0, 0);
         }
