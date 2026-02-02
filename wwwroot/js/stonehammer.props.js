@@ -25,7 +25,7 @@
         ];
     };
 
-    sh.spawnVoxel = function (asset, name, isPlayer, transform) {
+    sh.spawnVoxel = function (asset, name, isPlayer, transform, metadata) {
         // v15.5: Singleton Enforcement (Prevent Double Spawns)
         // Check if this actor already exists and remove it to prevent "Ghost Nodes"
         const existingNode = this.scene.getTransformNodeByName("voxel_" + name) || this.scene.getMeshByName("voxel_" + name);
@@ -35,6 +35,7 @@
         }
 
         const group = new BABYLON.TransformNode("voxel_" + name, this.scene);
+        if (metadata) group.metadata = metadata;
 
         // Handle rotation if provided
         let rawParts = this.getProp(asset, "Parts");
@@ -149,9 +150,13 @@
         this.log("Spawned Actor: " + name, "lime");
     };
 
-    sh.spawnRecipe = function (asset, name, transform) {
+    sh.spawnRecipe = function (asset, name, transform, metadata) {
         const group = new BABYLON.TransformNode("recipe_" + name, this.scene);
+        if (metadata) group.metadata = metadata;
         const parts = this.getProp(asset, "Parts") || [];
+
+        // v24.0: Optimization - Mesh Merging
+        const meshesByMat = {};
 
         parts.forEach(p => {
             const shape = (this.getProp(p, "Shape") || "Box").toLowerCase();
@@ -180,17 +185,41 @@
             );
 
             // Restore Texture/Material Logic
-            mesh.material = this.createMaterial(name + "_" + id, p);
+            const mat = this.createMaterial(name + "_" + id, p);
+            mesh.material = mat;
 
+            // Merging Logic: Only merge if NO parent specified (root level parts usually)
             const parentId = this.getProp(p, "ParentId");
-            if (parentId) {
+            if (!parentId) {
+                if (!meshesByMat[mat.uniqueId]) meshesByMat[mat.uniqueId] = [];
+                meshesByMat[mat.uniqueId].push(mesh);
+            } else {
+                // Keep hierarchy for complex props
                 const parent = this.scene.getNodeByName(name + "_" + parentId);
                 if (parent) mesh.parent = parent;
                 else mesh.parent = group;
-            } else {
-                mesh.parent = group;
             }
         });
+
+        // Perform Merge
+        for (const matId in meshesByMat) {
+            const list = meshesByMat[matId];
+            if (list.length > 0) {
+                // Use the first material (they should all be unique instances from cache now, or compatible)
+                const mat = list[0].material;
+                if (list.length === 1) {
+                    list[0].parent = group;
+                } else {
+                    const merged = BABYLON.Mesh.MergeMeshes(list, true, true, undefined, false, true);
+                    if (merged) {
+                        merged.name = "merged_" + matId;
+                        merged.parent = group;
+                        merged.material = mat;
+                        this.log("Merged " + list.length + " meshes for mat " + matId, "gray");
+                    }
+                }
+            }
+        }
 
         // Apply Prefab-level Transform
         const pos = this.parseVec3(this.getProp(transform, "Position"));

@@ -1,0 +1,120 @@
+{
+    "StaticBuildings": [
+        {
+            "AssetPath": "assets/tavern.json",
+            "Name": "The Rusty Mug",
+            "Position": [
+                -20,
+                0,
+                20
+            ],
+            "Rotation": [
+                0,
+                45,
+                0
+            ],
+            "ActionId": "OpenTavern"
+        },
+        {
+            "AssetPath": "assets/blacksmith.json",
+            "Name": "Hammer & Sickle Store",
+            "Position": [
+                20,
+                0,
+                20
+            ],
+            "Rotation": [
+                0,
+                -45,
+                0
+            ],
+            "ActionId": "OpenShop"
+        },
+        {
+            "AssetPath": "assets/fountain.json",
+            "Name": "Town Square Fountain",
+            "Position": [
+                0,
+                0,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "AssetPath": "assets/house.json",
+            "Name": "Player House",
+            "Position": [
+                -30,
+                0,
+                -30
+            ],
+            "Rotation": [
+                0,
+                180,
+                0
+            ]
+        }
+    ],
+    "DungeonEntrances": [
+        {
+            "DungeonId": "crypt",
+            "EntranceAssetPath": "assets/crypt_entrance.json",
+            "Position": [
+                0,
+                0,
+                50
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "DungeonId": "goblin_cave",
+            "EntranceAssetPath": "assets/mine_entrance.json",
+            "Position": [
+                -60,
+                0,
+                0
+            ],
+            "Rotation": [
+                0,
+                90,
+                0
+            ]
+        },
+        {
+            "DungeonId": "sewer",
+            "EntranceAssetPath": "assets/sewer_entrance.json",
+            "Position": [
+                40,
+                0,
+                -40
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "DungeonId": "thehole",
+            "EntranceAssetPath": "assets/thehole_entrance.json",
+            "Position": [
+                40,
+                0,
+                40
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ]
+        }
+    ]
+}

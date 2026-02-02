@@ -22,7 +22,8 @@
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("stoneHammer.setDotNetHelper", DotNetObjectReference.Create(this));
+            // v26.0: Moved .net helper to Home.razor to centralize logic
+            // await JSRuntime.InvokeVoidAsync("stoneHammer.setDotNetHelper", DotNetObjectReference.Create(this));
             await JSRuntime.InvokeVoidAsync("stoneHammer.init", "renderCanvas");
         }
     }

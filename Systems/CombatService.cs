@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace StoneHammer.Systems
 {
@@ -208,7 +209,7 @@ namespace StoneHammer.Systems
 
         public bool IsGroupDefeated(string groupName) => _defeatedGroups.Contains(groupName);
 
-        public async Task StartCombat(string targetActorName)
+        public async Task StartCombat(string targetActorName, JsonElement? metadata = null)
         {
             if (IsFighting) return;
 
@@ -228,13 +229,21 @@ namespace StoneHammer.Systems
             
             // v21.1: Context-Aware Return
             // In the future, pass the scene name from JS. For now, infer from mob type.
-            if (baseName.Contains("Goblin") || baseName.Contains("Spider"))
+            if (metadata.HasValue && metadata.Value.TryGetProperty("returnScene", out var rs))
+            {
+                 _returnToScene = rs.ToString();
+            }
+            else if (baseName.Contains("Goblin") || baseName.Contains("Spider"))
             {
                 _returnToScene = "GoblinCave";
             }
             else if (baseName.Contains("Slime") || baseName.Contains("Rat"))
             {
                 _returnToScene = "Sewer";
+            }
+            else if (baseName.Contains("Snake") || baseName.Contains("Beetle"))
+            {
+                _returnToScene = "DungeonEntrance_thehole";
             }
             else
             {
@@ -335,7 +344,14 @@ namespace StoneHammer.Systems
                     IsHero = false, ModelId = enemyId
                 };
 
-                if (_engagedGroup.Contains("Goblin")) 
+                if (metadata.HasValue)
+                {
+                    // Data-Driven Stats
+                    enemy.Name = $"{_engagedGroup} {suffix}"; // Generic name
+                    if (metadata.Value.TryGetProperty("hp", out var h)) enemy.HP = enemy.MaxHP = h.GetInt32();
+                    if (metadata.Value.TryGetProperty("xp", out var x)) enemy.XPValue = x.GetInt32();
+                }
+                else if (_engagedGroup.Contains("Goblin")) 
                 {
                     enemy.Name = $"Goblin {suffix}";
                     enemy.HP = 25; enemy.MaxHP = 25; enemy.XPValue = 15;
@@ -355,6 +371,16 @@ namespace StoneHammer.Systems
                     enemy.Name = $"Giant Rat {suffix}";
                     enemy.HP = 10; enemy.MaxHP = 10; enemy.XPValue = 5;
                 }
+                else if (_engagedGroup.Contains("Snake"))
+                {
+                    enemy.Name = $"Giant Snake {suffix}";
+                    enemy.HP = 50; enemy.MaxHP = 50; enemy.XPValue = 40;
+                }
+                else if (_engagedGroup.Contains("Beetle"))
+                {
+                    enemy.Name = $"Giant Beetle {suffix}";
+                    enemy.HP = 80; enemy.MaxHP = 80; enemy.XPValue = 60;
+                }
 
                 
                 Enemies.Add(enemy);
@@ -362,10 +388,18 @@ namespace StoneHammer.Systems
                 
                 // Spawn Visual
                 string assetPath = "assets/skeleton.json";
-                if (_engagedGroup.Contains("Goblin")) assetPath = "assets/goblin.json";
+
+                if (metadata.HasValue && metadata.Value.TryGetProperty("assetPath", out var ap))
+                {
+                    assetPath = ap.ToString();
+                }
+                else if (_engagedGroup.Contains("Goblin")) assetPath = "assets/goblin.json";
                 else if (_engagedGroup.Contains("Spider")) assetPath = "assets/spider.json";
                 else if (_engagedGroup.Contains("Slime")) assetPath = "assets/slime.json";
+                else if (_engagedGroup.Contains("Slime")) assetPath = "assets/slime.json"; // Dupe implicit logic
                 else if (_engagedGroup.Contains("Rat")) assetPath = "assets/rat.json";
+                else if (_engagedGroup.Contains("Snake")) assetPath = "assets/snake.json";
+                else if (_engagedGroup.Contains("Beetle")) assetPath = "assets/beetle.json";
                 
                 await _assets.SpawnAsset(assetPath, enemyId, false, new { Position = new float[] { 20, 0, (i * 8) - 4 }, Rotation = new float[] { 0, -90, 0 } });
             }
@@ -730,7 +764,17 @@ namespace StoneHammer.Systems
             IsFighting = false;
             OnStateChanged?.Invoke();
         }
+
+
+    // Helper for JsonElement parsing
+    public static int GetInt(object o)
+    {
+       if (o is int i) return i;
+       if (o is long l) return (int)l;
+       if (o is JsonElement je && je.ValueKind == JsonValueKind.Number) return je.GetInt32();
+       return 0; // fallback
     }
+}
 
     public enum CombatPhase
     {
@@ -763,4 +807,6 @@ namespace StoneHammer.Systems
         public string Type { get; set; } = "Attack"; // Attack, Magic, Item, Run
         public CombatEntity? Target { get; set; }
     }
+    
+    // Moved to CombatService class
 }

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.JSInterop;
 using System.Threading.Tasks;
 
@@ -12,14 +13,14 @@ namespace StoneHammer.Systems
             _jsRuntime = jsRuntime;
         }
 
-        public async Task SpawnVoxel(VoxelAsset asset, string name, bool isPlayer = false, object? transform = null)
+        public async Task SpawnVoxel(VoxelAsset asset, string name, bool isPlayer = false, object? transform = null, Dictionary<string, object>? metadata = null)
         {
-            await _jsRuntime.InvokeVoidAsync("stoneHammer.spawnVoxel", asset, name, isPlayer, transform);
+            await _jsRuntime.InvokeVoidAsync("stoneHammer.spawnVoxel", asset, name, isPlayer, transform, metadata);
         }
 
-        public async Task SpawnRecipe(ProceduralAsset asset, string name, object? transform = null)
+        public async Task SpawnRecipe(ProceduralAsset asset, string name, object? transform = null, Dictionary<string, object>? metadata = null)
         {
-            await _jsRuntime.InvokeVoidAsync("stoneHammer.spawnRecipe", asset, name, transform);
+            await _jsRuntime.InvokeVoidAsync("stoneHammer.spawnRecipe", asset, name, transform, metadata);
         }
 
         public async Task ClearAll()

@@ -1,0 +1,139 @@
+{
+    "Name": "Giant Beetle",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "beetle_body",
+            "Shape": "Sphere",
+            "Position": [
+                0,
+                0.8,
+                0
+            ],
+            "Scale": [
+                1.5,
+                0.8,
+                2.0
+            ],
+            "ColorHex": "#0a0a0f",
+            "Material": "Metal"
+        },
+        {
+            "Id": "beetle_head",
+            "Shape": "Sphere",
+            "Position": [
+                0,
+                0.7,
+                1.2
+            ],
+            "Scale": [
+                0.8,
+                0.6,
+                0.8
+            ],
+            "ColorHex": "#050505",
+            "Material": "Metal"
+        },
+        {
+            "Id": "leg_l1",
+            "Shape": "Cylinder",
+            "Position": [
+                0.8,
+                0.3,
+                0.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                -45
+            ],
+            "Scale": [
+                0.1,
+                1.2,
+                0.1
+            ],
+            "ColorHex": "#000000"
+        },
+        {
+            "Id": "leg_r1",
+            "Shape": "Cylinder",
+            "Position": [
+                -0.8,
+                0.3,
+                0.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                45
+            ],
+            "Scale": [
+                0.1,
+                1.2,
+                0.1
+            ],
+            "ColorHex": "#000000"
+        },
+        {
+            "Id": "leg_l2",
+            "Shape": "Cylinder",
+            "Position": [
+                0.8,
+                0.3,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                -45
+            ],
+            "Scale": [
+                0.1,
+                1.2,
+                0.1
+            ],
+            "ColorHex": "#000000"
+        },
+        {
+            "Id": "leg_r2",
+            "Shape": "Cylinder",
+            "Position": [
+                -0.8,
+                0.3,
+                0
+            ],
+            "Rotation": [
+                0,
+                0,
+                45
+            ],
+            "Scale": [
+                0.1,
+                1.2,
+                0.1
+            ],
+            "ColorHex": "#000000"
+        },
+        {
+            "Id": "horn",
+            "Shape": "Cone",
+            "Position": [
+                0,
+                1.1,
+                1.5
+            ],
+            "Rotation": [
+                45,
+                0,
+                0
+            ],
+            "Scale": [
+                0.2,
+                1.0,
+                0.2
+            ],
+            "ColorHex": "#220000",
+            "Material": "Metal"
+        }
+    ]
+}

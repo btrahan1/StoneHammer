@@ -1,0 +1,118 @@
+{
+    "Name": "Giant Snake",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "snake_head",
+            "Shape": "Sphere",
+            "Position": [
+                0,
+                1.5,
+                0
+            ],
+            "Scale": [
+                0.8,
+                0.6,
+                1.2
+            ],
+            "ColorHex": "#1a2416",
+            "Material": "Leather"
+        },
+        {
+            "Id": "snake_body_1",
+            "Shape": "Sphere",
+            "Position": [
+                0,
+                1.2,
+                -0.8
+            ],
+            "Scale": [
+                0.7,
+                0.7,
+                0.7
+            ],
+            "ColorHex": "#1a2416",
+            "Material": "Leather"
+        },
+        {
+            "Id": "snake_body_2",
+            "Shape": "Sphere",
+            "Position": [
+                0.2,
+                0.9,
+                -1.4
+            ],
+            "Scale": [
+                0.65,
+                0.65,
+                0.65
+            ],
+            "ColorHex": "#1a2416",
+            "Material": "Leather"
+        },
+        {
+            "Id": "snake_body_3",
+            "Shape": "Sphere",
+            "Position": [
+                -0.3,
+                0.6,
+                -2.0
+            ],
+            "Scale": [
+                0.6,
+                0.6,
+                0.6
+            ],
+            "ColorHex": "#1a2416",
+            "Material": "Leather"
+        },
+        {
+            "Id": "snake_eye_l",
+            "Shape": "Sphere",
+            "Position": [
+                0.2,
+                1.6,
+                0.4
+            ],
+            "Scale": [
+                0.15,
+                0.15,
+                0.15
+            ],
+            "ColorHex": "#ffff00",
+            "Material": "Glow"
+        },
+        {
+            "Id": "snake_eye_r",
+            "Shape": "Sphere",
+            "Position": [
+                -0.2,
+                1.6,
+                0.4
+            ],
+            "Scale": [
+                0.15,
+                0.15,
+                0.15
+            ],
+            "ColorHex": "#ffff00",
+            "Material": "Glow"
+        },
+        {
+            "Id": "snake_tongue",
+            "Shape": "Box",
+            "Position": [
+                0,
+                1.5,
+                0.6
+            ],
+            "Scale": [
+                0.1,
+                0.05,
+                0.4
+            ],
+            "ColorHex": "#ff0000",
+            "Material": "Plastic"
+        }
+    ]
+}

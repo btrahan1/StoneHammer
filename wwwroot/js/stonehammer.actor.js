@@ -66,9 +66,13 @@
         // v10.6: Building Trigger Detection (With Lockout)
         if (!this.currentBuilding && !this.triggerLockout) {
             this.buildingTriggers.forEach(t => {
+                // v24.0: Guard clause. If entering a building, player might be nulled mid-loop.
+                if (!this.player) return;
+
                 const dist = BABYLON.Vector3.Distance(this.player.position, t.pos);
                 if (dist < t.radius) {
                     this.enterBuilding(t.name);
+                    return; // Stop checking other triggers
                 }
             });
         }

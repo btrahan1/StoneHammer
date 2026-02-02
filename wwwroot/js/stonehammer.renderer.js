@@ -5,9 +5,16 @@
 (function () {
     const sh = window.stoneHammer = window.stoneHammer || {};
 
+    sh.materialCache = {};
+
     sh.createMaterial = function (id, config) {
         const type = (this.getProp(config, "Material") || "Plastic").toLowerCase();
         const colorHex = this.getProp(config, "ColorHex") || "#888888";
+
+        // Cache Key
+        const key = type + "|" + colorHex;
+        if (this.materialCache[key]) return this.materialCache[key];
+
         const color = BABYLON.Color3.FromHexString(colorHex);
 
         // v9.20/v10.0: Wood Material (Procedural Planks)
@@ -80,6 +87,7 @@
             mat.metallic = 0.0;
             mat.roughness = 0.7;
         }
+        this.materialCache[key] = mat;
         return mat;
     };
 })();

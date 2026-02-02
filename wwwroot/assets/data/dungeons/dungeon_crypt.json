@@ -1,0 +1,22 @@
+{
+    "Id": "crypt",
+    "Name": "The Ossuary Crypt",
+    "LayoutType": "Rooms",
+    "DefaultDepth": 1,
+    "Theme": {
+        "WallColor": "#555555",
+        "WallMaterial": "Stone",
+        "FloorColor": "#333333",
+        "FloorMaterial": "Stone",
+        "AtmosphereColor": "#000000"
+    },
+    "Enemies": [
+        {
+            "AssetPath": "assets/skeleton.json",
+            "NamePrefix": "Skeleton",
+            "HP": 40,
+            "XP": 25,
+            "SpawnChance": 1.0
+        }
+    ]
+}

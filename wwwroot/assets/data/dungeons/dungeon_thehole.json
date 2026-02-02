@@ -1,0 +1,29 @@
+{
+  "Id": "thehole",
+  "Name": "The Hole",
+  "LayoutType": "Cave",
+  "DefaultDepth": 1,
+  "Theme": {
+    "FloorColor": "#050200",
+    "FloorMaterial": "Plastic",
+    "WallColor": "#1a0b00",
+    "WallMaterial": "Stone",
+    "AtmosphereColor": "#000000"
+  },
+  "Enemies": [
+    {
+      "NamePrefix": "snake",
+      "AssetPath": "assets/snake.json",
+      "HP": 35,
+      "XP": 20,
+      "SpawnChance": 1.0
+    },
+    {
+      "NamePrefix": "beetle",
+      "AssetPath": "assets/beetle.json",
+      "HP": 35,
+      "XP": 20,
+      "SpawnChance": 1.0
+    }
+  ]
+}

@@ -1,0 +1,419 @@
+{
+    "Name": "TheHoleEntrance",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "ground_rim",
+            "ParentId": null,
+            "Shape": "Box",
+            "Position": [
+                0,
+                -0.5,
+                -5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                15,
+                1,
+                15
+            ],
+            "ColorHex": "#1c1c1a",
+            "Material": "Rubber",
+            "Operation": "Union"
+        },
+        {
+            "Id": "the_void",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                0,
+                -0.4,
+                -5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                6,
+                1.1,
+                6
+            ],
+            "ColorHex": "#000000",
+            "Material": "Rubber",
+            "Operation": "Union"
+        },
+        {
+            "Id": "pit_glow",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                0,
+                -2,
+                -5
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                5,
+                2,
+                5
+            ],
+            "ColorHex": "#331100",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "snake_main_body_1",
+            "ParentId": null,
+            "Shape": "Capsule",
+            "Position": [
+                1.8,
+                0.5,
+                -4.5
+            ],
+            "Rotation": [
+                -45,
+                20,
+                0
+            ],
+            "Scale": [
+                0.6,
+                3,
+                0.6
+            ],
+            "ColorHex": "#1a2416",
+            "Material": "Leather",
+            "Operation": "Union"
+        },
+        {
+            "Id": "snake_main_head_1",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                2.5,
+                2.2,
+                -3.5
+            ],
+            "Rotation": [
+                -20,
+                30,
+                0
+            ],
+            "Scale": [
+                0.8,
+                0.6,
+                1.0
+            ],
+            "ColorHex": "#1a2416",
+            "Material": "Leather",
+            "Operation": "Union"
+        },
+        {
+            "Id": "snake_eye_l",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                2.8,
+                2.3,
+                -3.1
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.1,
+                0.1,
+                0.1
+            ],
+            "ColorHex": "#ffff00",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "snake_eye_r",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                2.3,
+                2.3,
+                -3.1
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                0.1,
+                0.1,
+                0.1
+            ],
+            "ColorHex": "#ffff00",
+            "Material": "Glow",
+            "Operation": "Union"
+        },
+        {
+            "Id": "snake_body_coil",
+            "ParentId": null,
+            "Shape": "Torus",
+            "Position": [
+                -2.0,
+                0.1,
+                -4.0
+            ],
+            "Rotation": [
+                90,
+                0,
+                0
+            ],
+            "Scale": [
+                2.5,
+                2.5,
+                0.5
+            ],
+            "ColorHex": "#2b3d25",
+            "Material": "Leather",
+            "Operation": "Union"
+        },
+        {
+            "Id": "beetle_carapace",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                -3.5,
+                0.4,
+                -6.5
+            ],
+            "Rotation": [
+                10,
+                -45,
+                0
+            ],
+            "Scale": [
+                1.5,
+                0.8,
+                2.0
+            ],
+            "ColorHex": "#0a0a0f",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "beetle_head",
+            "ParentId": null,
+            "Shape": "Sphere",
+            "Position": [
+                -4.2,
+                0.3,
+                -5.2
+            ],
+            "Rotation": [
+                0,
+                -45,
+                0
+            ],
+            "Scale": [
+                0.8,
+                0.6,
+                0.8
+            ],
+            "ColorHex": "#050505",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "mandible_l",
+            "ParentId": null,
+            "Shape": "Cone",
+            "Position": [
+                -4.5,
+                0.2,
+                -4.8
+            ],
+            "Rotation": [
+                0,
+                -60,
+                90
+            ],
+            "Scale": [
+                0.2,
+                0.8,
+                0.2
+            ],
+            "ColorHex": "#1a1a1a",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "mandible_r",
+            "ParentId": null,
+            "Shape": "Cone",
+            "Position": [
+                -4.0,
+                0.2,
+                -4.6
+            ],
+            "Rotation": [
+                0,
+                -30,
+                90
+            ],
+            "Scale": [
+                0.2,
+                0.8,
+                0.2
+            ],
+            "ColorHex": "#1a1a1a",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "beetle_leg_1",
+            "ParentId": null,
+            "Shape": "Cylinder",
+            "Position": [
+                -2.5,
+                0.3,
+                -5.5
+            ],
+            "Rotation": [
+                0,
+                0,
+                45
+            ],
+            "Scale": [
+                0.1,
+                1.5,
+                0.1
+            ],
+            "ColorHex": "#000000",
+            "Material": "Plastic",
+            "Operation": "Union"
+        },
+        {
+            "Id": "rock_spire_1",
+            "ParentId": null,
+            "Shape": "Cone",
+            "Position": [
+                5.5,
+                1.5,
+                -8
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ],
+            "Scale": [
+                2,
+                4,
+                2
+            ],
+            "ColorHex": "#2b2b2b",
+            "Material": "Metal",
+            "Operation": "Union"
+        },
+        {
+            "Id": "rock_spire_2",
+            "ParentId": null,
+            "Shape": "Cone",
+            "Position": [
+                -6,
+                1.0,
+                -4
+            ],
+            "Rotation": [
+                5,
+                0,
+                -10
+            ],
+            "Scale": [
+                1.5,
+                3,
+                1.5
+            ],
+            "ColorHex": "#2b2b2b",
+            "Material": "Metal",
+            "Operation": "Union"
+        }
+    ],
+    "Timeline": [
+        {
+            "Time": 0.0,
+            "Action": "Move",
+            "TargetId": "snake_main_head_1",
+            "Value": [
+                2.5,
+                2.2,
+                -3.5
+            ],
+            "Duration": 1.0
+        },
+        {
+            "Time": 1.0,
+            "Action": "Move",
+            "TargetId": "snake_main_head_1",
+            "Value": [
+                2.8,
+                2.8,
+                -3.0
+            ],
+            "Duration": 2.0
+        },
+        {
+            "Time": 0.0,
+            "Action": "Rotate",
+            "TargetId": "mandible_l",
+            "Value": [
+                0,
+                -80,
+                90
+            ],
+            "Duration": 0.5
+        },
+        {
+            "Time": 0.5,
+            "Action": "Rotate",
+            "TargetId": "mandible_l",
+            "Value": [
+                0,
+                -60,
+                90
+            ],
+            "Duration": 0.5
+        },
+        {
+            "Time": 0.0,
+            "Action": "Color",
+            "TargetId": "pit_glow",
+            "Value": [
+                0.4,
+                0.1,
+                0.0
+            ],
+            "Duration": 1.5
+        },
+        {
+            "Time": 1.5,
+            "Action": "Color",
+            "TargetId": "pit_glow",
+            "Value": [
+                0.2,
+                0.05,
+                0.0
+            ],
+            "Duration": 1.5
+        }
+    ]
+}

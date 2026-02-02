@@ -1,0 +1,29 @@
+{
+    "Id": "goblin_cave",
+    "Name": "Goblin Den",
+    "LayoutType": "Cave",
+    "DefaultDepth": 1,
+    "Theme": {
+        "WallColor": "#4E342E",
+        "WallMaterial": "Stone",
+        "FloorColor": "#5D4037",
+        "FloorMaterial": "Dirt",
+        "AtmosphereColor": "#3E2723"
+    },
+    "Enemies": [
+        {
+            "AssetPath": "assets/goblin.json",
+            "NamePrefix": "Goblin",
+            "HP": 25,
+            "XP": 15,
+            "SpawnChance": 1.0
+        },
+        {
+            "AssetPath": "assets/spider.json",
+            "NamePrefix": "Spider",
+            "HP": 15,
+            "XP": 10,
+            "SpawnChance": 0.5
+        }
+    ]
+}

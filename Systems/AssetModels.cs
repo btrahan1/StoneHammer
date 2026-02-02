@@ -72,6 +72,7 @@ namespace StoneHammer.Systems
         public string Path { get; set; } = "";
         public string Name { get; set; } = "";
         public object? Transform { get; set; }
+        public Dictionary<string, object> Metadata { get; set; } = new();
     }
 
     public class TimelineEvent
@@ -81,5 +82,65 @@ namespace StoneHammer.Systems
         public string TargetId { get; set; } = "";
         public object? Value { get; set; }
         public double Duration { get; set; } = 1.0;
+    }
+
+    // --- Data-Driven Dungeon Models ---
+
+    public class TownRecipe
+    {
+        public List<StaticBuildingPlacement> StaticBuildings { get; set; } = new();
+        public List<DungeonEntrancePlacement> DungeonEntrances { get; set; } = new();
+    }
+
+    public class StaticBuildingPlacement
+    {
+        public string AssetPath { get; set; } = "";
+        public string Name { get; set; } = ""; // Unique ID for interaction
+        public float[] Position { get; set; } = new float[3];
+        public float[] Rotation { get; set; } = new float[3];
+        public string? ActionId { get; set; } // e.g., "OpenShop"
+    }
+
+    public class DungeonEntrancePlacement
+    {
+        public string DungeonId { get; set; } = ""; // Links to DungeonRecipe.Id
+        public string EntranceAssetPath { get; set; } = "";
+        public float[] Position { get; set; } = new float[3];
+        public float[] Rotation { get; set; } = new float[3];
+    }
+
+    public class DungeonRecipe
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public DungeonLayoutType LayoutType { get; set; } = DungeonLayoutType.Rooms;
+        public DungeonTheme Theme { get; set; } = new();
+        public List<DungeonEnemy> Enemies { get; set; } = new();
+        public int DefaultDepth { get; set; } = 1;
+    }
+
+    public enum DungeonLayoutType
+    {
+        Rooms,
+        Cave,
+        Tunnel
+    }
+
+    public class DungeonTheme
+    {
+        public string WallColor { get; set; } = "#555555";
+        public string WallMaterial { get; set; } = "Stone";
+        public string FloorColor { get; set; } = "#444444";
+        public string FloorMaterial { get; set; } = "Stone";
+        public string AtmosphereColor { get; set; } = "#000000"; // For fog/skybox
+    }
+
+    public class DungeonEnemy
+    {
+        public string AssetPath { get; set; } = "";
+        public string NamePrefix { get; set; } = "Enemy";
+        public int HP { get; set; } = 20;
+        public int XP { get; set; } = 10;
+        public float SpawnChance { get; set; } = 1.0f; // Relative weight
     }
 }

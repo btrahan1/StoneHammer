@@ -5,13 +5,44 @@
 (function () {
     const sh = window.stoneHammer = window.stoneHammer || {};
 
+    // v26.0: Split Entry Logic for Confirmation
     sh.enterBuilding = function (buildingName) {
+        // Check for dungeons that need confirmation (Case Insensitive)
+        const lowerName = buildingName.toLowerCase();
+        if (lowerName.includes("crypt") ||
+            lowerName.includes("goblincave") ||
+            lowerName.includes("sewer") ||
+            lowerName.includes("desert") ||
+            lowerName.includes("dungeonentrance")) {
+
+            this.log("Requesting Access: " + buildingName, "cyan");
+            if (this.dotNetHelper) {
+                this.dotNetHelper.invokeMethodAsync('ConfirmEnterBuilding', buildingName);
+            }
+            return;
+        }
+
+        // Direct Entry
+        this.commitEntry(buildingName);
+    };
+
+
+
+    sh.commitEntry = function (buildingName) {
         this.log("Entering: " + buildingName, "cyan");
         this.currentBuilding = buildingName;
 
         if (this.player) {
             this.lastTownPosition = this.player.position.clone();
-            this.lastTownPosition.z += 2;
+            // v25.0+: Push back slightly to avoid immediate re-entry on return
+            if (this.player.forward) {
+                //   var backDir = this.player.forward.clone().normalize().scale(4); 
+                //   this.lastTownPosition.subtractInPlace(backDir);
+                // Handled in exit logic better? No, saving LAST position. 
+                // We want the return position to be 'safe'.
+                // Let's rely on exitBuilding's logic or just save current pos?
+                // Actually, saving current pos (at door) is fine if exitBuilding applies offset.
+            }
         } else {
             this.lastTownPosition = new BABYLON.Vector3(0, 0, 0);
         }
@@ -23,6 +54,13 @@
             this.dotNetHelper.invokeMethodAsync('HandleEnterBuilding', buildingName);
         }
         this.log("Skybox Active. 'Esc' to exit.", "yellow");
+    };
+
+    sh.pushPlayerBack = function () {
+        if (this.player && this.player.forward) {
+            var backDir = this.player.forward.clone().normalize().scale(-2); // Move backward 2 units
+            this.player.position.addInPlace(backDir);
+        }
     };
 
     sh.exitBuilding = function () {
@@ -42,6 +80,22 @@
         if (this.ground) this.ground.setEnabled(true);
 
         if (this.dotNetHelper) {
+            // Apply Offset on Exit
+            // We want to return to lastTownPosition BUT pushed back.
+            // Since we don't have player forward ref (player is gone), we rely on lastTownPosition being correct?
+            // Actually, let's modify the lastTownPosition HERE before sending it back?
+            // Wait, lastTownPosition was saved at entry (at the door).
+            // We need to shift it relative to the door?
+            // We don't know door facing here easily. 
+            // Better to rely on the C# side or just generic "Z+2" fallback if Vector math fails?
+            // Let's trust the unmodified saved pos for now, and rely on `enterBuilding` having saved it safely?
+            // Actually, in `commitEntry` I was modifying it. Let's ONLY modify it in `enterBuilding` if strictly needed.
+            // Reverting to saving EXACT position, and applying offset on SPAWN (in AssetManager)?
+            // AssetManager.ExitBuilding calls SpawnPlayer(x,z).
+            // Let's modify the coordinate passed back.
+
+            // Hack: Just add random offset? No.
+            // Let's stick to passing exact last pos.
             this.dotNetHelper.invokeMethodAsync('HandleExitBuilding', this.lastTownPosition.x, this.lastTownPosition.z);
         }
     };
@@ -104,19 +158,16 @@
                         this.enterBuilding("Desert");
                     }
 
-                    // v15.0: Combat Trigger (Enemy Clicks)
-                    // Ensure we don't trigger combat on Entrances
-                    if ((name.includes("Skeleton") || name.includes("Goblin") || name.includes("Spider") || name.includes("Slime") || name.includes("Rat")) && !name.includes("Entrance")) {
-                        // Find the root actor name
-                        // Already walked up? Maybe not if Voxel structure is complex.
-                        // Let's ensure we strip voxel_ prefix if present.
-                        let actorName = name.replace("voxel_", "");
-                        // Removing trailing parts like _A _B handled by StartCombat?
-                        // Actually the ID is usually "Skeleton_Lvl1_A".
+                    // v27.0: Data-Driven Combat Trigger
+                    // Check if the clicked mesh (or its root) has enemy metadata
+                    if (mesh.metadata && mesh.metadata.isEnemy) {
+                        // Clean name for display/ID
+                        let actorName = name.replace("voxel_", "").replace("recipe_", "");
 
                         this.log("Engaging " + actorName + "!", "red");
                         if (this.dotNetHelper) {
-                            this.dotNetHelper.invokeMethodAsync('StartCombat', actorName);
+                            // Pass metadata back to C#
+                            this.dotNetHelper.invokeMethodAsync('StartCombat', actorName, mesh.metadata);
                         }
                     }
 
@@ -231,14 +282,29 @@
         const meshes = this.scene.meshes;
         for (var i = meshes.length - 1; i >= 0; i--) {
             var m = meshes[i];
-            // v10.1: Skybox persists, everything else (including JSON ground) clears
             if (m.name !== "skyBox") {
                 m.dispose();
             }
         }
+
+        // v26.1: Deep Clean for Performance
+        // Dispose Materials (except Skybox/Default)
+        // We iterate backwards because disposing removes from reference array sometimes?
+        // Safest to cache list first?
+        const mats = [...this.scene.materials];
+        mats.forEach(m => {
+            if (m.name !== "skyBox" && m.name !== "default material") {
+                m.dispose(true, true); // Force dispose textures too
+            }
+        });
+
+        // Reset Cache
+        if (this.materialCache) this.materialCache = {};
+
         this.scene.transformNodes.forEach(t => t.dispose());
+
         this.player = null;
         this.buildingTriggers = [];
-        this.log("Scene Cleared", "orange");
+        this.log("Scene Cleared (Deep)", "orange");
     };
 })();

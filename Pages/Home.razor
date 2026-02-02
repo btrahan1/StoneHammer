@@ -2,11 +2,12 @@
 @using StoneHammer.Components
 @using StoneHammer.Systems
 @implements IDisposable
+@using System.Text.Json
 @inject AssetManager AssetManager
 @inject CityBridge CityBridge
 @inject IJSRuntime JSRuntime
 @inject CombatService CombatService
-
+@inject ShopService ShopService
 @inject SaveService SaveService
 
 <PageTitle>StoneHammer</PageTitle>
@@ -44,6 +45,7 @@
 <LootDialog />
 <CharacterSheet @ref="_charSheet" />
 <InnDialog @ref="_innDialog" />
+<ConfirmationDialog @ref="_confirmDialog" />
 
 @code {
     private DotNetObjectReference<Home>? _objRef;
@@ -75,15 +77,41 @@
     }
 
     [JSInvokable]
+    public async Task ConfirmEnterBuilding(string buildingName)
+    {
+         string properName = buildingName.Replace("DungeonEntrance_", "").Replace("_", " ");
+         string lower = properName.ToLower();
+
+         if (lower.Contains("crypt")) properName = "The Ancient Crypt";
+         else if (lower.Contains("goblincave") || lower.Contains("goblin")) properName = "The Goblin Cave";
+         else if (lower.Contains("sewer")) properName = "The Sewers";
+         else if (lower.Contains("desert")) properName = "The Wastelands";
+         
+         // Use TItle Case if not matched
+         if (properName == lower) properName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(properName);
+
+         bool confirmed = await _confirmDialog.Show("Enter Dungeon?", $"Are you brave enough to enter {properName}?");
+         
+         if (confirmed)
+         {
+             await JSRuntime.InvokeVoidAsync("stoneHammer.commitEntry", buildingName);
+         }
+         else
+         {
+             await JSRuntime.InvokeVoidAsync("stoneHammer.pushPlayerBack");
+         }
+    }
+
+    [JSInvokable]
     public async Task HandleEnterBuilding(string buildingName) => await AssetManager.EnterBuilding(buildingName);
 
     [JSInvokable]
     public async Task HandleExitBuilding(float x, float z) => await AssetManager.ExitBuilding(x, z);
     
     [JSInvokable]
-    public async Task StartCombat(string mobName)
+    public async Task StartCombat(string mobName, JsonElement? metadata = null)
     {
-        await CombatService.StartCombat(mobName);
+        await CombatService.StartCombat(mobName, metadata);
         StateHasChanged();
     }
 
@@ -107,9 +135,18 @@
 
     private InnDialog? _innDialog;
     private void OpenInn() => _innDialog?.Open();
+    
+    [JSInvokable] // v26.0 moved from SceneView
+    public void OpenShop()
+    {
+        ShopService.OpenShop();
+    }
+    
+    private ConfirmationDialog? _confirmDialog; // Added Reference
 
     public void Dispose() => _objRef?.Dispose();
 }
+
 
 <style>
     .start-screen {

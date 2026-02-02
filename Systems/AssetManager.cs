@@ -13,7 +13,8 @@ namespace StoneHammer.Systems
         private readonly IJSRuntime _js; // Added for IJSRuntime
         private readonly JsonSerializerOptions _options = new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
         };
 
         public AssetManager(IJSRuntime js, HttpClient http, CityBridge bridge) // Modified constructor
@@ -51,121 +52,139 @@ namespace StoneHammer.Systems
             await GenerateTown(x, z);
         }
 
+        // v23.0: Data-Driven Town Generation
         public async Task GenerateTown(float x = 0, float z = 0)
         {
             await _bridge.ClearAll();
 
-            // v10.1: Town Floor is now a JSON asset
+            // 1. Load Town Recipe
+            string json = await _http.GetStringAsync("assets/data/town.json?v=" + System.DateTime.Now.Ticks);
+            var town = JsonSerializer.Deserialize<TownRecipe>(json, _options);
+
+            if (town == null) return;
+
+            // 2. Town Floor
             await SpawnAsset("assets/town_floor.json", "TownFloor");
 
-            // 1. "Main Street" Layout
-            await SpawnTavern(0, 40); 
-            await SpawnGuild(-25, 10);
-            await SpawnStore(25, 10);
-
-            // 2. Residential strip
-            for (int i = 0; i < 3; i++)
+            // 3. Static Buildings
+            foreach (var b in town.StaticBuildings)
             {
-                await SpawnAsset("assets/house.json", $"House_L_{i}", false, new { Position = new[] { -20f, 0, -15f - (i * 20f) }, Rotation = new[] { 0, 90f, 0 } });
-                await SpawnAsset("assets/house.json", $"House_R_{i}", false, new { Position = new[] { 20f, 0, -15f - (i * 20f) }, Rotation = new[] { 0, -90f, 0 } });
+                // Note: Rotation order in JSON [X, Y, Z]
+                await SpawnAsset(b.AssetPath, b.Name, false, new { Position = b.Position, Rotation = b.Rotation });
+                // If ActionId exists, we might need to handle triggers? 
+                // Currently only triggers have specific handling.
+                // TODO: Store ActionId in metadata or similar if needed for interaction.
             }
 
-            // 3. NPCs, Player & Decor
+            // 4. Dungeon Entrances
+            foreach (var d in town.DungeonEntrances)
+            {
+                // We encode the DungeonId into the Name so we know what to load on entry
+                // Name format: "DungeonEntrance_{DungeonId}"
+                // AssetPath should point to visual glTF/JSON
+                string name = $"DungeonEntrance_{d.DungeonId}";
+                await SpawnAsset(d.EntranceAssetPath, name, false, new { Position = d.Position, Rotation = d.Rotation, isTrigger = true, triggerRadius = 5.0f });
+            }
+
+            // 5. Player & Decor (Hardcoded for now / could be in recipe too)
             await SpawnPlayer(x, z);
-            // await SpawnBartender(x + 5, z + 5);
             await SpawnAsset("assets/table.json", "Street Table 1", false, new { Position = new[] { 5, 0, 5 } });
             await SpawnAsset("assets/table.json", "Street Table 2", false, new { Position = new[] { -5, 0, 5 } });
 
-            // v12.3: The Crypt Entrance (Behind Tavern)
-            await SpawnAsset("assets/crypt_entrance.json", "CryptEntrance", false, new { Position = new[] { 0, 0, 60 } });
-
-            // v14.0: The Desert Teleporter (East of Tavern)
+            // v14.0: The Desert Teleporter (Legacy Hybrid)
             await SpawnAsset("assets/desert_entrance.json", "DesertEntrance", false, new { Position = new[] { 50, 0, 50 } });
-
-            // v21.0: Goblin Cave Entrance (West of Town)
-            await SpawnAsset("assets/mine_entrance.json", "GoblinCaveEntrance", false, new { Position = new[] { -60, 0, 0 }, Rotation = new[] { 0, 90, 0 }, isTrigger = true, triggerRadius = 5.0f });
-
-            // v22.0: Sewer Entrance (South-East of Town)
-            await SpawnAsset("assets/sewer_entrance.json", "SewerEntrance", false, new { Position = new[] { 40, 0, -40 }, Rotation = new[] { 0, 0, 0 }, isTrigger = true, triggerRadius = 5.0f });
         }
 
         private int _currentDepth = 0;
 
+        // v23.0: Data-Driven Dungeon Entry
         public async Task EnterBuilding(string buildingName)
         {
             await this.ClearAll();
 
-            if (buildingName.Contains("Guild"))
-            {
-                await SpawnAsset("assets/guild_interior.json", "Guild Interior");
-            }
-            else if (buildingName.Contains("Lodge"))
-            {
-                await SpawnAsset("assets/lodge_interior.json", "Lodge Interior");
-            }
-            else if (buildingName.Contains("Desert"))
-            {
-               // v14.0: Hybrid Desert Mode
-               // The terrain is procedural JS, but we need an exit mechanism.
-               // We will spawn the 'exit crystal' via the bridge, but let JS handle the world.
-               
-               System.Console.WriteLine("[AssetManager] Entering Procedural Desert...");
-               await _bridge.EnterDesert();
-               
-               // Spawn just the exit crystal so user can leave
-               await SpawnAsset("assets/exit_crystal.json", "DesertExit", false, new { Position = new float[] { 0, 10, 0 } });
-            }
-            else if (buildingName.Contains("Crypt"))
-            {
-                // v13.0: Procedural Dungeon Generation
-                // format: "Crypt_Depth_X"
-                if (buildingName.Contains("Depth"))
-                {
-                   var parts = buildingName.Split('_');
-                   if (parts.Length == 3 && int.TryParse(parts[2], out int d))
-                   {
-                       _currentDepth = d;
-                   }
-                }
-                else 
-                {
-                   _currentDepth = 1; // Default entry
-                }
-
-                System.Console.WriteLine($"[AssetManager] Entering Crypt Level {_currentDepth}");
-                var levelAsset = CryptGenerator.Generate(_currentDepth);
-                await SpawnGeneratedAsset(levelAsset, levelAsset.Name);
-            }
-            else if (buildingName.Contains("GoblinCave"))
-            {
-                 // New Procedural Cave
-                 System.Console.WriteLine("[AssetManager] Entering Goblin Cave...");
-                 var levelAsset = CaveGenerator.Generate(1); // Default Level 1
-                 await SpawnGeneratedAsset(levelAsset, levelAsset.Name);
-                 await SpawnPlayer(0, 0); // Need to spawn player manually
-                 return; // SpawnGeneratedAsset spawns children, but we handled player explicitly
-            }
-            else if (buildingName.Contains("Sewer"))
-            {
-                 // New Procedural Sewers
-                 System.Console.WriteLine("[AssetManager] Entering Sewers...");
-                 var levelAsset = SewerGenerator.Generate(1); 
-                 await SpawnGeneratedAsset(levelAsset, levelAsset.Name);
-                 await SpawnPlayer(0, 0);
-                 return;
-            }
-            else if (buildingName == "BattleArena")
+            // 1. Interiors (Tavern, Store, etc)
+            // TODO: Move these to recipe too? For now keep them if they are simple assets.
+            if (buildingName.Contains("The Rusty Mug") || buildingName == "Tavern") await SpawnAsset("assets/tavern_interior.json", "Tavern Interior");
+            else if (buildingName.Contains("Hammer & Sickle") || buildingName == "General Store") await SpawnAsset("assets/general_store_interior.json", "Store Interior"); // No interior asset yet?
+            else if (buildingName.Contains("Guild")) await SpawnAsset("assets/guild_interior.json", "Guild Interior");
+            else if (buildingName.Contains("Lodge")) await SpawnAsset("assets/lodge_interior.json", "Lodge Interior");
+            else if (buildingName == "BattleArena") 
             {
                 await SpawnAsset("assets/battle_arena.json", "BattleArena");
-                // Do not spawn default player; CombatService handles unit placement
-                return; 
+                return;
+            }
+            else if (buildingName == "Desert")
+            {
+                System.Console.WriteLine("[AssetManager] Entering Procedural Desert...");
+                await _bridge.EnterDesert();
+                await SpawnAsset("assets/exit_crystal.json", "DesertExit", false, new { Position = new float[] { 0, 10, 0 } });
+            }
+            // 2. Dungeons
+            else if (buildingName.StartsWith("DungeonEntrance_") || buildingName.Contains("Crypt") || buildingName.Contains("GoblinCave") || buildingName.Contains("Sewer"))
+            {
+                string dungeonId = "";
+                int depth = 1;
+
+                // Parse ID
+                if (buildingName.StartsWith("DungeonEntrance_"))
+                {
+                    dungeonId = buildingName.Replace("DungeonEntrance_", "");
+                }
+                // Legacy Fallbacks (for Interaction names like "CryptEntrance")
+                else if (buildingName.Contains("Crypt")) dungeonId = "crypt";
+                else if (buildingName.Contains("GoblinCave")) dungeonId = "goblin_cave";
+                else if (buildingName.Contains("Sewer")) dungeonId = "sewer";
+
+                // Parse Depth (e.g. "crypt_Depth_2")
+                if (buildingName.Contains("_Depth_"))
+                {
+                    var parts = buildingName.Split(new[]{"_Depth_"}, System.StringSplitOptions.None);
+                    if (parts.Length > 1 && int.TryParse(parts[1], out int d)) depth = d;
+                }
+                
+                _currentDepth = depth;
+
+                // Load Recipe
+                string recipePath = $"assets/data/dungeons/dungeon_{dungeonId}.json";
+                System.Console.WriteLine($"[AssetManager] Loading Dungeon Recipe: {recipePath} (Depth {depth})");
+
+                try 
+                {
+                    string json = await _http.GetStringAsync(recipePath + "?v=" + System.DateTime.Now.Ticks);
+                    System.Console.WriteLine($"[AssetManager] JSON Loaded. Length: {json.Length}");
+                    
+                    var recipe = JsonSerializer.Deserialize<DungeonRecipe>(json, _options);
+
+                    if (recipe != null)
+                    {
+                        System.Console.WriteLine($"[AssetManager] Recipe Parsed. Layout: {recipe.LayoutType}");
+                        var dungeonAsset = UniversalDungeonGenerator.Generate(recipe, depth);
+                        System.Console.WriteLine($"[AssetManager] Asset Generated. Parts: {dungeonAsset.Parts.Count}");
+                        
+                        await SpawnGeneratedAsset(dungeonAsset, dungeonAsset.Name);
+                        await SpawnPlayer(0, 0);
+                    }
+                    else
+                    {
+                         System.Console.WriteLine($"[AssetManager] Recipe was null after deserialization!");
+                    }
+                }
+                catch(System.Exception ex)
+                {
+                     System.Console.WriteLine($"[AssetManager] CRITICAL ERROR loading dungeon {dungeonId}: {ex.Message}");
+                     System.Console.WriteLine($"[AssetManager] StackTrace: {ex.StackTrace}");
+                     // Fallback
+                     await SpawnAsset("assets/sandbox_interior.json", "Error Fallback");
+                     await SpawnPlayer(0, 0);
+                }
+                return;
             }
             else
             {
-                await SpawnAsset("assets/sandbox_interior.json", "Sandbox Interior");
+                 // Default interior
+                 await SpawnAsset("assets/sandbox_interior.json", "Sandbox Interior");
             }
             
-            // v11.0: Child assets like Exit Crystals are now loaded via JSON nesting
             await SpawnPlayer(0, 0);
         }
 
@@ -182,7 +201,7 @@ namespace StoneHammer.Systems
              foreach (var child in asset.Children)
              {
                  // Recursively spawn children (stairs, crystals, etc)
-                 await SpawnAsset(child.Path, child.Name, false, child.Transform);
+                 await SpawnAsset(child.Path, child.Name, false, child.Transform, child.Metadata);
              }
         }
 
@@ -198,7 +217,7 @@ namespace StoneHammer.Systems
             }
         }
 
-        public async Task SpawnAsset(string path, string name, bool isPlayer = false, object? transform = null)
+        public async Task SpawnAsset(string path, string name, bool isPlayer = false, object? transform = null, Dictionary<string, object>? metadata = null)
         {
             try 
             {
@@ -234,7 +253,7 @@ namespace StoneHammer.Systems
                     var asset = JsonSerializer.Deserialize<VoxelAsset>(json, _options);
                     if (asset != null) 
                     {
-                        await _bridge.SpawnVoxel(asset, name, isPlayer, transform);
+                        await _bridge.SpawnVoxel(asset, name, isPlayer, transform, metadata);
                         foreach (var child in asset.Children)
                         {
                             await SpawnAsset(child.Path, child.Name, false, child.Transform);
@@ -247,10 +266,10 @@ namespace StoneHammer.Systems
                     var asset = JsonSerializer.Deserialize<ProceduralAsset>(json, _options);
                     if (asset != null) 
                     {
-                        await _bridge.SpawnRecipe(asset, name, transform);
+                        await _bridge.SpawnRecipe(asset, name, transform, metadata);
                         foreach (var child in asset.Children)
                         {
-                            await SpawnAsset(child.Path, child.Name, false, child.Transform);
+                            await SpawnAsset(child.Path, child.Name, false, child.Transform, child.Metadata);
                         }
                     }
                 }

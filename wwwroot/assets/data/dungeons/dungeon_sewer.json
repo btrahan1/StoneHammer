@@ -1,0 +1,29 @@
+{
+    "Id": "sewer",
+    "Name": "The Sewers",
+    "LayoutType": "Tunnel",
+    "DefaultDepth": 1,
+    "Theme": {
+        "WallColor": "#444444",
+        "WallMaterial": "Brick",
+        "FloorColor": "#2F4F2F",
+        "FloorMaterial": "Stone",
+        "AtmosphereColor": "#112211"
+    },
+    "Enemies": [
+        {
+            "AssetPath": "assets/slime.json",
+            "NamePrefix": "Slime",
+            "HP": 35,
+            "XP": 20,
+            "SpawnChance": 1.0
+        },
+        {
+            "AssetPath": "assets/rat.json",
+            "NamePrefix": "Giant Rat",
+            "HP": 10,
+            "XP": 5,
+            "SpawnChance": 1.5
+        }
+    ]
+}
