@@ -77,11 +77,14 @@ namespace StoneHammer.Systems
             // 2. Town Floor
             await SpawnAsset("assets/town_floor.json", "TownFloor", false, null, null);
 
+            // 3. Guards
+            // await _js.InvokeVoidAsync("stoneHammer.spawnGuards"); // Guards initialized later in town.json loop? Actually logic below handles it.
+            
             // 3. Static Buildings
             foreach (var b in town.StaticBuildings)
             {
                 // Note: Rotation order in JSON [X, Y, Z]
-                await SpawnAsset(b.AssetPath, b.Name, false, new { Position = b.Position, Rotation = b.Rotation }, null);
+                await SpawnAsset(b.AssetPath, b.Name, false, new { Position = b.Position, Rotation = b.Rotation }, b.Metadata);
                 // If ActionId exists, we might need to handle triggers? 
                 // Currently only triggers have specific handling.
                 // TODO: Store ActionId in metadata or similar if needed for interaction.
@@ -169,6 +172,9 @@ namespace StoneHammer.Systems
             // v14.0: The Desert Teleporter (Legacy Hybrid)
             // Removed: Now in town.json
             // await SpawnAsset("assets/desert_entrance.json", "DesertEntrance", false, new { Position = new[] { 50, 0, 50 } });
+            
+            // v40.0: Initialize Labels AFTER all assets are spawned
+            await _js.InvokeVoidAsync("stoneHammer.initLabels");
         }
 
         private int _currentDepth = 0;

@@ -18,6 +18,12 @@
     {
       "AssetPath": "assets/blacksmith.json",
       "Name": "Hammer & Sickle Store",
+
+      "Metadata": {
+        "Label": "Blacksmith",
+        "LabelColor": "#AAAAAA"
+      },
+
       "Position": [
         15,
         0,
@@ -29,20 +35,6 @@
         0
       ],
       "ActionId": "OpenShop"
-    },
-    {
-      "AssetPath": "assets/fountain.json",
-      "Name": "Town Square Fountain",
-      "Position": [
-        0,
-        0,
-        10
-      ],
-      "Rotation": [
-        0,
-        0,
-        0
-      ]
     },
     {
       "AssetPath": "assets/house.json",
@@ -299,6 +291,10 @@
     {
       "AssetPath": "assets/wall_tall.json",
       "Name": "Crypt_Back_C",
+      "Metadata": {
+        "Label": "The Crypts",
+        "LabelColor": "#AAAAAA"
+      },
       "Position": [
         0,
         0,
@@ -425,6 +421,10 @@
     {
       "AssetPath": "assets/wall_tall.json",
       "Name": "Sewer_Back_C",
+      "Metadata": {
+        "Label": "Sewer Dungeon",
+        "LabelColor": "#00FF00"
+      },
       "Position": [
         0,
         0,
@@ -551,6 +551,10 @@
     {
       "AssetPath": "assets/wall_tall.json",
       "Name": "Goblin_Back_C",
+      "Metadata": {
+        "Label": "Goblin Cave",
+        "LabelColor": "#FF4444"
+      },
       "Position": [
         -100,
         0,
@@ -677,6 +681,10 @@
     {
       "AssetPath": "assets/wall_tall.json",
       "Name": "Hole_Back_C",
+      "Metadata": {
+        "Label": "The Abyss",
+        "LabelColor": "#A020F0"
+      },
       "Position": [
         100,
         0,
@@ -733,6 +741,10 @@
     {
       "AssetPath": "assets/wall_tall.json",
       "Name": "Elem_Back_N",
+      "Metadata": {
+        "Label": "Elemental Sanctum",
+        "LabelColor": "#0088FF"
+      },
       "Position": [
         80,
         0,

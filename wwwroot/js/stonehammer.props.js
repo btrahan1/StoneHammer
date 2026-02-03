@@ -278,7 +278,7 @@
             sh.playTimeline(timeline, group);
         }
 
-        this.log("Spawned Prop: " + name, "lime");
+        // this.log("Spawned Prop: " + name, "lime");
     };
 
     sh.createBackgroundBuildings = function () {

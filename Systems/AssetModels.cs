@@ -123,6 +123,7 @@ namespace StoneHammer.Systems
         public float[] Position { get; set; } = new float[3];
         public float[] Rotation { get; set; } = new float[3];
         public string? ActionId { get; set; } // e.g., "OpenShop"
+        public Dictionary<string, object> Metadata { get; set; } = new(); // v41.0: Data-Driven Labels/Props
     }
 
     public class DungeonEntrancePlacement
