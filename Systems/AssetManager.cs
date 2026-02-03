@@ -97,6 +97,51 @@ namespace StoneHammer.Systems
                 await SpawnAsset(d.EntranceAssetPath, name, false, new { Position = d.Position, Rotation = d.Rotation, isTrigger = true, triggerRadius = 5.0f });
             }
 
+            // v33.0: Procedural Ring Walls
+            if (town.RingWalls != null)
+            {
+                foreach (var ring in town.RingWalls)
+                {
+                    float anglePerSeg = 360f / ring.SegmentCount;
+                    for (int i = 0; i < ring.SegmentCount; i++)
+                    {
+                        float currentAngle = i * anglePerSeg;
+                        
+                        // Check Gates
+                        bool isGate = false;
+                        foreach(var gateAngle in ring.GateAngles)
+                        {
+                            float diff = Math.Abs(currentAngle - gateAngle);
+                            if (diff > 180) diff = 360 - diff; // Handle wrap around
+                            if (diff < ring.GateWidthDegrees / 2f) 
+                            {
+                                isGate = true;
+                                break;
+                            }
+                        }
+
+                        if (isGate) continue;
+
+                        // Calculate Math (Babylon Y is Up, Z is Forward)
+                        // Angle 0 = North = +Z ? Or East = +X?
+                        // Usually Math.Cos is X, Math.Sin is Z
+                        float rad = currentAngle * (MathF.PI / 180f);
+                        float px = MathF.Sin(rad) * ring.Radius;
+                        float pz = MathF.Cos(rad) * ring.Radius;
+                        
+                        // Rotation: Wall should face center or tangent?
+                        // Box is usually long along X? wall_tall is 20 along X.
+                        // So to face tangent, we rotate Y.
+                        // If at angle 0 (0, radius), tangent is X-axis (90 deg).
+                        // Let's try Rotation = currentAngle.
+                        float rotY = currentAngle; 
+
+                        string name = $"RingWall_{ring.Radius}_{i}";
+                        await SpawnAsset(ring.AssetPath, name, false, new { Position = new[]{px, ring.HeightOffset, pz}, Rotation = new[]{0, rotY, 0} });
+                    }
+                }
+            }
+
             // 5. Player & Decor (Hardcoded for now / could be in recipe too)
             await SpawnPlayer(x, z);
             //await SpawnAsset("assets/table.json", "Street Table 1", false, new { Position = new[] { 5, 0, 5 } });

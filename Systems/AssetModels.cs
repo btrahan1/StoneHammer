@@ -90,7 +90,19 @@ namespace StoneHammer.Systems
     {
         public List<StaticBuildingPlacement> StaticBuildings { get; set; } = new();
         public List<DungeonEntrancePlacement> DungeonEntrances { get; set; } = new();
+        public List<CircularWallDefinition> RingWalls { get; set; } = new();
         public DungeonTheme Theme { get; set; } = new();
+    }
+
+    public class CircularWallDefinition
+    {
+        public string AssetPath { get; set; } = "assets/wall_tall.json";
+        public float Radius { get; set; } = 150f;
+        public int SegmentCount { get; set; } = 48;
+        public float SegmentWidth { get; set; } = 20f;
+        public float HeightOffset { get; set; } = 0f;
+        public List<float> GateAngles { get; set; } = new(); // Degrees to skip
+        public float GateWidthDegrees { get; set; } = 10f; // Width of gap
     }
 
     public class StaticBuildingPlacement

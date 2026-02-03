@@ -1,220 +1,1114 @@
 {
-    "StaticBuildings": [
-        {
-            "AssetPath": "assets/tavern.json",
-            "Name": "The Rusty Mug",
-            "Position": [
-                -15,
-                0,
-                15
-            ],
-            "Rotation": [
-                0,
-                45,
-                0
-            ],
-            "ActionId": "OpenTavern"
-        },
-        {
-            "AssetPath": "assets/blacksmith.json",
-            "Name": "Hammer & Sickle Store",
-            "Position": [
-                15,
-                0,
-                15
-            ],
-            "Rotation": [
-                0,
-                -45,
-                0
-            ],
-            "ActionId": "OpenShop"
-        },
-        {
-            "AssetPath": "assets/fountain.json",
-            "Name": "Town Square Fountain",
-            "Position": [
-                0,
-                0,
-                10
-            ],
-            "Rotation": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "AssetPath": "assets/house.json",
-            "Name": "Player House",
-            "Position": [
-                -25,
-                0,
-                -25
-            ],
-            "Rotation": [
-                0,
-                135,
-                0
-            ]
-        },
-        {
-            "AssetPath": "assets/class_trainer_hub.json",
-            "Name": "ClassTrainerHub",
-            "Position": [
-                25,
-                0,
-                -25
-            ],
-            "Rotation": [
-                0,
-                -135,
-                0
-            ]
-        },
-        {
-            "AssetPath": "assets/desert_entrance.json",
-            "Name": "DesertEntrance",
-            "Position": [
-                80,
-                0,
-                -80
-            ],
-            "Rotation": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "AssetPath": "assets/wall_short.json",
-            "Name": "Wall_N_Left",
-            "Position": [
-                -20,
-                0,
-                40
-            ],
-            "Rotation": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "AssetPath": "assets/wall_short.json",
-            "Name": "Wall_N_Right",
-            "Position": [
-                20,
-                0,
-                40
-            ],
-            "Rotation": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "AssetPath": "assets/wall_short.json",
-            "Name": "Wall_S_Left",
-            "Position": [
-                -20,
-                0,
-                -40
-            ],
-            "Rotation": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "AssetPath": "assets/wall_short.json",
-            "Name": "Wall_S_Right",
-            "Position": [
-                20,
-                0,
-                -40
-            ],
-            "Rotation": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "AssetPath": "assets/wall_short.json",
-            "Name": "Wall_E_Top",
-            "Position": [
-                40,
-                0,
-                20
-            ],
-            "Rotation": [
-                0,
-                90,
-                0
-            ]
-        },
-        {
-            "AssetPath": "assets/wall_short.json",
-            "Name": "Wall_E_Bot",
-            "Position": [
-                40,
-                0,
-                -20
-            ],
-            "Rotation": [
-                0,
-                90,
-                0
-            ]
-        },
-        {
-            "AssetPath": "assets/wall_short.json",
-            "Name": "Wall_W_Top",
-            "Position": [
-                -40,
-                0,
-                20
-            ],
-            "Rotation": [
-                0,
-                90,
-                0
-            ]
-        },
-      {
-        "AssetPath": "assets/wall_short.json",
-        "Name": "Wall_W_Bot",
-        "Position": [
-          -40,
-          0,
-          -20
-        ],
-        "Rotation": [
-          0,
-          90,
-          0
-        ]
-      },
-
-      {
-        "AssetPath": "assets/stonehammercastle.json",
-        "Name": "Stone Hammer Castle",
-        "Position": [
-          0,
-          0,
-          150
-        ],
-        "Rotation": [
-          0,
-          0,
-          0
-        ]
-      }
-
-    ],
+  "StaticBuildings": [
+    {
+      "AssetPath": "assets/tavern.json",
+      "Name": "The Rusty Mug",
+      "Position": [
+        -15,
+        0,
+        15
+      ],
+      "Rotation": [
+        0,
+        45,
+        0
+      ],
+      "ActionId": "OpenTavern"
+    },
+    {
+      "AssetPath": "assets/blacksmith.json",
+      "Name": "Hammer & Sickle Store",
+      "Position": [
+        15,
+        0,
+        15
+      ],
+      "Rotation": [
+        0,
+        -45,
+        0
+      ],
+      "ActionId": "OpenShop"
+    },
+    {
+      "AssetPath": "assets/fountain.json",
+      "Name": "Town Square Fountain",
+      "Position": [
+        0,
+        0,
+        10
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/house.json",
+      "Name": "Player House",
+      "Position": [
+        -25,
+        0,
+        -25
+      ],
+      "Rotation": [
+        0,
+        135,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/class_trainer_hub.json",
+      "Name": "ClassTrainerHub",
+      "Position": [
+        25,
+        0,
+        -25
+      ],
+      "Rotation": [
+        0,
+        -135,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/desert_entrance.json",
+      "Name": "DesertEntrance",
+      "Position": [
+        80,
+        0,
+        -80
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_short.json",
+      "Name": "Wall_N_Left",
+      "Position": [
+        -20,
+        0,
+        40
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_short.json",
+      "Name": "Wall_N_Right",
+      "Position": [
+        20,
+        0,
+        40
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_short.json",
+      "Name": "Wall_S_Left",
+      "Position": [
+        -20,
+        0,
+        -40
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_short.json",
+      "Name": "Wall_S_Right",
+      "Position": [
+        20,
+        0,
+        -40
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_short.json",
+      "Name": "Wall_E_Top",
+      "Position": [
+        40,
+        0,
+        20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_short.json",
+      "Name": "Wall_E_Bot",
+      "Position": [
+        40,
+        0,
+        -20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_short.json",
+      "Name": "Wall_W_Top",
+      "Position": [
+        -40,
+        0,
+        20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_short.json",
+      "Name": "Wall_W_Bot",
+      "Position": [
+        -40,
+        0,
+        -20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Crypt_Gate_L",
+      "Position": [
+        -20,
+        0,
+        60
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Crypt_Gate_R",
+      "Position": [
+        20,
+        0,
+        60
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Crypt_Wall_W1",
+      "Position": [
+        -30,
+        0,
+        70
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Crypt_Wall_W2",
+      "Position": [
+        -30,
+        0,
+        90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Crypt_Wall_E1",
+      "Position": [
+        30,
+        0,
+        70
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Crypt_Wall_E2",
+      "Position": [
+        30,
+        0,
+        90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Crypt_Back_L",
+      "Position": [
+        -20,
+        0,
+        100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Crypt_Back_C",
+      "Position": [
+        0,
+        0,
+        100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Crypt_Back_R",
+      "Position": [
+        20,
+        0,
+        100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Sewer_Gate_L",
+      "Position": [
+        -20,
+        0,
+        -60
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Sewer_Gate_R",
+      "Position": [
+        20,
+        0,
+        -60
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Sewer_Wall_W1",
+      "Position": [
+        -30,
+        0,
+        -70
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Sewer_Wall_W2",
+      "Position": [
+        -30,
+        0,
+        -90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Sewer_Wall_E1",
+      "Position": [
+        30,
+        0,
+        -70
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Sewer_Wall_E2",
+      "Position": [
+        30,
+        0,
+        -90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Sewer_Back_L",
+      "Position": [
+        -20,
+        0,
+        -100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Sewer_Back_C",
+      "Position": [
+        0,
+        0,
+        -100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Sewer_Back_R",
+      "Position": [
+        20,
+        0,
+        -100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Goblin_Gate_L",
+      "Position": [
+        -60,
+        0,
+        -20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Goblin_Gate_R",
+      "Position": [
+        -60,
+        0,
+        20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Goblin_Wall_N1",
+      "Position": [
+        -70,
+        0,
+        30
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Goblin_Wall_N2",
+      "Position": [
+        -90,
+        0,
+        30
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Goblin_Wall_S1",
+      "Position": [
+        -70,
+        0,
+        -30
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Goblin_Wall_S2",
+      "Position": [
+        -90,
+        0,
+        -30
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Goblin_Back_L",
+      "Position": [
+        -100,
+        0,
+        -20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Goblin_Back_C",
+      "Position": [
+        -100,
+        0,
+        0
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Goblin_Back_R",
+      "Position": [
+        -100,
+        0,
+        20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Hole_Gate_L",
+      "Position": [
+        60,
+        0,
+        -20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Hole_Gate_R",
+      "Position": [
+        60,
+        0,
+        20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Hole_Wall_N1",
+      "Position": [
+        70,
+        0,
+        30
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Hole_Wall_N2",
+      "Position": [
+        90,
+        0,
+        30
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Hole_Wall_S1",
+      "Position": [
+        70,
+        0,
+        -30
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Hole_Wall_S2",
+      "Position": [
+        90,
+        0,
+        -30
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Hole_Back_L",
+      "Position": [
+        100,
+        0,
+        -20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Hole_Back_C",
+      "Position": [
+        100,
+        0,
+        0
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Hole_Back_R",
+      "Position": [
+        100,
+        0,
+        20
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Elem_Gate_S",
+      "Position": [
+        80,
+        0,
+        60
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Elem_Gate_W",
+      "Position": [
+        60,
+        0,
+        80
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Elem_Back_N",
+      "Position": [
+        80,
+        0,
+        100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Elem_Back_E",
+      "Position": [
+        100,
+        0,
+        80
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Elem_Back_N1",
+      "Position": [
+        70,
+        0,
+        100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Elem_Back_N2",
+      "Position": [
+        90,
+        0,
+        100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Elem_Side_E1",
+      "Position": [
+        100,
+        0,
+        70
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Elem_Side_E2",
+      "Position": [
+        100,
+        0,
+        90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Elem_Gate_S",
+      "Position": [
+        90,
+        0,
+        60
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Elem_Gate_W",
+      "Position": [
+        60,
+        0,
+        90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Desert_Back_S1",
+      "Position": [
+        70,
+        0,
+        -100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Desert_Back_S2",
+      "Position": [
+        90,
+        0,
+        -100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Desert_Side_E1",
+      "Position": [
+        100,
+        0,
+        -90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Desert_Side_E2",
+      "Position": [
+        100,
+        0,
+        -70
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Desert_Gate_N",
+      "Position": [
+        90,
+        0,
+        -60
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "Desert_Gate_W",
+      "Position": [
+        60,
+        0,
+        -90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "NW_Back_N1",
+      "Position": [
+        -70,
+        0,
+        100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "NW_Back_N2",
+      "Position": [
+        -90,
+        0,
+        100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "NW_Side_W1",
+      "Position": [
+        -100,
+        0,
+        70
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "NW_Side_W2",
+      "Position": [
+        -100,
+        0,
+        90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "NW_Gate_S",
+      "Position": [
+        -90,
+        0,
+        60
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "NW_Gate_E",
+      "Position": [
+        -60,
+        0,
+        90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "SW_Back_S1",
+      "Position": [
+        -70,
+        0,
+        -100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "SW_Back_S2",
+      "Position": [
+        -90,
+        0,
+        -100
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "SW_Side_W1",
+      "Position": [
+        -100,
+        0,
+        -90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "SW_Side_W2",
+      "Position": [
+        -100,
+        0,
+        -70
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "SW_Gate_N",
+      "Position": [
+        -90,
+        0,
+        -60
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/wall_tall.json",
+      "Name": "SW_Gate_E",
+      "Position": [
+        -60,
+        0,
+        -90
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "AssetPath": "assets/stonehammercastle.json",
+      "Name": "Stone Hammer Castle",
+      "Position": [
+        0,
+        0,
+        150
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
   "DungeonEntrances": [
     {
       "DungeonId": "crypt",
@@ -285,6 +1179,21 @@
         45,
         0
       ]
+    }
+  ],
+  "RingWalls": [
+    {
+      "AssetPath": "assets/wall_huge.json",
+      "Radius": 180,
+      "SegmentCount": 60,
+      "SegmentWidth": 20,
+      "GateAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "GateWidthDegrees": 15
     }
   ]
 }

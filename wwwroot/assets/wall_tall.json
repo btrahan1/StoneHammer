@@ -1,0 +1,21 @@
+{
+    "Name": "Tall Wall",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "wall_main",
+            "Shape": "Box",
+            "Scale": [
+                20.0,
+                5.0,
+                1.5
+            ],
+            "Position": [
+                0,
+                2.5,
+                0
+            ],
+            "Color": "#333333"
+        }
+    ]
+}

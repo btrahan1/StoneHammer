@@ -1,0 +1,21 @@
+{
+    "Name": "Huge Wall",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "wall_main",
+            "Shape": "Box",
+            "Scale": [
+                20.0,
+                15.0,
+                3.0
+            ],
+            "Position": [
+                0,
+                7.5,
+                0
+            ],
+            "Color": "#222222"
+        }
+    ]
+}
