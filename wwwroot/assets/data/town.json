@@ -4,9 +4,9 @@
             "AssetPath": "assets/tavern.json",
             "Name": "The Rusty Mug",
             "Position": [
-                -20,
+                -15,
                 0,
-                20
+                15
             ],
             "Rotation": [
                 0,
@@ -19,9 +19,9 @@
             "AssetPath": "assets/blacksmith.json",
             "Name": "Hammer & Sickle Store",
             "Position": [
-                20,
+                15,
                 0,
-                20
+                15
             ],
             "Rotation": [
                 0,
@@ -36,7 +36,7 @@
             "Position": [
                 0,
                 0,
-                -20
+                10
             ],
             "Rotation": [
                 0,
@@ -48,13 +48,13 @@
             "AssetPath": "assets/house.json",
             "Name": "Player House",
             "Position": [
-                -30,
+                -25,
                 0,
-                -30
+                -25
             ],
             "Rotation": [
                 0,
-                180,
+                135,
                 0
             ]
         },
@@ -62,25 +62,23 @@
             "AssetPath": "assets/class_trainer_hub.json",
             "Name": "ClassTrainerHub",
             "Position": [
-                10,
+                25,
                 0,
-                -10
+                -25
             ],
             "Rotation": [
                 0,
-                0,
+                -135,
                 0
             ]
-        }
-    ],
-    "DungeonEntrances": [
+        },
         {
-            "DungeonId": "crypt",
-            "EntranceAssetPath": "assets/crypt_entrance.json",
+            "AssetPath": "assets/desert_entrance.json",
+            "Name": "DesertEntrance",
             "Position": [
+                80,
                 0,
-                0,
-                50
+                -80
             ],
             "Rotation": [
                 0,
@@ -89,38 +87,10 @@
             ]
         },
         {
-            "DungeonId": "goblin_cave",
-            "EntranceAssetPath": "assets/mine_entrance.json",
+            "AssetPath": "assets/wall_short.json",
+            "Name": "Wall_N_Left",
             "Position": [
-                -60,
-                0,
-                0
-            ],
-            "Rotation": [
-                0,
-                90,
-                0
-            ]
-        },
-        {
-            "DungeonId": "sewer",
-            "EntranceAssetPath": "assets/sewer_entrance.json",
-            "Position": [
-                40,
-                0,
-                -40
-            ],
-            "Rotation": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "DungeonId": "thehole",
-            "EntranceAssetPath": "assets/thehole_entrance.json",
-            "Position": [
-                40,
+                -20,
                 0,
                 40
             ],
@@ -131,18 +101,190 @@
             ]
         },
         {
-            "DungeonId": "elemental",
-            "EntranceAssetPath": "assets/elemental_entrance.json",
+            "AssetPath": "assets/wall_short.json",
+            "Name": "Wall_N_Right",
             "Position": [
-                -50,
+                20,
                 0,
-                -50
+                40
             ],
             "Rotation": [
                 0,
-                45,
+                0,
                 0
             ]
-        }
-    ]
+        },
+        {
+            "AssetPath": "assets/wall_short.json",
+            "Name": "Wall_S_Left",
+            "Position": [
+                -20,
+                0,
+                -40
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "AssetPath": "assets/wall_short.json",
+            "Name": "Wall_S_Right",
+            "Position": [
+                20,
+                0,
+                -40
+            ],
+            "Rotation": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "AssetPath": "assets/wall_short.json",
+            "Name": "Wall_E_Top",
+            "Position": [
+                40,
+                0,
+                20
+            ],
+            "Rotation": [
+                0,
+                90,
+                0
+            ]
+        },
+        {
+            "AssetPath": "assets/wall_short.json",
+            "Name": "Wall_E_Bot",
+            "Position": [
+                40,
+                0,
+                -20
+            ],
+            "Rotation": [
+                0,
+                90,
+                0
+            ]
+        },
+        {
+            "AssetPath": "assets/wall_short.json",
+            "Name": "Wall_W_Top",
+            "Position": [
+                -40,
+                0,
+                20
+            ],
+            "Rotation": [
+                0,
+                90,
+                0
+            ]
+        },
+      {
+        "AssetPath": "assets/wall_short.json",
+        "Name": "Wall_W_Bot",
+        "Position": [
+          -40,
+          0,
+          -20
+        ],
+        "Rotation": [
+          0,
+          90,
+          0
+        ]
+      },
+
+      {
+        "AssetPath": "assets/stonehammercastle.json",
+        "Name": "Stone Hammer Castle",
+        "Position": [
+          0,
+          0,
+          150
+        ],
+        "Rotation": [
+          0,
+          0,
+          0
+        ]
+      }
+
+    ],
+  "DungeonEntrances": [
+    {
+      "DungeonId": "crypt",
+      "EntranceAssetPath": "assets/crypt_entrance.json",
+      "Position": [
+        0,
+        0,
+        80
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "DungeonId": "goblin_cave",
+      "EntranceAssetPath": "assets/mine_entrance.json",
+      "Position": [
+        -80,
+        0,
+        0
+      ],
+      "Rotation": [
+        0,
+        90,
+        0
+      ]
+    },
+    {
+      "DungeonId": "sewer",
+      "EntranceAssetPath": "assets/sewer_entrance.json",
+      "Position": [
+        0,
+        0,
+        -80
+      ],
+      "Rotation": [
+        0,
+        180,
+        0
+      ]
+    },
+    {
+      "DungeonId": "thehole",
+      "EntranceAssetPath": "assets/thehole_entrance.json",
+      "Position": [
+        80,
+        0,
+        0
+      ],
+      "Rotation": [
+        0,
+        -90,
+        0
+      ]
+    },
+    {
+      "DungeonId": "elemental",
+      "EntranceAssetPath": "assets/elemental_entrance.json",
+      "Position": [
+        80,
+        0,
+        80
+      ],
+      "Rotation": [
+        0,
+        45,
+        0
+      ]
+    }
+  ]
 }

@@ -80,5 +80,19 @@
     }
   ],
   "Timeline": [
+    {
+      "Time": 0.0,
+      "Action": "Rotate",
+      "TargetId": "tavern_sign",
+      "Value": [0, 10, 0],
+      "Duration": 2.0
+    },
+    {
+      "Time": 2.0,
+      "Action": "Rotate",
+      "TargetId": "tavern_sign",
+      "Value": [0, -10, 0],
+      "Duration": 2.0
+    }
   ]
 }

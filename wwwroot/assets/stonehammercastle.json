@@ -1,0 +1,366 @@
+{
+  "Name": "GrandCastleWithMoat",
+  "Type": "Procedural",
+  "Parts": [
+
+
+ {
+      "Id": "castle_foundation",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [0, 0, 0],
+      "Rotation": [0, 0, 0],
+      "Scale": [30, 0.5, 30],
+      "ColorHex": "#333333",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "keep_main_body",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [0, 6, -4],
+      "Rotation": [0, 0, 0],
+      "Scale": [12, 12, 12],
+      "ColorHex": "#777777",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "keep_roof_spire",
+      "ParentId": null,
+      "Shape": "Cone",
+      "Position": [0, 16, -4],
+      "Rotation": [0, 0, 0],
+      "Scale": [10, 8, 10],
+      "ColorHex": "#223355",
+      "Material": "Plastic",
+      "Operation": "Union"
+    },
+    {
+      "Id": "tower_front_left",
+      "ParentId": null,
+      "Shape": "Cylinder",
+      "Position": [12, 7, 8],
+      "Rotation": [0, 0, 0],
+      "Scale": [4, 14, 4],
+      "ColorHex": "#666666",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "spire_front_left",
+      "ParentId": null,
+      "Shape": "Cone",
+      "Position": [12, 17, 8],
+      "Rotation": [0, 0, 0],
+      "Scale": [4.5, 6, 4.5],
+      "ColorHex": "#223355",
+      "Material": "Plastic",
+      "Operation": "Union"
+    },
+    {
+      "Id": "tower_front_right",
+      "ParentId": null,
+      "Shape": "Cylinder",
+      "Position": [-12, 7, 8],
+      "Rotation": [0, 0, 0],
+      "Scale": [4, 14, 4],
+      "ColorHex": "#666666",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "spire_front_right",
+      "ParentId": null,
+      "Shape": "Cone",
+      "Position": [-12, 17, 8],
+      "Rotation": [0, 0, 0],
+      "Scale": [4.5, 6, 4.5],
+      "ColorHex": "#223355",
+      "Material": "Plastic",
+      "Operation": "Union"
+    },
+    {
+      "Id": "outer_wall_left",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [12, 4, -4],
+      "Rotation": [0, 0, 0],
+      "Scale": [1.5, 8, 24],
+      "ColorHex": "#555555",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "outer_wall_right",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [-12, 4, -4],
+      "Rotation": [0, 0, 0],
+      "Scale": [1.5, 8, 24],
+      "ColorHex": "#555555",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "gatehouse_left",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [4, 5, 10],
+      "Rotation": [0, 0, 0],
+      "Scale": [4, 10, 4],
+      "ColorHex": "#666666",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "gatehouse_right",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [-4, 5, 10],
+      "Rotation": [0, 0, 0],
+      "Scale": [4, 10, 4],
+      "ColorHex": "#666666",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "gatehouse_arch",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [0, 8, 10],
+      "Rotation": [0, 0, 0],
+      "Scale": [4.1, 4, 4],
+      "ColorHex": "#666666",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "portcullis",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [0, 3, 11],
+      "Rotation": [0, 0, 0],
+      "Scale": [3.8, 6, 0.2],
+      "ColorHex": "#222222",
+      "Material": "Metal",
+      "Operation": "Union"
+    },
+    {
+      "Id": "flag_pole",
+      "ParentId": null,
+      "Shape": "Cylinder",
+      "Position": [0, 22, -4],
+      "Rotation": [0, 0, 0],
+      "Scale": [0.1, 4, 0.1],
+      "ColorHex": "#AA8844",
+      "Material": "Metal",
+      "Operation": "Union"
+    },
+    {
+      "Id": "flag_fabric",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [-0.6, 23.5, -4],
+      "Rotation": [0, 0, 0],
+      "Scale": [1.2, 0.8, 0.05],
+      "ColorHex": "#CC0000",
+      "Material": "Leather",
+      "Operation": "Union"
+    },
+
+    {
+      "Id": "moat_water",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [0, -0.2, 0],
+      "Rotation": [0, 0, 0],
+      "Scale": [50, 0.4, 50],
+      "ColorHex": "#0E4D92",
+      "Material": "Glass",
+      "Operation": "Union"
+    },
+    {
+      "Id": "island_foundation",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [0, 0, 0],
+      "Rotation": [0, 0, 0],
+      "Scale": [32, 0.6, 32],
+      "ColorHex": "#444444",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "keep_main",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [0, 6, -5],
+      "Rotation": [0, 0, 0],
+      "Scale": [10, 12, 10],
+      "ColorHex": "#777777",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "outer_wall_back",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [0, 4, -15.5],
+      "Rotation": [0, 0, 0],
+      "Scale": [32, 8, 1],
+      "ColorHex": "#666666",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "outer_wall_left",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [15.5, 4, 0],
+      "Rotation": [0, 0, 0],
+      "Scale": [1, 8, 32],
+      "ColorHex": "#666666",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "outer_wall_right",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [-15.5, 4, 0],
+      "Rotation": [0, 0, 0],
+      "Scale": [1, 8, 32],
+      "ColorHex": "#666666",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "outer_wall_front_left",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [10, 4, 15.5],
+      "Rotation": [0, 0, 0],
+      "Scale": [12, 8, 1],
+      "ColorHex": "#666666",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "outer_wall_front_right",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [-10, 4, 15.5],
+      "Rotation": [0, 0, 0],
+      "Scale": [12, 8, 1],
+      "ColorHex": "#666666",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "gate_tower_left",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [3, 5, 15.5],
+      "Rotation": [0, 0, 0],
+      "Scale": [2, 10, 2.5],
+      "ColorHex": "#555555",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "gate_tower_right",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [-3, 5, 15.5],
+      "Rotation": [0, 0, 0],
+      "Scale": [2, 10, 2.5],
+      "ColorHex": "#555555",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "drawbridge",
+      "ParentId": null,
+      "Shape": "Box",
+      "Position": [0, 0.1, 18.5],
+      "Rotation": [0, 0, 0],
+      "Scale": [4, 0.4, 6],
+      "ColorHex": "#4E342E",
+      "Material": "Wood",
+      "Operation": "Union"
+    },
+    {
+      "Id": "tower_corner_fl",
+      "ParentId": null,
+      "Shape": "Cylinder",
+      "Position": [15.5, 6, 15.5],
+      "Rotation": [0, 0, 0],
+      "Scale": [3, 12, 3],
+      "ColorHex": "#555555",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "tower_corner_fr",
+      "ParentId": null,
+      "Shape": "Cylinder",
+      "Position": [-15.5, 6, 15.5],
+      "Rotation": [0, 0, 0],
+      "Scale": [3, 12, 3],
+      "ColorHex": "#555555",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "tower_corner_bl",
+      "ParentId": null,
+      "Shape": "Cylinder",
+      "Position": [15.5, 6, -15.5],
+      "Rotation": [0, 0, 0],
+      "Scale": [3, 12, 3],
+      "ColorHex": "#555555",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "tower_corner_br",
+      "ParentId": null,
+      "Shape": "Cylinder",
+      "Position": [-15.5, 6, -15.5],
+      "Rotation": [0, 0, 0],
+      "Scale": [3, 12, 3],
+      "ColorHex": "#555555",
+      "Material": "Stone",
+      "Operation": "Union"
+    },
+    {
+      "Id": "spire_keep",
+      "ParentId": null,
+      "Shape": "Cone",
+      "Position": [0, 16, -5],
+      "Rotation": [0, 0, 0],
+      "Scale": [8, 8, 8],
+      "ColorHex": "#1A237E",
+      "Material": "Plastic",
+      "Operation": "Union"
+    }
+  ],
+  "Timeline": [
+    {
+      "Time": 0.0,
+      "Action": "Rotate",
+      "TargetId": "drawbridge",
+      "Value": [-85, 0, 0],
+      "Duration": 0.1
+    },
+    {
+      "Time": 1.0,
+      "Action": "Rotate",
+      "TargetId": "drawbridge",
+      "Value": [0, 0, 0],
+      "Duration": 4.0
+    }
+  ]
+}

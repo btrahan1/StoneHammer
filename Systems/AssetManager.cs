@@ -103,13 +103,14 @@ namespace StoneHammer.Systems
             //await SpawnAsset("assets/table.json", "Street Table 2", false, new { Position = new[] { -5, 0, 5 } });
 
             // v14.0: The Desert Teleporter (Legacy Hybrid)
-            await SpawnAsset("assets/desert_entrance.json", "DesertEntrance", false, new { Position = new[] { 50, 0, 50 } });
+            // Removed: Now in town.json
+            // await SpawnAsset("assets/desert_entrance.json", "DesertEntrance", false, new { Position = new[] { 50, 0, 50 } });
         }
 
         private int _currentDepth = 0;
 
         // v23.0: Data-Driven Dungeon Entry
-        public async Task EnterBuilding(string buildingName)
+        public async Task EnterBuilding(string buildingName, float? spawnX = null, float? spawnZ = null)
         {
             await this.ClearAll();
 
@@ -181,7 +182,7 @@ namespace StoneHammer.Systems
                         await _js.InvokeVoidAsync("stoneHammer.setAtmosphere", atmos);
 
                         await SpawnGeneratedAsset(dungeonAsset, dungeonAsset.Name);
-                        await SpawnPlayer(0, 0);
+                        await SpawnPlayer(spawnX ?? 0, spawnZ ?? 0);
                     }
                     else
                     {
@@ -194,13 +195,13 @@ namespace StoneHammer.Systems
                      System.Console.WriteLine($"[AssetManager] StackTrace: {ex.StackTrace}");
                      // Fallback
                      await SpawnAsset("assets/sandbox_interior.json", "Error Fallback");
-                     await SpawnPlayer(0, 0);
+                     await SpawnPlayer(spawnX ?? 0, spawnZ ?? 0);
                 }
                 return;
             }
 
             
-            await SpawnPlayer(0, 0);
+            await SpawnPlayer(spawnX ?? 0, spawnZ ?? 0);
         }
 
         public async Task ClearAll()

@@ -215,8 +215,8 @@ namespace StoneHammer.Systems
 
         // Instanced Combat State
         private string _returnToScene = "";
-        private float _returnX = 0;
-        private float _returnZ = 0;
+        private float? _returnX = null;
+        private float? _returnZ = null;
         private string _engagedGroup = "";
         
         // Bestiary Data
@@ -232,25 +232,35 @@ namespace StoneHammer.Systems
             if (IsFighting) return;
 
             IsFighting = true;
+            _returnX = null;
+            _returnZ = null;
+            _returnToScene = "";
+
             // Phase = CombatPhase.Input; // Defer until spawned
             CombatLog = "Preparing for Battle...";
             
             // 1. Capture State
-            // We assume the JS tracks current building. We need to ask JS or AssetManager?
-            // AssetManager tracks _currentDepth but not full name string publicly easily.
-            // For now, let's assume we are in "Crypt_Depth_" + depth.
-            // A better way: Pass current scene from JS in StartCombat args? 
-            // Or just default to restoring the logical location.
-            // Temporary: Assume Crypt L1 if uncertain.
             // Improve ID Parsing
             string baseName = targetActorName.Replace("voxel_", "");
             
+            // v31.0: Context-Aware Return
             // v21.1: Context-Aware Return
-            // In the future, pass the scene name from JS. For now, infer from mob type.
-            if (metadata.HasValue && metadata.Value.TryGetProperty("returnScene", out var rs))
+            if (metadata.HasValue)
             {
-                 _returnToScene = rs.ToString();
+                 // Console.WriteLine($"[Combat] Metadata: {metadata.Value.GetRawText()}");
+                 if (metadata.Value.TryGetProperty("returnScene", out var rs)) _returnToScene = rs.ToString();
+                 
+                 // Safer Parsing (Handle Int/Float JSON confusion)
+                 if (metadata.Value.TryGetProperty("returnX", out var rx))
+                 {
+                     if (rx.ValueKind == JsonValueKind.Number) _returnX = (float)rx.GetDouble();
+                 }
+                 if (metadata.Value.TryGetProperty("returnZ", out var rz))
+                 {
+                     if (rz.ValueKind == JsonValueKind.Number) _returnZ = (float)rz.GetDouble();
+                 }
             }
+            Console.WriteLine($"[Combat] Return Context: Scene='{_returnToScene}' X={_returnX} Z={_returnZ}");
             // Logic moved to Lookup
             // else if (baseName.Contains("Goblin") || baseName.Contains("Spider")) ...
 
@@ -430,7 +440,7 @@ namespace StoneHammer.Systems
             }
             
             // Return to World (This will regenerate the scene, now respecting the dead list)
-            await _assets.EnterBuilding(_returnToScene);
+            await _assets.EnterBuilding(_returnToScene, _returnX, _returnZ);
             
             OnStateChanged?.Invoke();
         }
@@ -444,7 +454,7 @@ namespace StoneHammer.Systems
             CombatLog = "You fled the battle!";
             LootOpen = false;
             
-            await _assets.EnterBuilding(_returnToScene);
+            await _assets.EnterBuilding(_returnToScene, _returnX, _returnZ);
             OnStateChanged?.Invoke();
         }
 

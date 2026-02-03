@@ -257,6 +257,13 @@
             let actorName = name.replace("voxel_", "").replace("recipe_", "");
             this.log("Engaging " + actorName + "!", "red");
             if (this.dotNetHelper) {
+                // v31.0: Inject current position context
+                if (this.player) {
+                    mesh.metadata = mesh.metadata || {};
+                    mesh.metadata.returnX = this.player.position.x;
+                    mesh.metadata.returnZ = this.player.position.z;
+                    mesh.metadata.returnScene = this.currentBuilding; // explicit override just in case
+                }
                 this.dotNetHelper.invokeMethodAsync('StartCombat', actorName, mesh.metadata);
             }
         }

@@ -1,0 +1,21 @@
+{
+    "Name": "Short Wall",
+    "Type": "Procedural",
+    "Parts": [
+        {
+            "Id": "wall_core",
+            "Shape": "Box",
+            "Scale": [
+                30.0,
+                1.5,
+                1.0
+            ],
+            "Position": [
+                0,
+                0.75,
+                0
+            ],
+            "Color": "#555555"
+        }
+    ]
+}
