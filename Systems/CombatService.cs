@@ -435,6 +435,19 @@ namespace StoneHammer.Systems
             OnStateChanged?.Invoke();
         }
 
+        public async Task Flee()
+        {
+            if (!IsFighting) return;
+            
+            IsFighting = false;
+            IsAutoBattling = false; // Ensure auto stops
+            CombatLog = "You fled the battle!";
+            LootOpen = false;
+            
+            await _assets.EnterBuilding(_returnToScene);
+            OnStateChanged?.Invoke();
+        }
+
         public void QueueAction(CombatEntity actor, string actionType, CombatEntity? target = null)
         {
             if (Phase != CombatPhase.Input) return;
@@ -615,7 +628,7 @@ namespace StoneHammer.Systems
              {
                  if (skill.EffectType == SkillEffectType.Damage)
                  {
-                     int damage = (int)(CalculateDamage(actor) * skill.Multiplier);
+                     int damage = (int)(CalculateDamage(actor, isBasicAttack: false) * skill.Multiplier);
                      
                      await PlayAnim(target, "Hit");
                      await JS.InvokeVoidAsync("stoneHammer.flashTarget", target.ModelId, skill.VfxColor, 300);
@@ -678,7 +691,7 @@ namespace StoneHammer.Systems
              string sfx = actualAnim == "Shoot" ? "attack_range" : "attack_melee";
              await JS.InvokeVoidAsync("stoneHammer.audio.playSound", sfx);
 
-             int damage = (int)(CalculateDamage(actor) * multiplier);
+             int damage = (int)(CalculateDamage(actor, isBasicAttack: true) * multiplier);
              
              await PlayAnim(target, "Hit");
              await JS.InvokeVoidAsync("stoneHammer.flashTarget", target.ModelId, "#FF0000", 200);
@@ -710,7 +723,7 @@ namespace StoneHammer.Systems
              await JS.InvokeVoidAsync("stoneHammer.audio.playSound", "spell_fire"); // Generic magic sound
 
              // Magic Calc
-             int damage = (int)(CalculateDamage(actor) * multiplier);
+             int damage = (int)(CalculateDamage(actor, isBasicAttack: false) * multiplier);
              
              CombatLog = $"{effectEmoji} {target.Name} hit for {damage}!";
              await PlayAnim(target, "Hit");
@@ -777,17 +790,22 @@ namespace StoneHammer.Systems
              await Task.Delay(200);
         }
 
-        private int CalculateDamage(CombatEntity entity)
+        private int CalculateDamage(CombatEntity entity, bool isBasicAttack = false)
         {
             if (!entity.IsHero || entity.SourceCharacter == null) return 5; // Base mob damage
 
             float multiplier = 1.0f;
-            switch(entity.SourceCharacter.Class)
+            
+            // v30.2: Class penalties only apply to Basic Attacks
+            if (isBasicAttack)
             {
-                case CharacterClass.Rogue: multiplier = 0.75f; break;
-                case CharacterClass.Healer: multiplier = 0.50f; break;
-                case CharacterClass.Mage: multiplier = 0.25f; break;
-                // Fighter stays 1.0
+                switch(entity.SourceCharacter.Class)
+                {
+                    case CharacterClass.Rogue: multiplier = 0.75f; break;
+                    case CharacterClass.Healer: multiplier = 0.50f; break;
+                    case CharacterClass.Mage: multiplier = 0.25f; break;
+                    // Fighter stays 1.0
+                }
             }
 
             return Math.Max(1, (int)(entity.SourceCharacter.GetTotalAttack() * multiplier));

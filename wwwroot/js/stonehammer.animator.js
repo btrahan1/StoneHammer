@@ -30,7 +30,7 @@
             return;
         }
 
-        if (animType === "Attack") {
+        if (animType === "Attack" || animType === "Attack_Heavy" || animType === "Attack_Cleave" || animType === "Spin") {
             // ... (Melee Logic Omitted for Brevity - It remains unchanged because it has built-in 'dash to target' logic that we might need to parameterize too, but for now focusing on Ranged)
             // Actually, Melee logic hardcodes "8.0 units forward". It ignores TargetID. 
             // If we want melee to go TO the target, we'd need to update it too. but user only complained about Arrows.

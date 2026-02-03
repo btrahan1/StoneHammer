@@ -60,7 +60,11 @@
                     </div>
 
                     <div class="item-list">
-                        @foreach(var item in _selectedChar?.Inventory ?? new List<CharacterModels.InventoryItem>())
+                        @{
+                            var equippedIds = _selectedChar?.Equipment.Values.Where(i => i != null).Select(i => i.Id).ToHashSet() ?? new HashSet<string>();
+                            var sellableItems = _selectedChar?.Inventory.Where(i => !equippedIds.Contains(i.Id)).ToList() ?? new List<CharacterModels.InventoryItem>();
+                        }
+                        @foreach(var item in sellableItems)
                         {
                             <div class="shop-item">
                                 <div class="icon">@item.Icon</div>

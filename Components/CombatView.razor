@@ -118,7 +118,15 @@
             <!-- Target Selection Message -->
             <div class="sub-text">Select an action or target.</div>
             <div class="btn-grid">
-                <button @onclick="ToggleAuto" class="btn-auto">🤖 Auto</button>
+                @if (CombatService.IsAutoBattling)
+                {
+                    <button @onclick="ToggleAuto" class="btn-auto stop">🛑 Stop Auto</button>
+                }
+                else
+                {
+                    <button @onclick="ToggleAuto" class="btn-auto">🤖 Auto</button>
+                }
+                <button @onclick="FleeBattle" class="btn-flee">🏃 Flee</button>
                 <button @onclick="SkipHero" class="skip-btn">Skip ></button>
             </div>
                     }
@@ -308,6 +316,11 @@
         }
     }
 
+    private async Task FleeBattle()
+    {
+        await CombatService.Flee();
+    }
+
     private async Task TakeAllLoot()
     {
         // Add Gold
@@ -454,6 +467,9 @@
     
     .btn-cancel { background: #822; }
     .btn-auto { background: #228; border-color: #66f; }
+    .btn-auto.stop { background: #822; border-color: #f44; color: #ffcccc; animation: pulse 2s infinite; }
+    .btn-flee { background: #aa6600; border-color: #ffaa00; color: #ffddaa; }
+    .btn-flee:hover { background: #cc8800; border-color: white; }
     .skip-btn { margin-top: 10px; color: #666; cursor: pointer; font-size: 0.8rem; }
     .skip-btn:hover { color: white; }
 
