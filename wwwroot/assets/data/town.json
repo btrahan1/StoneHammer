@@ -1195,5 +1195,95 @@
       ],
       "GateWidthDegrees": 15
     }
+  ],
+  "NPCs": [
+    {
+      "Name": "Guard_North",
+      "AssetPath": "assets/guard_recipe.json",
+      "Position": [
+        0,
+        0,
+        60
+      ],
+      "PatrolPath": [
+        [
+          -10,
+          0,
+          60
+        ],
+        [
+          10,
+          0,
+          60
+        ]
+      ],
+      "PatrolSpeed": 3.0
+    },
+    {
+      "Name": "Guard_South",
+      "AssetPath": "assets/guard_recipe.json",
+      "Position": [
+        0,
+        0,
+        -60
+      ],
+      "PatrolPath": [
+        [
+          -10,
+          0,
+          -60
+        ],
+        [
+          10,
+          0,
+          -60
+        ]
+      ],
+      "PatrolSpeed": 3.0
+    },
+    {
+      "Name": "Guard_East",
+      "AssetPath": "assets/guard_recipe.json",
+      "Position": [
+        60,
+        0,
+        0
+      ],
+      "PatrolPath": [
+        [
+          60,
+          0,
+          -10
+        ],
+        [
+          60,
+          0,
+          10
+        ]
+      ],
+      "PatrolSpeed": 3.0
+    },
+    {
+      "Name": "Guard_West",
+      "AssetPath": "assets/guard_recipe.json",
+      "Position": [
+        -60,
+        0,
+        0
+      ],
+      "PatrolPath": [
+        [
+          -60,
+          0,
+          -10
+        ],
+        [
+          -60,
+          0,
+          10
+        ]
+      ],
+      "PatrolSpeed": 3.0
+    }
   ]
 }

@@ -1,0 +1,21 @@
+{
+    "Name": "Town Guard",
+    "Type": "Humanoid",
+    "ProceduralColors": {
+        "Skin": "#FACFA0",
+        "Shirt": "#AAAAAA",
+        "Pants": "#444444",
+        "Eyes": "#000000"
+    },
+    "Textures": {
+        "Hat": [
+            "assets/textures/helmet_silver.png"
+        ],
+        "Chest": [
+            "assets/textures/armor_silver.png"
+        ]
+    },
+    "Equipment": [
+        "Spear"
+    ]
+}

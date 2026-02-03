@@ -91,7 +91,18 @@ namespace StoneHammer.Systems
         public List<StaticBuildingPlacement> StaticBuildings { get; set; } = new();
         public List<DungeonEntrancePlacement> DungeonEntrances { get; set; } = new();
         public List<CircularWallDefinition> RingWalls { get; set; } = new();
+        public List<TownNPC> NPCs { get; set; } = new();
         public DungeonTheme Theme { get; set; } = new();
+    }
+
+    public class TownNPC
+    {
+        public string Name { get; set; } = "Guard";
+        public string AssetPath { get; set; } = "assets/guard_recipe.json";
+        public float[] Position { get; set; } = new float[3];
+        public float[] Rotation { get; set; } = new float[3];
+        public List<float[]> PatrolPath { get; set; } = new();
+        public float PatrolSpeed { get; set; } = 2.0f;
     }
 
     public class CircularWallDefinition

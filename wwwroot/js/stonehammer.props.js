@@ -7,8 +7,8 @@
 
     sh.generateHumanoidParts = function (colors) {
         const skin = this.getProp(colors, "Skin") || "#F1C27D";
-        const cloth = this.getProp(colors, "Cloth") || "#4E342E";
-        const accent = this.getProp(colors, "Accent") || "#3E2723";
+        const cloth = this.getProp(colors, "Cloth") || this.getProp(colors, "Shirt") || "#4E342E";
+        const accent = this.getProp(colors, "Accent") || this.getProp(colors, "Pants") || "#3E2723";
         const charcoal = "#333333";
         const wood = "#5D4037";
 

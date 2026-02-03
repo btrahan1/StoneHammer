@@ -24,34 +24,34 @@ namespace StoneHammer.Systems
             _bridge = bridge;
         }
 
-        // New SpawnAsset method as per instruction - Forwarding to main logic
+        // New SpawnAsset method - Forwarding to main logic
         public async Task SpawnAsset(string path, string name, object transform)
         {
-             await SpawnAsset(path, name, false, transform);
+             await SpawnAsset(path, name, false, transform, null);
         }
 
         public async Task SpawnPlayer(float x = 0, float z = 0)
         {
-            await SpawnAsset("assets/player.json", "Player", true, new { Position = new float[] { x, 0, z } });
+            await SpawnAsset("assets/player.json", "Player", true, new { Position = new float[] { x, 0, z } }, null);
         }
 
         public async Task SpawnBartender(float x = 0, float z = 0)
         {
-            await SpawnAsset("assets/bartender.json", "Bartender", false, new { Position = new float[] { x, 0, z } });
+            await SpawnAsset("assets/bartender.json", "Bartender", false, new { Position = new float[] { x, 0, z } }, null);
         }
 
-        public async Task SpawnBlackjackTable() => await SpawnAsset("assets/table.json", "Blackjack Table", false);
+        public async Task SpawnBlackjackTable() => await SpawnAsset("assets/table.json", "Blackjack Table", false, null, null);
 
-        public async Task SpawnTavern(float x = 0, float z = 0) => await SpawnAsset("assets/tavern.json", "Tavern", false, new { Position = new[] { x, 0, z } });
-        public async Task SpawnGuild(float x = 0, float z = 0) => await SpawnAsset("assets/guild.json", "Guild", false, new { Position = new[] { x, 0, z }, isTrigger = true, triggerRadius = 5.0f });
-        public async Task SpawnStore(float x = 0, float z = 0) => await SpawnAsset("assets/general_store.json", "General Store", false, new { Position = new[] { x, 0, z } });
-        public async Task SpawnGuildMaster(float x = 0, float z = 0) => await SpawnAsset("assets/guild_master.json", "Guild Master Debug", false, new { Position = new[] { x, 0, z } }); // Debug helper
+        public async Task SpawnTavern(float x = 0, float z = 0) => await SpawnAsset("assets/tavern.json", "Tavern", false, new { Position = new[] { x, 0, z } }, null);
+        public async Task SpawnGuild(float x = 0, float z = 0) => await SpawnAsset("assets/guild.json", "Guild", false, new { Position = new[] { x, 0, z }, isTrigger = true, triggerRadius = 5.0f }, null);
+        public async Task SpawnStore(float x = 0, float z = 0) => await SpawnAsset("assets/general_store.json", "General Store", false, new { Position = new[] { x, 0, z } }, null);
+        public async Task SpawnGuildMaster(float x = 0, float z = 0) => await SpawnAsset("assets/guild_master.json", "Guild Master Debug", false, new { Position = new[] { x, 0, z } }, null); // Debug helper
 
         public async Task SpawnProp(string assetFile, string name, float x, float z)
         {
             // Auto-prepend assets/ if not present
             string path = assetFile.StartsWith("assets/") ? assetFile : $"assets/{assetFile}";
-            await SpawnAsset(path, name, false, new { Position = new[] { x, 0, z } });
+            await SpawnAsset(path, name, false, new { Position = new[] { x, 0, z } }, null);
         }
 
         public async Task ExitBuilding(float x, float z)
@@ -75,13 +75,13 @@ namespace StoneHammer.Systems
             await _js.InvokeVoidAsync("stoneHammer.setAtmosphere", atmos);
 
             // 2. Town Floor
-            await SpawnAsset("assets/town_floor.json", "TownFloor");
+            await SpawnAsset("assets/town_floor.json", "TownFloor", false, null, null);
 
             // 3. Static Buildings
             foreach (var b in town.StaticBuildings)
             {
                 // Note: Rotation order in JSON [X, Y, Z]
-                await SpawnAsset(b.AssetPath, b.Name, false, new { Position = b.Position, Rotation = b.Rotation });
+                await SpawnAsset(b.AssetPath, b.Name, false, new { Position = b.Position, Rotation = b.Rotation }, null);
                 // If ActionId exists, we might need to handle triggers? 
                 // Currently only triggers have specific handling.
                 // TODO: Store ActionId in metadata or similar if needed for interaction.
@@ -94,7 +94,7 @@ namespace StoneHammer.Systems
                 // Name format: "DungeonEntrance_{DungeonId}"
                 // AssetPath should point to visual glTF/JSON
                 string name = $"DungeonEntrance_{d.DungeonId}";
-                await SpawnAsset(d.EntranceAssetPath, name, false, new { Position = d.Position, Rotation = d.Rotation, isTrigger = true, triggerRadius = 5.0f });
+                await SpawnAsset(d.EntranceAssetPath, name, false, new { Position = d.Position, Rotation = d.Rotation, isTrigger = true, triggerRadius = 5.0f }, null);
             }
 
             // v33.0: Procedural Ring Walls
@@ -137,7 +137,26 @@ namespace StoneHammer.Systems
                         float rotY = currentAngle; 
 
                         string name = $"RingWall_{ring.Radius}_{i}";
-                        await SpawnAsset(ring.AssetPath, name, false, new { Position = new[]{px, ring.HeightOffset, pz}, Rotation = new[]{0, rotY, 0} });
+                        await SpawnAsset(ring.AssetPath, name, false, new { Position = new[]{px, ring.HeightOffset, pz}, Rotation = new[]{0, rotY, 0} }, null);
+                    }
+                }
+            }
+
+
+            
+            // v35.0: Town NPCs (Guards)
+            if (town.NPCs != null)
+            {
+                await _js.InvokeVoidAsync("stoneHammer.initAI");
+                foreach (var npc in town.NPCs)
+                {
+                    // Spawn
+                    await SpawnAsset(npc.AssetPath, npc.Name, false, new { Position = npc.Position, Rotation = npc.Rotation }, null);
+                    
+                    // Register Patrol
+                    if (npc.PatrolPath != null && npc.PatrolPath.Count > 0)
+                    {
+                        await _js.InvokeVoidAsync("stoneHammer.registerPatrol", npc.Name, npc.PatrolPath, npc.PatrolSpeed);
                     }
                 }
             }
@@ -302,7 +321,8 @@ namespace StoneHammer.Systems
                 }
 
                 // Robust check for Voxel type
-                bool isVoxel = json.Contains("\"Voxel\"", System.StringComparison.OrdinalIgnoreCase);
+                bool isVoxel = json.Contains("\"Voxel\"", System.StringComparison.OrdinalIgnoreCase) || 
+                               json.Contains("\"Humanoid\"", System.StringComparison.OrdinalIgnoreCase);
 
                 if (isVoxel)
                 {
@@ -312,7 +332,7 @@ namespace StoneHammer.Systems
                         await _bridge.SpawnVoxel(asset, name, isPlayer, transform, metadata);
                         foreach (var child in asset.Children)
                         {
-                            await SpawnAsset(child.Path, child.Name, false, child.Transform);
+                            await SpawnAsset(child.Path, child.Name, false, child.Transform, null);
                         }
                     }
                 }
