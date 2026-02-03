@@ -52,13 +52,27 @@
             const target = p.path[p.index];
             const currentPos = mesh.position;
 
+            // Handle Wait Timer
+            if (p.wait > 0) {
+                p.wait -= dt;
+
+                // Force Idle Pose
+                mesh.getChildren().forEach(node => {
+                    const name = node.name.toLowerCase();
+                    if (name.includes("arm") || name.includes("leg")) {
+                        node.rotation.x = BABYLON.Scalar.Lerp(node.rotation.x, 0, 0.1);
+                    }
+                });
+                return; // Don't move
+            }
+
             // Ignore Y for distance check (2D navigation)
             const dist = Math.sqrt(Math.pow(target.x - currentPos.x, 2) + Math.pow(target.z - currentPos.z, 2));
 
-            if (dist < 0.5) {
-                // Arrived
-                p.index = (p.index + 1) % p.path.length;
-                // Optional: Wait time?
+            if (dist < 1.0) { // Slight increase in tolerance
+                // Arrived at current waypoint
+                p.wait = 5.0; // Wait 5 seconds
+                p.index = (p.index + 1) % p.path.length; // Next waypoint
             } else {
                 // Move
                 const dir = target.subtract(currentPos);

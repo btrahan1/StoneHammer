@@ -1,0 +1,21 @@
+{
+    "Name": "Elite Captain",
+    "Type": "Humanoid",
+    "ProceduralColors": {
+        "Skin": "#FFDAB9",
+        "Shirt": "#DAA520",
+        "Pants": "#800000",
+        "Eyes": "#000000"
+    },
+    "Textures": {
+        "Hat": [
+            "assets/textures/helmet_gold.png"
+        ],
+        "Chest": [
+            "assets/textures/armor_gold.png"
+        ]
+    },
+    "Equipment": [
+        "Spear"
+    ]
+}

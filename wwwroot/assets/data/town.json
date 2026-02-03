@@ -18,12 +18,10 @@
     {
       "AssetPath": "assets/blacksmith.json",
       "Name": "Hammer & Sickle Store",
-
       "Metadata": {
         "Label": "Blacksmith",
         "LabelColor": "#AAAAAA"
       },
-
       "Position": [
         15,
         0,
@@ -1296,6 +1294,67 @@
         ]
       ],
       "PatrolSpeed": 3.0
+    },
+    {
+      "Name": "Captain Vimes",
+      "AssetPath": "assets/captain_recipe.json",
+      "Position": [
+        0,
+        0,
+        0
+      ],
+      "Rotation": [
+        0,
+        0,
+        0
+      ],
+      "PatrolSpeed": 3.0,
+      "PatrolPath": [
+        [
+          -15,
+          0,
+          15
+        ],
+        [
+          15,
+          0,
+          15
+        ],
+        [
+          25,
+          0,
+          -25
+        ],
+        [
+          60,
+          0,
+          0
+        ],
+        [
+          60,
+          0,
+          60
+        ],
+        [
+          0,
+          0,
+          60
+        ],
+        [
+          -60,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          -60
+        ]
+      ],
+      "Metadata": {
+        "Label": "Captain Vimes",
+        "LabelColor": "#FFD700"
+      }
     }
   ]
 }
